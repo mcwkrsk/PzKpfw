@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="fixture" info="synthetic">
+ <user name="test" info=""/>
+ <models><primaryModel><params LastID="0"/><objects LastID="0"/><spd><actions lastID="2"><pd id="1" name="root" type="2" formalization="0" status="1" level="1" number="1"/><pd id="2" name="leaf" type="0" formalization="0" status="0" level="2" number="1"><alts text="demo"/></pd></actions><links><link type="2" afe1="1" afe2="2" afe3="0"/><link type="3" afe1="1" afe2="2" afe3="0"/></links></spd></primaryModel><ConceptModel><cs><elemets/></cs><spz><elemets/></spz></ConceptModel></models><ModuleParams><Module name="PrimaryModelAuto"><param decStr=""/></Module></ModuleParams>
+</project>

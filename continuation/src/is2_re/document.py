@@ -1,0 +1,560 @@
+"""Editable IS-2 XML document model and conservative writer.
+
+The implementation preserves the original XML tree (including unknown elements
+and attributes) and only mutates the explicitly supported primary-model fields.
+It does not claim byte-identical output to Qt's QDomDocument serializer.
+"""
+from __future__ import annotations
+
+from copy import deepcopy
+from dataclasses import dataclass
+import os
+from pathlib import Path
+import tempfile
+from typing import Iterable, Mapping
+import xml.etree.ElementTree as ET
+
+from .model import ProjectFormatError
+
+MAX_PROJECT_BYTES = 128 * 1024 * 1024
+ACTION_FIELDS = {"name", "type", "formalization", "mark", "symbol", "status", "level", "number"}
+
+
+def _xml_parser() -> ET.XMLParser:
+    return ET.XMLParser(target=ET.TreeBuilder(insert_comments=True, insert_pis=True))
+
+
+def _int_attr(node: ET.Element, key: str, *, default: int | None = None) -> int:
+    raw = node.get(key)
+    if raw is None:
+        if default is None:
+            raise ProjectFormatError(f"<{node.tag}> is missing required integer attribute {key!r}")
+        return default
+    try:
+        return int(raw, 10)
+    except ValueError as exc:
+        raise ProjectFormatError(f"<{node.tag}> has non-integer {key}={raw!r}") from exc
+
+
+def _clean_formatting_text(value: str | None) -> str | None:
+    if value is None or not value.strip():
+        return None
+    return value
+
+
+def _semantic_node(node: ET.Element):
+    """Semantic tree representation: ignores formatting-only whitespace/attr order."""
+    return (
+        node.tag,
+        tuple(sorted(node.attrib.items())),
+        _clean_formatting_text(node.text),
+        tuple(_semantic_node(child) for child in list(node)),
+        _clean_formatting_text(node.tail),
+    )
+
+
+@dataclass(frozen=True)
+class ActionRecord:
+    id: str
+    name: str
+    type: str | None
+    formalization: str | None
+    level: str | None
+    number: str | None
+
+
+@dataclass(frozen=True)
+class LinkRecord:
+    type: str
+    parent_id: str
+    child_id: str
+    next_id: str
+
+
+class ProjectDocument:
+    """Editable XML-backed project with conservative, schema-aware operations."""
+
+    def __init__(self, root: ET.Element, *, source_path: str | None = None):
+        self.root = root
+        self.source_path = source_path
+        self._validate_envelope()
+
+    @classmethod
+    def load(cls, path: str | Path) -> "ProjectDocument":
+        path = Path(path)
+        size = path.stat().st_size
+        if size > MAX_PROJECT_BYTES:
+            raise ProjectFormatError(f"project exceeds safety limit ({size} bytes > {MAX_PROJECT_BYTES})")
+        raw = path.read_bytes()
+        try:
+            root = ET.fromstring(raw, parser=_xml_parser())
+        except ET.ParseError as exc:
+            raise ProjectFormatError(f"XML parse error in {path}: {exc}") from exc
+        return cls(root, source_path=str(path))
+
+    @classmethod
+    def new_empty(
+        cls, name: str, *, info: str = "", user_name: str = "", user_info: str = ""
+    ) -> "ProjectDocument":
+        """Create an empty project from the recovered common XML envelope.
+
+        The envelope is grounded in the supplied native samples. Plugin-specific
+        defaults inside ModuleParams are intentionally not invented.
+        """
+        if not name.strip():
+            raise ValueError("project name must not be empty")
+        root = ET.Element("project", {"name": name, "info": info})
+        ET.SubElement(root, "user", {"name": user_name, "info": user_info})
+        models = ET.SubElement(root, "models")
+        primary = ET.SubElement(models, "primaryModel")
+        ET.SubElement(primary, "params", {"LastID": "0"})
+        ET.SubElement(primary, "objects", {"LastID": "0"})
+        spd = ET.SubElement(primary, "spd")
+        ET.SubElement(spd, "actions", {"lastID": "0"})
+        ET.SubElement(spd, "links")
+        ET.SubElement(primary, "matrix")
+        concept = ET.SubElement(models, "ConceptModel")
+        cs = ET.SubElement(concept, "cs", {"last_elem_id": "0", "last_link_id": "0"})
+        ET.SubElement(cs, "elemets")
+        ET.SubElement(cs, "links")
+        spz = ET.SubElement(concept, "spz", {"last_id": "0"})
+        ET.SubElement(spz, "elemets")
+        ET.SubElement(spz, "links")
+        ET.SubElement(concept, "content")
+        ET.SubElement(root, "ModuleParams")
+        return cls(root)
+
+    @classmethod
+    def from_bytes(cls, raw: bytes) -> "ProjectDocument":
+        if len(raw) > MAX_PROJECT_BYTES:
+            raise ProjectFormatError("project exceeds safety limit")
+        try:
+            root = ET.fromstring(raw, parser=_xml_parser())
+        except ET.ParseError as exc:
+            raise ProjectFormatError(f"XML parse error: {exc}") from exc
+        return cls(root)
+
+    def clone(self) -> "ProjectDocument":
+        return ProjectDocument(deepcopy(self.root), source_path=self.source_path)
+
+    def _validate_envelope(self) -> None:
+        if self.root.tag != "project":
+            raise ProjectFormatError(f"expected root <project>, got <{self.root.tag}>")
+        self._required("models/primaryModel/spd/actions")
+        self._required("models/primaryModel/spd/links")
+        self._required("models/primaryModel/params")
+        self._required("models/primaryModel/objects")
+
+    def _required(self, path: str) -> ET.Element:
+        node = self.root.find(path)
+        if node is None:
+            raise ProjectFormatError(f"missing required path /project/{path}")
+        return node
+
+    @property
+    def actions_node(self) -> ET.Element:
+        return self._required("models/primaryModel/spd/actions")
+
+    @property
+    def links_node(self) -> ET.Element:
+        return self._required("models/primaryModel/spd/links")
+
+    @property
+    def params_node(self) -> ET.Element:
+        return self._required("models/primaryModel/params")
+
+    @property
+    def objects_node(self) -> ET.Element:
+        return self._required("models/primaryModel/objects")
+
+    @property
+    def concept_structure(self):
+        """Typed editor for the observed ConceptModel/cs branch."""
+        from .concept import ConceptStructureDocument
+        return ConceptStructureDocument(self.root)
+
+    @property
+    def user_node(self) -> ET.Element | None:
+        return self.root.find("user")
+
+    def update_project_metadata(self, *, name: str | None = None, info: str | None = None) -> None:
+        if name is not None and not name.strip():
+            raise ValueError("project name must not be empty")
+        for key, value in (("name", name), ("info", info)):
+            if value is not None:
+                self.root.set(key, value)
+
+    def update_user_metadata(self, *, name: str | None = None, info: str | None = None) -> None:
+        user = self.user_node
+        if user is None:
+            user = ET.Element("user")
+            models = self.root.find("models")
+            insert_at = list(self.root).index(models) if models is not None else len(self.root)
+            self.root.insert(insert_at, user)
+        for key, value in (("name", name), ("info", info)):
+            if value is not None:
+                user.set(key, value)
+
+    @property
+    def actions(self) -> list[ET.Element]:
+        return self.actions_node.findall("pd")
+
+    @property
+    def links(self) -> list[ET.Element]:
+        return self.links_node.findall("link")
+
+    def action(self, action_id: str | int) -> ET.Element:
+        wanted = str(action_id)
+        for node in self.actions:
+            if node.get("id") == wanted:
+                return node
+        raise KeyError(f"action id {wanted!r} does not exist")
+
+    def action_records(self) -> list[ActionRecord]:
+        return [ActionRecord(
+            id=node.get("id", ""), name=node.get("name", ""),
+            type=node.get("type"), formalization=node.get("formalization"),
+            level=node.get("level"), number=node.get("number"),
+        ) for node in self.actions]
+
+    def _links_of_type(self, link_type: str) -> list[ET.Element]:
+        return [node for node in self.links if node.get("type") == link_type]
+
+    def composition_children(self, parent_id: str | int) -> list[str]:
+        parent = str(parent_id)
+        return [node.get("afe2", "") for node in self._links_of_type("2") if node.get("afe1") == parent]
+
+    def sibling_order(self, parent_id: str | int) -> list[str]:
+        """Return child order by following type=3 afe3 links, never sorting IDs."""
+        parent = str(parent_id)
+        records = [n for n in self._links_of_type("3") if n.get("afe1") == parent]
+        if not records:
+            if self.composition_children(parent):
+                raise ProjectFormatError(f"parent {parent}: composition children exist without arrangement links")
+            return []
+        by_current: dict[str, ET.Element] = {}
+        incoming: set[str] = set()
+        for rec in records:
+            current = rec.get("afe2", "")
+            nxt = rec.get("afe3", "0")
+            if not current or current == "0":
+                raise ProjectFormatError(f"parent {parent}: arrangement record has invalid afe2")
+            if current in by_current:
+                raise ProjectFormatError(f"parent {parent}: duplicate arrangement record for child {current}")
+            by_current[current] = rec
+            if nxt not in ("", "0"):
+                incoming.add(nxt)
+        heads = [child for child in by_current if child not in incoming]
+        if not heads:
+            raise ProjectFormatError(f"parent {parent}: arrangement cycle detected (no chain head)")
+        if len(heads) != 1:
+            raise ProjectFormatError(f"parent {parent}: expected one arrangement head, found {len(heads)}")
+        ordered: list[str] = []
+        seen: set[str] = set()
+        current = heads[0]
+        while current not in ("", "0"):
+            if current in seen:
+                raise ProjectFormatError(f"parent {parent}: arrangement cycle at child {current}")
+            rec = by_current.get(current)
+            if rec is None:
+                raise ProjectFormatError(f"parent {parent}: arrangement points to missing child {current}")
+            seen.add(current)
+            ordered.append(current)
+            current = rec.get("afe3", "0")
+        if seen != set(by_current):
+            missing = sorted(set(by_current) - seen)
+            raise ProjectFormatError(f"parent {parent}: unreachable arrangement children {missing}")
+        comp = self.composition_children(parent)
+        if len(comp) != len(set(comp)):
+            raise ProjectFormatError(f"parent {parent}: duplicate composition child")
+        if set(comp) != set(ordered):
+            raise ProjectFormatError(f"parent {parent}: composition/arrangement child sets differ")
+        return ordered
+
+    def validate(self, *, deep: bool = True) -> list[str]:
+        issues: list[str] = []
+        actions = self.actions
+        ids = [n.get("id", "") for n in actions]
+        if any(not value for value in ids):
+            issues.append("one or more <pd> nodes have no id")
+        if len(ids) != len(set(ids)):
+            issues.append("duplicate action IDs")
+        idset = set(ids)
+        parent_of: dict[str, str] = {}
+        for idx, link in enumerate(self.links):
+            kind = link.get("type")
+            e1, e2, e3 = link.get("afe1"), link.get("afe2"), link.get("afe3", "0")
+            if kind not in {"2", "3"}:
+                issues.append(f"link[{idx}] has unsupported type {kind!r}; preserved but not interpreted")
+                continue
+            for key, endpoint in (("afe1", e1), ("afe2", e2), ("afe3", e3 if kind == "3" else "0")):
+                if endpoint not in (None, "", "0") and endpoint not in idset:
+                    issues.append(f"link[{idx}] {key} references missing action id {endpoint}")
+            if kind == "2" and e3 not in (None, "", "0"):
+                issues.append(f"link[{idx}] type=2 must use afe3=0")
+            if kind in {"2", "3"} and (e1 in (None, "", "0") or e2 in (None, "", "0")):
+                issues.append(f"link[{idx}] type={kind} requires nonzero afe1 and afe2")
+            if kind == "2" and e1 and e2 and e2 != "0":
+                previous = parent_of.setdefault(e2, e1)
+                if previous != e1:
+                    issues.append(f"action {e2} has multiple composition parents ({previous}, {e1})")
+        if deep:
+            parents = {n.get("afe1", "") for n in self._links_of_type("2") + self._links_of_type("3")}
+            for parent in sorted(parents):
+                try:
+                    self.sibling_order(parent)
+                except ProjectFormatError as exc:
+                    issues.append(str(exc))
+            # Composition cycles are invalid. Check the parent map without assuming ID order.
+            for start in parent_of:
+                seen: set[str] = set()
+                cur = start
+                while cur in parent_of:
+                    if cur in seen:
+                        issues.append(f"composition cycle involving action {cur}")
+                        break
+                    seen.add(cur)
+                    cur = parent_of[cur]
+        # Keep the high-water counters, but ensure they are not lower than any current numeric ID.
+        for container, key, nodes in (
+            (self.actions_node, "lastID", actions),
+            (self.params_node, "LastID", self.params_node.findall("param")),
+            (self.objects_node, "LastID", list(self.objects_node)),
+        ):
+            try:
+                counter = _int_attr(container, key)
+                numeric = [int(n.get("id", "")) for n in nodes if (n.get("id", "").isdigit())]
+                if numeric and counter < max(numeric):
+                    issues.append(f"<{container.tag}> {key}={counter} is below max current ID {max(numeric)}")
+            except ProjectFormatError as exc:
+                issues.append(str(exc))
+        # ConceptModel/cs is independently validated using its recovered
+        # SubjectCategory / SCBinaryLink contracts. Other ConceptModel branches
+        # (spz/content) remain preserved and are not rewritten here.
+        try:
+            issues.extend(self.concept_structure.validate())
+        except ProjectFormatError as exc:
+            issues.append(str(exc))
+        return issues
+
+    def next_id(self, kind: str) -> int:
+        mapping = {
+            "action": (self.actions_node, "lastID"),
+            "parameter": (self.params_node, "LastID"),
+            "object": (self.objects_node, "LastID"),
+        }
+        try:
+            node, key = mapping[kind]
+        except KeyError as exc:
+            raise ValueError(f"unknown ID domain: {kind}") from exc
+        current = _int_attr(node, key)
+        records = {
+            "action": self.actions,
+            "parameter": self.params_node.findall("param"),
+            "object": list(self.objects_node),
+        }[kind]
+        numeric_ids = [int(n.get("id", "")) for n in records if n.get("id", "").isdigit()]
+        if numeric_ids and current < max(numeric_ids):
+            raise ProjectFormatError(
+                f"<{node.tag}> {key}={current} is below max current ID {max(numeric_ids)}; refusing ID reuse"
+            )
+        next_value = current + 1
+        node.set(key, str(next_value))
+        return next_value
+
+    def add_action(
+        self, name: str, *, action_type: int | str, formalization: int | str = 0,
+        status: int | str = 0, mark: str = "", symbol: str | None = None,
+        level: int | str | None = None, number: int | str | None = None,
+        parent_id: str | int | None = None, alternatives: Iterable[str] = (),
+    ) -> str:
+        if parent_id is not None:
+            self.action(parent_id)
+            # Fail before consuming an ID if the existing order chain is malformed.
+            self.sibling_order(parent_id)
+        action_id = str(self.next_id("action"))
+        attrs = {
+            "id": action_id, "name": str(name), "type": str(action_type),
+            "formalization": str(formalization), "mark": str(mark),
+            "status": str(status),
+        }
+        if symbol is not None:
+            attrs["symbol"] = str(symbol)
+        if level is not None:
+            attrs["level"] = str(level)
+        if number is not None:
+            attrs["number"] = str(number)
+        node = ET.SubElement(self.actions_node, "pd", attrs)
+        for text in alternatives:
+            ET.SubElement(node, "alts", {"text": str(text)})
+        if parent_id is not None:
+            self.append_child(parent_id, action_id)
+        return action_id
+
+    def append_child(self, parent_id: str | int, child_id: str | int) -> None:
+        parent, child = str(parent_id), str(child_id)
+        self.action(parent)
+        self.action(child)
+        if parent == child:
+            raise ValueError("an action cannot be its own parent")
+        if child in self.composition_children(parent):
+            raise ValueError(f"action {child} is already a child of {parent}")
+        # A child may have only one composition parent.
+        parents = [n.get("afe1") for n in self._links_of_type("2") if n.get("afe2") == child]
+        if parents:
+            raise ValueError(f"action {child} already has composition parent {parents[0]}")
+        # Prevent introducing a cycle.
+        cur = parent
+        parent_map = {n.get("afe2"): n.get("afe1") for n in self._links_of_type("2")}
+        while cur in parent_map:
+            cur = parent_map[cur]
+            if cur == child:
+                raise ValueError("adding this child would create a composition cycle")
+        chain = self.sibling_order(parent)
+        ET.SubElement(self.links_node, "link", {"type": "2", "afe1": parent, "afe2": child, "afe3": "0"})
+        if chain:
+            tail_id = chain[-1]
+            tail = next(n for n in self._links_of_type("3") if n.get("afe1") == parent and n.get("afe2") == tail_id)
+            tail.set("afe3", child)
+        ET.SubElement(self.links_node, "link", {"type": "3", "afe1": parent, "afe2": child, "afe3": "0"})
+
+    def update_action(self, action_id: str | int, **changes: str | int | None) -> None:
+        node = self.action(action_id)
+        unknown = set(changes) - ACTION_FIELDS
+        if unknown:
+            raise ValueError(f"unsupported action fields: {sorted(unknown)}")
+        for key, value in changes.items():
+            if value is None:
+                node.attrib.pop(key, None)
+            else:
+                node.set(key, str(value))
+
+    def delete_action(self, action_id: str | int, *, cascade: bool = False) -> None:
+        target = str(action_id)
+        self.action(target)
+        content_node = self.root.find("models/ConceptModel/content")
+        if content_node is not None and len(content_node):
+            raise ValueError(
+                "ConceptModel/content is non-empty; action deletion is blocked until cross-model content-link endpoints are resolved"
+            )
+        children = self.composition_children(target)
+        if children and not cascade:
+            raise ValueError(f"action {target} has children; pass cascade=True to delete its subtree")
+        if cascade:
+            for child in list(children):
+                self.delete_action(child, cascade=True)
+        # Remove target from its parent's sibling chain before deleting incoming links.
+        incoming_parent = next((n.get("afe1") for n in self._links_of_type("2") if n.get("afe2") == target), None)
+        if incoming_parent is not None:
+            order = self.sibling_order(incoming_parent)
+            index = order.index(target)
+            successor = order[index + 1] if index + 1 < len(order) else "0"
+            if index > 0:
+                predecessor = order[index - 1]
+                pred_link = next(n for n in self._links_of_type("3") if n.get("afe1") == incoming_parent and n.get("afe2") == predecessor)
+                pred_link.set("afe3", successor)
+        # Remove all composition/arrangement links touching the target as parent/current/next.
+        for link in list(self.links):
+            if target in {link.get("afe1"), link.get("afe2"), link.get("afe3")}:
+                self.links_node.remove(link)
+        action_node = self.action(target)
+        self.actions_node.remove(action_node)
+
+    def add_parameter(self, attributes: Mapping[str, str | int]) -> str:
+        attrs = {str(k): str(v) for k, v in attributes.items()}
+        if "id" in attrs:
+            raise ValueError("parameter id is assigned from params/@LastID")
+        param_id = str(self.next_id("parameter"))
+        attrs["id"] = param_id
+        ET.SubElement(self.params_node, "param", attrs)
+        return param_id
+
+    def update_parameter(self, parameter_id: str | int, **changes: str | int | None) -> None:
+        self._update_record(self.params_node.findall("param"), str(parameter_id), changes)
+
+    def delete_parameter(self, parameter_id: str | int) -> None:
+        content_node = self.root.find("models/ConceptModel/content")
+        if content_node is not None and len(content_node):
+            raise ValueError(
+                "ConceptModel/content is non-empty; parameter deletion is blocked until cross-model content-link endpoints are resolved"
+            )
+        self._delete_record(self.params_node, "param", str(parameter_id))
+
+    def add_object(self, name: str, *, attributes: Mapping[str, str | int] | None = None) -> str:
+        attrs = {str(k): str(v) for k, v in (attributes or {}).items()}
+        if "id" in attrs or "name" in attrs:
+            raise ValueError("object id/name are assigned by add_object")
+        object_id = str(self.next_id("object"))
+        attrs = {"name": str(name), "id": object_id, **attrs}
+        ET.SubElement(self.objects_node, "object", attrs)
+        return object_id
+
+    def update_object(self, object_id: str | int, **changes: str | int | None) -> None:
+        self._update_record(list(self.objects_node), str(object_id), changes)
+
+    def delete_object(self, object_id: str | int, *, allow_unknown_references: bool = False) -> None:
+        if self.params_node.findall("param") and not allow_unknown_references:
+            raise ValueError(
+                "parameters exist and the serialized Parameter->Object reference field is not fully specified; "
+                "pass allow_unknown_references=True only after checking the project"
+            )
+        self._delete_record(self.objects_node, None, str(object_id))
+
+    @staticmethod
+    def _update_record(nodes: Iterable[ET.Element], ident: str, changes: Mapping[str, str | int | None]) -> None:
+        node = next((n for n in nodes if n.get("id") == ident), None)
+        if node is None:
+            raise KeyError(f"record id {ident!r} does not exist")
+        for key, value in changes.items():
+            if key == "id":
+                raise ValueError("record IDs are immutable; delete and add explicitly")
+            if value is None:
+                node.attrib.pop(key, None)
+            else:
+                node.set(key, str(value))
+
+    @staticmethod
+    def _delete_record(parent: ET.Element, tag: str | None, ident: str) -> None:
+        nodes = list(parent) if tag is None else parent.findall(tag)
+        node = next((n for n in nodes if n.get("id") == ident), None)
+        if node is None:
+            raise KeyError(f"record id {ident!r} does not exist")
+        parent.remove(node)
+
+    def semantic_snapshot(self):
+        return _semantic_node(self.root)
+
+    def save(self, path: str | Path, *, pretty: bool = True, atomic: bool = True) -> Path:
+        path = Path(path)
+        path.parent.mkdir(parents=True, exist_ok=True)
+        root = deepcopy(self.root)
+        if pretty:
+            ET.indent(root, space=" ")  # QDomDocument::toString(1) uses one-space indentation.
+        payload = ET.tostring(root, encoding="utf-8", xml_declaration=True, short_empty_elements=True)
+        if not atomic:
+            path.write_bytes(payload)
+            self.source_path = str(path)
+            return path
+        fd, temp_name = tempfile.mkstemp(prefix=f".{path.name}.", suffix=".tmp", dir=str(path.parent))
+        try:
+            with os.fdopen(fd, "wb") as stream:
+                stream.write(payload)
+                stream.flush()
+                os.fsync(stream.fileno())
+            os.replace(temp_name, path)
+        except Exception:
+            try:
+                os.unlink(temp_name)
+            except FileNotFoundError:
+                pass
+            raise
+        self.source_path = str(path)
+        return path
+
+    def roundtrip_to(self, path: str | Path) -> list[str]:
+        before = self.semantic_snapshot()
+        self.save(path)
+        after = ProjectDocument.load(path).semantic_snapshot()
+        if before != after:
+            raise ProjectFormatError("semantic tree changed during writer round-trip")
+        return self.validate(deep=True)
