@@ -1,0 +1,530 @@
+{
+  "stage": "1.17-concept-structure",
+  "binary": {
+    "name": "MAIWmodels.dll",
+    "format": "PE32/i386",
+    "image_base": "0x10000000",
+    "sha256": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525"
+  },
+  "exports": {
+    "addArragmentLink": {
+      "va": "0x1000F9B0",
+      "decorated": "?addArragmentLink@ConceptStructure@@QAEPAVSCBinaryLink@@PAVSubjectCategory@@00@Z"
+    },
+    "addCompositionLink": {
+      "va": "0x1000FA50",
+      "decorated": "?addCompositionLink@ConceptStructure@@QAEPAVSCBinaryLink@@PAVSubjectCategory@@0@Z"
+    },
+    "addOrderLink": {
+      "va": "0x1000FB10",
+      "decorated": "?addOrderLink@ConceptStructure@@QAEPAVSCBinaryLink@@PAVSubjectCategory@@0@Z"
+    },
+    "addSubjectCategory": {
+      "va": "0x1000FBA0",
+      "decorated": "?addSubjectCategory@ConceptStructure@@QAEPAVSubjectCategory@@XZ"
+    },
+    "codeStructure": {
+      "va": "0x1000FC10",
+      "decorated": "?codeStructure@ConceptStructure@@QAEXW4IEclass@@@Z"
+    },
+    "SCcompare": {
+      "va": "0x10011330",
+      "decorated": "?SCcompare@SubjectCategory@@SA_NPAV1@0@Z"
+    }
+  },
+  "subject_category_compare": {
+    "field_order": [
+      "class@private+0x38",
+      "group@private+0x40",
+      "number@private+0x44"
+    ],
+    "strict_lexicographic": true,
+    "null_left_returns": false,
+    "null_right_returns": true,
+    "equal_tuple_returns": false
+  },
+  "class_char_map": {
+    "1": "S",
+    "2": "P",
+    "3": "Z",
+    "4": "K",
+    "5": "O",
+    "6": "R",
+    "7": "C"
+  },
+  "subject_category_constructor": {
+    "wrapper_size": 8,
+    "private_size": 92,
+    "defaults": {
+      "private+0x40_group": -1,
+      "private+0x44_number": -1,
+      "private+0x48": -1,
+      "private+0x4c_status_pre_public_init": -1,
+      "private+0x50": -1,
+      "private+0x54": -1,
+      "private+0x58_autoRange": 1
+    },
+    "public_ctor_sets_status": 0
+  },
+  "scbinarylink_factories": {
+    "arragment": {
+      "va": "0x1000F9B0",
+      "setter_va": "0x10011170",
+      "range": "1 if third argument is null else 99",
+      "outer_object_allocation_size": 48,
+      "outer_object_free_size": 48,
+      "base_private_record_allocation_size": 48,
+      "allocation_evidence": {
+        "factory_operator_new_va": "0x10014CF0",
+        "constructor_va": "0x10010480",
+        "base_constructor_va": "0x1000C600",
+        "scalar_deleting_destructor_va": "0x1000F740",
+        "free_va": "0x10014D28",
+        "derived_non_deleting_destructor_va": "0x100104A0"
+      }
+    },
+    "composition": {
+      "va": "0x1000FA50",
+      "setter_va": "0x10011180",
+      "range": "1 if first endpoint class in {1,3,5}, else 99",
+      "outer_object_allocation_size": 48,
+      "outer_object_free_size": 48,
+      "base_private_record_allocation_size": 48,
+      "allocation_evidence": {
+        "factory_operator_new_va": "0x10014CF0",
+        "constructor_va": "0x10010480",
+        "base_constructor_va": "0x1000C600",
+        "scalar_deleting_destructor_va": "0x1000F740",
+        "free_va": "0x10014D28",
+        "derived_non_deleting_destructor_va": "0x100104A0"
+      }
+    },
+    "order": {
+      "va": "0x1000FB10",
+      "setter_va": "0x10011190",
+      "range": 99,
+      "outer_object_allocation_size": 48,
+      "outer_object_free_size": 48,
+      "base_private_record_allocation_size": 48,
+      "allocation_evidence": {
+        "factory_operator_new_va": "0x10014CF0",
+        "constructor_va": "0x10010480",
+        "base_constructor_va": "0x1000C600",
+        "scalar_deleting_destructor_va": "0x1000F740",
+        "free_va": "0x10014D28",
+        "derived_non_deleting_destructor_va": "0x100104A0"
+      }
+    }
+  },
+  "code_structure": {
+    "va": "0x1000FC10",
+    "argument": "IEclass formal parameter is not read in visible function body",
+    "uses_two_stack_local_rb_tree_handles": true,
+    "uses_temporary_linked_list": true,
+    "iterates_ai_element_vector_offset": "private+0x14",
+    "calls_getters": [
+      "getCodingType",
+      "getNumber",
+      "getGroup",
+      "getClass",
+      "getParent",
+      "getAutoRange"
+    ],
+    "branches": {
+      "class_5": "temporary list-building path",
+      "class_4": "if two parent traversals are available above the current category, copies the group of the grandparent to the current category"
+    },
+    "renumbers_and_regroups": true,
+    "auto_range": {
+      "va_range": "0x10010180-0x100102C8",
+      "requires_autoRange_nonzero": true,
+      "autoRange_getter": "0x10011390",
+      "autoRange_storage": "SubjectCategoryPrivate+0x58",
+      "constructor_default": 1,
+      "link_binding_count_vtable_slot": 1,
+      "link_binding_count_va": "0x10003AA0",
+      "link_binding_get_vtable_slot": 2,
+      "link_binding_get_va": "0x10003A20",
+      "binding_contract": {
+        "field0": "endpoint index occupied by current AElement",
+        "field1": "AEBinaryLink*"
+      },
+      "filters": {
+        "binding_endpoint_index": 0,
+        "link_type": 3,
+        "endpoint_slot2": "null"
+      },
+      "sort_key": "endpoint1 SubjectCategory tuple (class, group, number)",
+      "sort_helper": "0x1000F390",
+      "comparator": "SubjectCategory::SCcompare@0x10011330",
+      "assignment": "range=1..N in sorted order via setRange@0x1000D1B0",
+      "independent_from_first_normalization_pass": true,
+      "scope_warning": "This exact filter must not be generalized to all type-3 links."
+    },
+    "cleanup": "clears temporary lists and tree headers before return",
+    "anomalies": [
+      "formal IEclass stack argument not referenced in visible body",
+      "[ebp-0x34] is read before a visible local write; keep as unresolved data-flow anomaly",
+      "no direct callsite found among seven analyzed PE32 images",
+      "exact temporary payload semantics and all class-specific branches remain unresolved",
+      "CodingType==0 is a confirmed gate for the first category-index pass; its enum meaning is not established.",
+      "The later auto-range pass is independent from the initial CodingType==0 gate and has a separate exact filter recorded under code_structure.auto_range."
+    ],
+    "first_normalization_pass": {
+      "va_range": "0x1000FC10-0x1000FCDB",
+      "filter": "getCodingType()==0",
+      "tuple_fields": [
+        "class",
+        "group",
+        "number"
+      ],
+      "tuple_index_helper": "0x1000F1C0",
+      "semantic_meaning_of_coding_type_zero": "unresolved",
+      "independent_from_later_auto_range_pass": true
+    }
+  },
+  "persistent_aistructure_tree": {
+    "semantic_role": "unresolved",
+    "note": "The two local RB-tree handles in ConceptStructure::codeStructure do not identify AIStructurePrivate+0x04's persistent tree."
+  },
+  "runtime_validation": {
+    "performed": false,
+    "reason": "Static disassembly and evidence-contract tests only; original Windows runtime and heap instrumentation not run"
+  },
+  "scbinarylink_layout": {
+    "outer_object_allocation_size": 48,
+    "base_private_record_allocation_size": 48,
+    "allocation_blocks_are_distinct": true,
+    "outer_size_crosscheck": "SCBinaryLink RTTI vtable slot 0 targets 0x1000F740; its deleting path calls 0x100104A0 then sized delete(this, 0x30).",
+    "private_record_crosscheck": "AIEBinaryLink constructor independently requests 0x30 for private storage",
+    "endpoint_slots": {
+      "slot0": "private+0x1c",
+      "slot1": "private+0x20",
+      "slot2": "private+0x24"
+    },
+    "type_field": "private+0x28",
+    "types": {
+      "order": 1,
+      "composition": 2,
+      "arragment": 3
+    },
+    "auto_range_filter_type": 3,
+    "caution": "Allocation extent is established; do not infer additional public data-member semantics solely from block size.",
+    "outer_object_release": {
+      "vtable_va": "0x100173D4",
+      "slot0_scalar_deleting_destructor": "0x1000F740",
+      "non_deleting_destructor_thunk": "0x100104A0",
+      "base_destructor": "0x1000C8D0",
+      "outer_free_size": 48,
+      "operator_delete_va": "0x10014D28"
+    },
+    "base_scalar_deleting_destructor_va": "0x1000CA50",
+    "display_methods": {
+      "getCode": {
+        "va": "0x10010800",
+        "uses_endpoint_accessors": [
+          "getAIE1@0x1000D050",
+          "getAIE2@0x10003610",
+          "getAIE3@0x1000D060"
+        ],
+        "endpoint_code_virtual_slot": "vtable+0x14 (AIElement hierarchy slot 5)",
+        "missing_endpoint_literal": {
+          "va": "0x100174F0",
+          "text": "-"
+        },
+        "string_operations": [
+          "MString::operator+@0x10011F90",
+          "MString::operator=@0x10011E40"
+        ],
+        "reads_range": false
+      },
+      "getName": {
+        "va": "0x100109E0",
+        "dispatch_method": "AIEBinaryLink::getType@0x10003180",
+        "type_labels": {
+          "1": {
+            "relation": "order",
+            "text": "Упорядочивание ",
+            "literal_va": "0x100174D0"
+          },
+          "2": {
+            "relation": "composition",
+            "text": "Состав ",
+            "literal_va": "0x100174C0"
+          },
+          "3": {
+            "relation": "arragment",
+            "text": "Компоновка ",
+            "literal_va": "0x100174A4"
+          }
+        },
+        "reads_range": false
+      },
+      "range_accessors": {
+        "getRange_va": "0x1000D070",
+        "getRange_field": "private+0x2C",
+        "setRange_va": "0x1000D1B0",
+        "setRange_field": "private+0x2C",
+        "semantic_values_1_and_99": "unresolved"
+      }
+    },
+    "range_accessors": {
+      "getRange_va": "0x1000D070",
+      "getRange_field": "private+0x2C",
+      "setRange_va": "0x1000D1B0",
+      "setRange_field": "private+0x2C",
+      "semantic_values_1_and_99": "F2 evaluation column and allowed values documented; natural-language meaning of 1 versus 99 unresolved",
+      "display_methods_directly_read_or_call_range": false,
+      "consumer_import_scan": {
+        "scope": "IS.exe and five supplied plugin DLLs",
+        "named_getRange_imports_found": false,
+        "named_setRange_imports_found": false,
+        "method": "bounded search of objdump -p output for exact decorated names",
+        "limitations": [
+          "not a full import-thunk disassembler",
+          "dynamic symbol resolution not excluded",
+          "ordinal imports not excluded",
+          "only supplied host and five plugins scanned"
+        ]
+      },
+      "source_documentation": {
+        "form": "F2",
+        "column_label": "Оценка",
+        "documented_allowed_outputs": {
+          "type_1_order": "99",
+          "type_2_composition": "1 or 99",
+          "type_3_arragment": "rank number or 99"
+        },
+        "meaning_of_1_vs_99": "not explained in natural language by the thesis; binary shows factory defaults and one auto-rank branch",
+        "do_not_confuse_with_F1": "F1 category evaluation is potential cardinality of a subject-category instance set; no binary field mapping established here"
+      }
+    },
+    "endpoint_layout_by_type": {
+      "order": {
+        "type": 1,
+        "slots": [
+          "null",
+          "A",
+          "B"
+        ],
+        "F2_columns": [
+          "PC2",
+          "PC3"
+        ]
+      },
+      "composition": {
+        "type": 2,
+        "slots": [
+          "A",
+          "B",
+          "null"
+        ],
+        "F2_columns": [
+          "PC1",
+          "PC2"
+        ]
+      },
+      "arragment": {
+        "type": 3,
+        "slots": [
+          "A",
+          "B",
+          "C"
+        ],
+        "F2_columns": [
+          "PC1",
+          "PC2",
+          "PC3"
+        ]
+      },
+      "source": "SCBinaryLink setter implementations and thesis §4.4.7, pp. 142-143"
+    }
+  },
+  "sample_project_coverage_for_scbinarylink_range": {
+    "samples": {
+      "kaka2.xml": {
+        "concept_model_count": 1,
+        "cs_containers": [
+          {
+            "element_count": 0,
+            "link_count": 0
+          }
+        ],
+        "has_nonempty_cs_links": false
+      },
+      "schaefer.is2": {
+        "concept_model_count": 1,
+        "cs_containers": [
+          {
+            "element_count": 0,
+            "link_count": 0
+          }
+        ],
+        "has_nonempty_cs_links": false
+      },
+      "untitled.is2": {
+        "concept_model_count": 1,
+        "cs_containers": [
+          {
+            "element_count": 0,
+            "link_count": 0
+          }
+        ],
+        "has_nonempty_cs_links": false
+      }
+    },
+    "conclusion": "None of the three supplied sample projects contains a nonempty ConceptModel/cs relation list; these samples cannot validate SCBinaryLink range values or display behavior."
+  },
+  "subject_category_domain": {
+    "binary_class_char_map": {
+      "1": "S",
+      "2": "P",
+      "3": "Z",
+      "4": "K",
+      "5": "O",
+      "6": "R",
+      "7": "C"
+    },
+    "domain_labels_from_thesis": {
+      "1": {
+        "code": "S",
+        "label": "cycle",
+        "source": "F1 and GUI list, thesis §4.4.5 and §4.4.7"
+      },
+      "2": {
+        "code": "P",
+        "label": "process",
+        "source": "F1 and GUI list; formal model"
+      },
+      "3": {
+        "code": "Z",
+        "label": "task",
+        "source": "F1 and GUI list; formal model"
+      },
+      "4": {
+        "code": "K",
+        "label": "component",
+        "source": "F1 and GUI list; formal model"
+      },
+      "5": {
+        "code": "O",
+        "label": "object",
+        "source": "F1 and GUI list; formal model"
+      },
+      "6": {
+        "code": "R",
+        "label": "feature / attribute",
+        "source": "F1 and formal model"
+      },
+      "7": {
+        "code": "C",
+        "label": "feature value",
+        "source": "formal model pp. 73–79; not listed in F1 six-character class description"
+      }
+    },
+    "scope_distinction": {
+      "gui_creation_menu": [
+        "S",
+        "P",
+        "Z",
+        "K",
+        "O"
+      ],
+      "F1_class_list": [
+        "S",
+        "P",
+        "Z",
+        "K",
+        "O",
+        "R"
+      ],
+      "formal_model": [
+        "S",
+        "P",
+        "Z",
+        "K",
+        "O",
+        "R",
+        "C"
+      ],
+      "warning": "Do not conflate GUI choices, F1 labels and the full formal-model class domain."
+    },
+    "relation_constraints_from_thesis": {
+      "order": {
+        "type": 1,
+        "constraint": "same class"
+      },
+      "composition": {
+        "type": 2,
+        "constraint": "adjacent classes",
+        "allowed_formal_transitions": [
+          "P->Z",
+          "Z->K",
+          "K->O",
+          "O->R",
+          "R->C"
+        ]
+      },
+      "arragment": {
+        "type": 3,
+        "constraint": "two categories share a higher-level parent through composition",
+        "formal_sibling_transitions": [
+          "Z/P",
+          "K/Z",
+          "O/K",
+          "R/O",
+          "C/R"
+        ]
+      },
+      "enforcement_note": "No corresponding validation is visible inside the three factory bodies; higher-level/UI validation is not ruled out."
+    },
+    "source_pages": {
+      "formal_model": "73-79",
+      "gui_constraints": "136-138",
+      "F1_F2_specification": "142-143"
+    }
+  },
+  "subject_category_properties": {
+    "getClass": {
+      "va": "0x10011440",
+      "field": "private+0x38"
+    },
+    "getClassChar": {
+      "va": "0x10011450",
+      "mapping": "1..7 -> S/P/Z/K/O/R/C"
+    },
+    "getCodingType": {
+      "va": "0x1000D360",
+      "field": "private+0x3C"
+    },
+    "setCodingType": {
+      "va": "0x100117A0",
+      "field": "private+0x3C"
+    },
+    "getStatus": {
+      "va": "0x100116C0",
+      "field": "private+0x4C"
+    },
+    "setStatus": {
+      "va": "0x10012FD0",
+      "field": "private+0x4C"
+    },
+    "getType": {
+      "va": "0x100116D0",
+      "return_enum": "CStype",
+      "kind": "derived from attached type-3 links; returns nonzero if current category is endpoint 1 and endpoint 2 is non-null; not a read of private+0x3C",
+      "observed_return_values": [
+        0,
+        1
+      ],
+      "return_value_logic": "returns 1 when the scan finds a type-3 link with endpoint1 == current category and endpoint2 != null; returns 0 if no such link is found",
+      "semantic_mapping_note": "Binary proves observed return values 0/1 and the graph predicate; the thesis T/NT interpretation and which numeric value maps to which label remain unconfirmed."
+    },
+    "getAutoRange": {
+      "va": "0x10011390",
+      "field": "private+0x58",
+      "constructor_default": 1
+    },
+    "semantic_mapping_note": "Thesis F1 uses Type=terminal/nonterminal and Status=complete/incomplete. Exact numeric mapping to CStype/CategoryStatus is not yet established. CodingType is a separate stored enum and must not be silently equated with F1 Type."
+  }
+}

@@ -1,0 +1,26 @@
+{
+  "release": "0.7.5",
+  "file_count": 592,
+  "source_files_included": 107,
+  "test_files_included": 49,
+  "required_source_assets": {
+    "LICENSE": true,
+    "NOTICE": true,
+    "README.md": true,
+    "pyproject.toml": true,
+    "src/is2_re/gui.py": true,
+    "src/is2_re/document.py": true,
+    "tests/test_release_metadata.py": true,
+    "docs/build_from_source.md": true,
+    "docs/primarymodel_editor.md": true,
+    "docs/editor_state.md": true,
+    "release_reports/validation_0.7.5.md": true
+  },
+  "wheel_present": true,
+  "wheel_sha256": "c696b604340bfa72b51db82ed6831235edabe66d709c3ab2c7e84057caa5d308",
+  "private_reference_directory_included": false,
+  "prohibited_binary_files": [],
+  "public_git_repository_created": false,
+  "status": "PASS",
+  "notes": "MIT scope is limited to original PzKpfw-authored components; research/sample materials have separate notices. Original IS-2 runtime acceptance remains NOT_TESTED."
+}

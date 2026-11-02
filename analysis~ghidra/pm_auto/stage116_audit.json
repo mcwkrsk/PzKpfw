@@ -1,0 +1,324 @@
+{
+  "stage": "1.16",
+  "analysis_mode": "static; no Windows runtime execution",
+  "binary_sha256": {
+    "IS.exe": "ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2",
+    "MAIWmodels.dll": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525",
+    "Model_Visualiser.dll": "1187c7a59ae2dbb8eb91bebbbe89850d9724a62ff186865733930f1488bce880",
+    "PM_auto.dll": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+    "PM_matrix_web.dll": "55d25ef0f07a069d80226abae1583928be92cf023fb66ffddbdd32b4f1a66f22",
+    "PM_params.dll": "22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781",
+    "PM_spec_WEB.dll": "ef0365f6fd3f69648ccf28c5eb564312f70faa9bbd892543a933ec4ae7fa6d68"
+  },
+  "pinned_binary_hashes": {
+    "PM_auto.dll": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+    "MAIWmodels.dll": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525"
+  },
+  "findings": {
+    "model_projection_helper": {
+      "address": "0x1000A360",
+      "working_name": "removeElementFromDiagramModels(AFElement*)",
+      "model_offsets": [
+        "this+0x120",
+        "this+0x128"
+      ],
+      "map_offsets": [
+        "this+0x140",
+        "this+0x144"
+      ],
+      "operations": [
+        "QMap lookup by AFElement*",
+        "QStandardItem::index",
+        "QModelIndex::parent/row",
+        "QAbstractItemModel::removeRow",
+        "remove AFElement key from both maps",
+        "get direct child list",
+        "remove direct-child projection entries",
+        "destroy temporary child-list wrapper"
+      ],
+      "recursion_observed": false,
+      "caller_addresses": [
+        "0x1000DBA4",
+        "0x1001163D"
+      ],
+      "confidence": "high for listed call/offset behavior; source-level intent is a working name"
+    },
+    "name_projection_updates": {
+      "map_0x140_helper": "0x10009970",
+      "map_0x144_helper": "0x10009730",
+      "model_data_role": 2,
+      "text_derivation": [
+        "AElement::getName",
+        "MString data -> QString",
+        "AFElement::getStructureSymbols",
+        "virtual getCode",
+        "format QString"
+      ],
+      "confidence": "high for offsets/imports/calls; exact rendered string format not fully decoded"
+    },
+    "context_field": {
+      "offset": "DecompositionWidget+0x2C",
+      "setter": "0x10009930",
+      "selection_handler": "0x100073B0",
+      "observed_conditions": [
+        {
+          "condition": "AFElement::getStatus() == 0",
+          "value": 2
+        },
+        {
+          "condition": "status == 1 and AFElement::getType() == 2",
+          "value": 1
+        },
+        {
+          "condition": "status == 1 and type == 1 branch",
+          "value": 3
+        },
+        {
+          "condition": "status == 1 and type == 3 branch",
+          "value": 4
+        },
+        {
+          "condition": "invalid/deselected current block",
+          "value": 0
+        }
+      ],
+      "enum_names_assigned": false
+    },
+    "context_widget_enable_matrix": {
+      "apply_range": "0x10011B00-0x10011D4F",
+      "api": "QWidget::setEnabled(true)",
+      "always_enabled_offsets": [
+        "0x58",
+        "0x54",
+        "0xB8"
+      ],
+      "modes": {
+        "1": [
+          "0x70",
+          "0x78",
+          "0x6C",
+          "0xA0"
+        ],
+        "2": [
+          "0x7C",
+          "0x78",
+          "0x6C",
+          "0xA0"
+        ],
+        "3": [
+          "0x70",
+          "0x7C",
+          "0x78",
+          "0xA0"
+        ],
+        "4": [
+          "0x70",
+          "0x7C",
+          "0x6C",
+          "0xA0"
+        ]
+      },
+      "conditional_offsets": [
+        "0xA8",
+        "0x90",
+        "0x8C",
+        "0x9C",
+        "0x94"
+      ],
+      "widget_names_resolved": false
+    },
+    "property_panel_toggle": {
+      "handler": "0x10009910",
+      "target_offset": "DecompositionWidget+0x100",
+      "behavior": "reads QWidget visibility state and branches to QWidget::hide or QWidget::show",
+      "model_mutation_observed": false
+    },
+    "nested_diagram_lifecycle": {
+      "create_slot": "0x10009FB0",
+      "create_helper": "0x10009170",
+      "source_element_status_gate": "AFElement::getStatus() != 0",
+      "back_reference_offsets": [
+        "DiagramBlock+0x1D8",
+        "DiagramBlock+0x1C4"
+      ],
+      "delete_slot": "0x1000A040",
+      "delete_behavior": [
+        "shows a QMessageBox confirmation flow",
+        "iterates linked diagram records",
+        "runs helper cleanup/destruction paths",
+        "invokes related widget virtual slot +0x0C with argument 1",
+        "clears DiagramBlock+0x1C4",
+        "sets byte DiagramBlock+0x1C1 to 0",
+        "refreshes diagram view"
+      ],
+      "exact_user_button_label": "not recovered",
+      "exact ownership/parenting": "not fully established statically"
+    },
+    "undo_redo_surface": {
+      "QUndoStack_or_QUndoCommand_imports": {},
+      "raw_undo_redo_tokens": {},
+      "PM_auto_QAbstractItemModel_revert_submit_imports": {
+        "PM_auto.dll": [
+          "00022308  <none>  157e  ?revert@QAbstractItemModel@@UAEXXZ",
+          "00022310  <none>  18e1  ?submit@QAbstractItemModel@@UAE_NXZ"
+        ]
+      },
+      "PM_auto_revert_submit_iat_references": [
+        "1001dd22:\tff 25 08 23 02 10    \tjmp    DWORD PTR ds:0x10022308",
+        "1001dd2e:\tff 25 10 23 02 10    \tjmp    DWORD PTR ds:0x10022310"
+      ],
+      "PM_auto_revert_submit_real_call_instructions": [],
+      "assessment": "No explicit QUndoStack/QUndoCommand or undo/redo import/token was found. PM_auto imports QAbstractItemModel::revert/submit but objdump shows only their forwarding IAT thunks and no direct call instruction to those IAT entries. This is not proof that no custom undo/history logic exists."
+    }
+  },
+  "sample_projects": [
+    {
+      "file": "schaefer.is2",
+      "sha256": "d2de1ea9ad205fd1d5a2b64a31c2d0038b3b57e205a5d5b1fa28482eb5314bb9",
+      "project_name": "ebanyui is2",
+      "project_info": "какая-то хуета",
+      "actions": 7,
+      "action_types": {
+        "0": 4,
+        "1": 2,
+        "3": 1
+      },
+      "formalization_values": {
+        "0": 7
+      },
+      "status_values": {
+        "0": 4,
+        "1": 3
+      },
+      "links": 12,
+      "link_types": {
+        "2": 6,
+        "3": 6
+      },
+      "parameters": 1,
+      "objects": 0,
+      "concept_elements": 1,
+      "module_parameters": [
+        {
+          "name": "PrimaryModelAuto",
+          "params": [
+            {
+              "decStr": "z22;"
+            }
+          ]
+        }
+      ],
+      "warnings": [],
+      "link_pair_correlation": {
+        "type_2_pairs": 6,
+        "type_3_pairs": 6,
+        "same_afe1_afe2_pairs": 6,
+        "type_2_only_pairs": 0,
+        "type_3_only_pairs": 0,
+        "interpretation": "Observed endpoint-pair correlation only; link type semantics are not assigned here."
+      },
+      "validated": true
+    },
+    {
+      "file": "untitled.is2",
+      "sha256": "eda85a2a2cc31bcf4e5277980ed401377895e5197e7d7c1826c4b981a9ecce21",
+      "project_name": "testovaya model is2",
+      "project_info": "ещё одна хуета",
+      "actions": 7,
+      "action_types": {
+        "0": 4,
+        "1": 2,
+        "3": 1
+      },
+      "formalization_values": {
+        "0": 7
+      },
+      "status_values": {
+        "0": 4,
+        "1": 3
+      },
+      "links": 12,
+      "link_types": {
+        "2": 6,
+        "3": 6
+      },
+      "parameters": 1,
+      "objects": 0,
+      "concept_elements": 1,
+      "module_parameters": [
+        {
+          "name": "PrimaryModelAuto",
+          "params": [
+            {
+              "decStr": "z22;"
+            }
+          ]
+        }
+      ],
+      "warnings": [],
+      "link_pair_correlation": {
+        "type_2_pairs": 6,
+        "type_3_pairs": 6,
+        "same_afe1_afe2_pairs": 6,
+        "type_2_only_pairs": 0,
+        "type_3_only_pairs": 0,
+        "interpretation": "Observed endpoint-pair correlation only; link type semantics are not assigned here."
+      },
+      "validated": true
+    },
+    {
+      "file": "kaka2.xml",
+      "sha256": "24251e96014518731f1f3f92571d6999afeb069ae33c89e68585b8c8d21082dc",
+      "project_name": "Проектировочный расчет цилиндрической передачи",
+      "project_info": "",
+      "actions": 73,
+      "action_types": {
+        "0": 33,
+        "1": 9,
+        "2": 30,
+        "3": 1
+      },
+      "formalization_values": {
+        "0": 43,
+        "2": 30
+      },
+      "status_values": {
+        "0": 33,
+        "1": 40
+      },
+      "links": 144,
+      "link_types": {
+        "2": 72,
+        "3": 72
+      },
+      "parameters": 0,
+      "objects": 0,
+      "concept_elements": 1,
+      "module_parameters": [
+        {
+          "name": "PrimaryModelAuto",
+          "params": [
+            {
+              "decStr": ""
+            }
+          ]
+        }
+      ],
+      "warnings": [],
+      "link_pair_correlation": {
+        "type_2_pairs": 72,
+        "type_3_pairs": 72,
+        "same_afe1_afe2_pairs": 72,
+        "type_2_only_pairs": 0,
+        "type_3_only_pairs": 0,
+        "interpretation": "Observed endpoint-pair correlation only; link type semantics are not assigned here."
+      },
+      "validated": true
+    }
+  ],
+  "validation": {
+    "all_samples_parse_and_validate": true,
+    "sample_count": 3,
+    "static_only": true
+  }
+}

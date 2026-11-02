@@ -1,0 +1,36 @@
+Stage 1.17 PM_params / AEContentLink validation
+Date: 2026-11-01
+
+Original binary SHA-256 checks:
+  PM_params.dll  22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781  PASS
+  MAIWmodels.dll 80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525  PASS
+
+Static audits:
+  tools/audit_pm_params_parameter_table.py  32/32 fingerprints PASS
+  tools/audit_aecontentlink_type4.py       19/19 fingerprints PASS
+
+Python regression suite:
+  pytest -q  61 passed
+
+Native C++ ABI/layout checks:
+  8 distinct programs compiled with -std=c++17 -Wall -Wextra -Werror -pedantic
+  All 8 executables returned exit code 0.
+
+Scope:
+  - QAbstractItemModel::dataChanged connection and callback adapter
+  - Six PM_params table columns mapped to core setters
+  - Parameter add/delete handlers
+  - AEContentLink class identity for LinkType==4
+  - AFElement / AIElement endpoint roles and marker/power fields
+  - Content-link deduplication by endpoints + marker; duplicate add may increment power
+  - Parameter-delete cleanup: unlink(true), removeFromList(), deleting destructor
+  - SHA-pinned imported/exported symbol mapping and disassembly fingerprints
+  - Re-ran Stage 1.16 PM_auto audit (3 sample projects) and Stage 1.17 nested-diagram audit (14/14 checks)
+  - Re-ran PM_auto host-refresh audit (31/31), structural-edit audit (8 functions / 6 core implementations), content-handler audit (5 functions), and typed-connection audit (17 static connectImpl callsites)
+
+Limitations:
+  - Static PE/disassembly only; no Windows runtime execution.
+  - Semantic details of LinkType values other than 4 remain open.
+  - Meaning of power beyond duplicate-add counting remains open.
+  - Post-erase ownership of removed Parameter/Object remains unresolved.
+  - No heap instrumentation, stale-pointer runtime test, or save/reopen test.

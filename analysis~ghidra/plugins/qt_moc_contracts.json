@@ -1,0 +1,1481 @@
+{
+  "format": "Qt5 QMetaObject static metadata",
+  "revision": 7,
+  "analysis_scope": "Static PE metadata parsing; no Qt runtime emulation or reachability proof.",
+  "plugins": [
+    {
+      "binary": "PM_auto.dll",
+      "sha256": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+      "sections": [
+        {
+          "name": ".text",
+          "va": 268439552,
+          "size": 131474
+        },
+        {
+          "name": ".rdata",
+          "va": 268574720,
+          "size": 312104
+        },
+        {
+          "name": ".data",
+          "va": 268890112,
+          "size": 5632
+        },
+        {
+          "name": ".gfids",
+          "va": 268898304,
+          "size": 76
+        },
+        {
+          "name": ".tls",
+          "va": 268902400,
+          "size": 9
+        },
+        {
+          "name": ".rsrc",
+          "va": 268906496,
+          "size": 480
+        },
+        {
+          "name": ".reloc",
+          "va": 268910592,
+          "size": 17692
+        }
+      ],
+      "qmetaobject_count": 10,
+      "total_methods": 25,
+      "total_signals": 5,
+      "connect_slots_by_name_imports": [
+        {
+          "dll": "Qt5Core.dll",
+          "symbol": "?connectSlotsByName@QMetaObject@@SAXPAVQObject@@@Z"
+        }
+      ],
+      "qmetaobjects": [
+        {
+          "va": 268795064,
+          "section": ".rdata",
+          "super_va": 268890112,
+          "stringdata_va": 268795088,
+          "data_va": 268795840,
+          "static_metacall_va": 268447376,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "DecompositionWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 18,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 1,
+          "flags": 0,
+          "methods": [
+            {
+              "index": 0,
+              "name": "stateChanged",
+              "kind": "signal",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "DiagramBlock*",
+                  "name": "arg0"
+                }
+              ],
+              "signature": "stateChanged(DiagramBlock* arg0)",
+              "tag": "",
+              "flags": 6,
+              "parameter_data_index": 104
+            },
+            {
+              "index": 1,
+              "name": "FdChangeState_slot",
+              "kind": "slot",
+              "access": "private",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "DiagramBlock*",
+                  "name": "d"
+                }
+              ],
+              "signature": "FdChangeState_slot(DiagramBlock* d)",
+              "tag": "",
+              "flags": 8,
+              "parameter_data_index": 107
+            },
+            {
+              "index": 2,
+              "name": "tabChanged_slot",
+              "kind": "slot",
+              "access": "private",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "int",
+                  "name": "arg0"
+                }
+              ],
+              "signature": "tabChanged_slot(int arg0)",
+              "tag": "",
+              "flags": 8,
+              "parameter_data_index": 110
+            },
+            {
+              "index": 3,
+              "name": "treeViewDoubleClick",
+              "kind": "slot",
+              "access": "private",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "QModelIndex",
+                  "name": "arg0"
+                }
+              ],
+              "signature": "treeViewDoubleClick(QModelIndex arg0)",
+              "tag": "",
+              "flags": 8,
+              "parameter_data_index": 113
+            },
+            {
+              "index": 4,
+              "name": "listViewDoubleClick",
+              "kind": "slot",
+              "access": "private",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "QModelIndex",
+                  "name": "arg0"
+                }
+              ],
+              "signature": "listViewDoubleClick(QModelIndex arg0)",
+              "tag": "",
+              "flags": 8,
+              "parameter_data_index": 116
+            },
+            {
+              "index": 5,
+              "name": "newLoop_slot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "newLoop_slot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 119
+            },
+            {
+              "index": 6,
+              "name": "newSeq_slot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "newSeq_slot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 120
+            },
+            {
+              "index": 7,
+              "name": "newAlt_slot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "newAlt_slot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 121
+            },
+            {
+              "index": 8,
+              "name": "toElementary_slot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "toElementary_slot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 122
+            },
+            {
+              "index": 9,
+              "name": "newElementBefore_slot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "newElementBefore_slot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 123
+            },
+            {
+              "index": 10,
+              "name": "newElementAfter_slot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "newElementAfter_slot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 124
+            },
+            {
+              "index": 11,
+              "name": "deleteElement_slot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "deleteElement_slot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 125
+            },
+            {
+              "index": 12,
+              "name": "changeProps_slot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "changeProps_slot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 126
+            },
+            {
+              "index": 13,
+              "name": "decomposeToNewList_slot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "decomposeToNewList_slot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 127
+            },
+            {
+              "index": 14,
+              "name": "delList_slot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "delList_slot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 128
+            },
+            {
+              "index": 15,
+              "name": "showPropsWidget_slot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "showPropsWidget_slot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 129
+            },
+            {
+              "index": 16,
+              "name": "on_tbMoveTo_pressed",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_tbMoveTo_pressed()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 130
+            },
+            {
+              "index": 17,
+              "name": "moveToElementary",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "DiagramBlock*",
+                  "name": "scr"
+                },
+                {
+                  "type": "DiagramBlock*",
+                  "name": "dst"
+                }
+              ],
+              "signature": "moveToElementary(DiagramBlock* scr, DiagramBlock* dst)",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 131
+            }
+          ],
+          "super_class": "WorkWidget"
+        },
+        {
+          "va": 268811408,
+          "section": ".rdata",
+          "super_va": 268890164,
+          "stringdata_va": 268811432,
+          "data_va": 268811704,
+          "static_metacall_va": 268531616,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "FunctionalDiagram",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 4,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 4,
+          "flags": 0,
+          "methods": [
+            {
+              "index": 0,
+              "name": "selectionChanged",
+              "kind": "signal",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "DiagramBlock*",
+                  "name": "selection"
+                }
+              ],
+              "signature": "selectionChanged(DiagramBlock* selection)",
+              "tag": "",
+              "flags": 6,
+              "parameter_data_index": 34
+            },
+            {
+              "index": 1,
+              "name": "itemDoubleClick",
+              "kind": "signal",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "DiagramBlock*",
+                  "name": "arg0"
+                }
+              ],
+              "signature": "itemDoubleClick(DiagramBlock* arg0)",
+              "tag": "",
+              "flags": 6,
+              "parameter_data_index": 37
+            },
+            {
+              "index": 2,
+              "name": "itemDraged",
+              "kind": "signal",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "DiagramBlock*",
+                  "name": "item"
+                },
+                {
+                  "type": "DiagramBlock*",
+                  "name": "destination"
+                }
+              ],
+              "signature": "itemDraged(DiagramBlock* item, DiagramBlock* destination)",
+              "tag": "",
+              "flags": 6,
+              "parameter_data_index": 40
+            },
+            {
+              "index": 3,
+              "name": "closed",
+              "kind": "signal",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "closed()",
+              "tag": "",
+              "flags": 6,
+              "parameter_data_index": 45
+            }
+          ],
+          "super_class": "BaseDiagram"
+        },
+        {
+          "va": 268890112,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268794668,
+          "data_va": 268794696,
+          "static_metacall_va": 268446832,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "WorkWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        },
+        {
+          "va": 268890136,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268794976,
+          "data_va": 268795004,
+          "static_metacall_va": 268446832,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "MenuWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        },
+        {
+          "va": 268890164,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268815936,
+          "data_va": 268816008,
+          "static_metacall_va": 268551568,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "BaseDiagram",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 1,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [
+            {
+              "index": 0,
+              "name": "repainSlot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "repainSlot()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 19
+            }
+          ],
+          "super_class": null
+        },
+        {
+          "va": 268890188,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268816092,
+          "data_va": 268816120,
+          "static_metacall_va": 268446832,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "AFEAltProps",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        },
+        {
+          "va": 268890212,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268816180,
+          "data_va": 268816208,
+          "static_metacall_va": 268446832,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "AFEProps",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        },
+        {
+          "va": 268890236,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268816268,
+          "data_va": 268816300,
+          "static_metacall_va": 268446832,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "ArgumentsWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        },
+        {
+          "va": 268890260,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268816360,
+          "data_va": 268816440,
+          "static_metacall_va": 268552448,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "CbWithBtn",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 1,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [
+            {
+              "index": 0,
+              "name": "on_pbDel_clicked",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_pbDel_clicked()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 19
+            }
+          ],
+          "super_class": null
+        },
+        {
+          "va": 268890284,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268816528,
+          "data_va": 268816616,
+          "static_metacall_va": 268552480,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "CbWithBtnContainer",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 1,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [
+            {
+              "index": 0,
+              "name": "on_pbAdd_clicked",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_pbAdd_clicked()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 19
+            }
+          ],
+          "super_class": null
+        }
+      ]
+    },
+    {
+      "binary": "PM_params.dll",
+      "sha256": "22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781",
+      "sections": [
+        {
+          "name": ".text",
+          "va": 268439552,
+          "size": 36315
+        },
+        {
+          "name": ".rdata",
+          "va": 268476416,
+          "size": 100610
+        },
+        {
+          "name": ".data",
+          "va": 268578816,
+          "size": 1536
+        },
+        {
+          "name": ".gfids",
+          "va": 268582912,
+          "size": 76
+        },
+        {
+          "name": ".tls",
+          "va": 268587008,
+          "size": 9
+        },
+        {
+          "name": ".rsrc",
+          "va": 268591104,
+          "size": 480
+        },
+        {
+          "name": ".reloc",
+          "va": 268595200,
+          "size": 7728
+        }
+      ],
+      "qmetaobject_count": 4,
+      "total_methods": 8,
+      "total_signals": 0,
+      "connect_slots_by_name_imports": [
+        {
+          "dll": "Qt5Core.dll",
+          "symbol": "?connectSlotsByName@QMetaObject@@SAXPAVQObject@@@Z"
+        }
+      ],
+      "qmetaobjects": [
+        {
+          "va": 268531024,
+          "section": ".rdata",
+          "super_va": 268578840,
+          "stringdata_va": 268531048,
+          "data_va": 268531272,
+          "static_metacall_va": 268440032,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "ParamsWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 4,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [
+            {
+              "index": 0,
+              "name": "on_tableView_clicked",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "QModelIndex",
+                  "name": "index"
+                }
+              ],
+              "signature": "on_tableView_clicked(QModelIndex index)",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 34
+            },
+            {
+              "index": 1,
+              "name": "on_tbDelParam_pressed",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_tbDelParam_pressed()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 37
+            },
+            {
+              "index": 2,
+              "name": "on_tbAddParam_clicked",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_tbAddParam_clicked()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 38
+            },
+            {
+              "index": 3,
+              "name": "on_tbObjects_clicked",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_tbObjects_clicked()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 39
+            }
+          ],
+          "super_class": "WorkWidget"
+        },
+        {
+          "va": 268578816,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268530680,
+          "data_va": 268530864,
+          "static_metacall_va": 268439952,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "ObjectsEditWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 4,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [
+            {
+              "index": 0,
+              "name": "on_pbDel_pressed",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_pbDel_pressed()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 34
+            },
+            {
+              "index": 1,
+              "name": "on_pbAdd_pressed",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_pbAdd_pressed()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 35
+            },
+            {
+              "index": 2,
+              "name": "on_pbUp_pressed",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_pbUp_pressed()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 36
+            },
+            {
+              "index": 3,
+              "name": "on_pbDown_pressed",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_pbDown_pressed()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 37
+            }
+          ],
+          "super_class": null
+        },
+        {
+          "va": 268578840,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268537156,
+          "data_va": 268537184,
+          "static_metacall_va": 268467728,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "WorkWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        },
+        {
+          "va": 268578864,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268537708,
+          "data_va": 268537736,
+          "static_metacall_va": 268467728,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "MenuWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        }
+      ]
+    },
+    {
+      "binary": "PM_spec_WEB.dll",
+      "sha256": "ef0365f6fd3f69648ccf28c5eb564312f70faa9bbd892543a933ec4ae7fa6d68",
+      "sections": [
+        {
+          "name": ".text",
+          "va": 268439552,
+          "size": 41578
+        },
+        {
+          "name": ".rdata",
+          "va": 268484608,
+          "size": 39740
+        },
+        {
+          "name": ".data",
+          "va": 268525568,
+          "size": 1024
+        },
+        {
+          "name": ".tls",
+          "va": 268529664,
+          "size": 9
+        },
+        {
+          "name": ".gfids",
+          "va": 268533760,
+          "size": 76
+        },
+        {
+          "name": ".rsrc",
+          "va": 268537856,
+          "size": 480
+        },
+        {
+          "name": ".reloc",
+          "va": 268541952,
+          "size": 6944
+        }
+      ],
+      "qmetaobject_count": 6,
+      "total_methods": 1,
+      "total_signals": 0,
+      "connect_slots_by_name_imports": [
+        {
+          "dll": "Qt5Core.dll",
+          "symbol": "?connectSlotsByName@QMetaObject@@SAXPAVQObject@@@Z"
+        }
+      ],
+      "qmetaobjects": [
+        {
+          "va": 268486464,
+          "section": ".rdata",
+          "super_va": 268488560,
+          "stringdata_va": 268486488,
+          "data_va": 268486520,
+          "static_metacall_va": 268439616,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "PM_spec_widget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": "Am_spec_widget"
+        },
+        {
+          "va": 268488560,
+          "section": ".rdata",
+          "super_va": 268525616,
+          "stringdata_va": 268488584,
+          "data_va": 268488752,
+          "static_metacall_va": 268461520,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "Am_spec_widget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 1,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [
+            {
+              "index": 0,
+              "name": "on_sbZoom_valueChanged",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "int",
+                  "name": "i"
+                }
+              ],
+              "signature": "on_sbZoom_valueChanged(int i)",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 19
+            }
+          ],
+          "super_class": "WorkWidget"
+        },
+        {
+          "va": 268525568,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268488844,
+          "data_va": 268488692,
+          "static_metacall_va": 268439616,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "FormAndPanel",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        },
+        {
+          "va": 268525592,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268488876,
+          "data_va": 268488904,
+          "static_metacall_va": 268439616,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "AFsettings",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        },
+        {
+          "va": 268525616,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268494340,
+          "data_va": 268494368,
+          "static_metacall_va": 268439616,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "WorkWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        },
+        {
+          "va": 268525640,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268494648,
+          "data_va": 268494676,
+          "static_metacall_va": 268439616,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "MenuWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        }
+      ]
+    },
+    {
+      "binary": "PM_matrix_web.dll",
+      "sha256": "55d25ef0f07a069d80226abae1583928be92cf023fb66ffddbdd32b4f1a66f22",
+      "sections": [
+        {
+          "name": ".text",
+          "va": 268439552,
+          "size": 26269
+        },
+        {
+          "name": ".rdata",
+          "va": 268468224,
+          "size": 28410
+        },
+        {
+          "name": ".data",
+          "va": 268496896,
+          "size": 1024
+        },
+        {
+          "name": ".gfids",
+          "va": 268500992,
+          "size": 76
+        },
+        {
+          "name": ".tls",
+          "va": 268505088,
+          "size": 9
+        },
+        {
+          "name": ".rsrc",
+          "va": 268509184,
+          "size": 480
+        },
+        {
+          "name": ".reloc",
+          "va": 268513280,
+          "size": 4508
+        }
+      ],
+      "qmetaobject_count": 4,
+      "total_methods": 0,
+      "total_signals": 0,
+      "connect_slots_by_name_imports": [
+        {
+          "dll": "Qt5Core.dll",
+          "symbol": "?connectSlotsByName@QMetaObject@@SAXPAVQObject@@@Z"
+        }
+      ],
+      "qmetaobjects": [
+        {
+          "va": 268469776,
+          "section": ".rdata",
+          "super_va": 268471148,
+          "stringdata_va": 268469800,
+          "data_va": 268469832,
+          "static_metacall_va": 268439584,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "Pm_matrix_web",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": "Am_matrix_web"
+        },
+        {
+          "va": 268471148,
+          "section": ".rdata",
+          "super_va": 268496896,
+          "stringdata_va": 268471172,
+          "data_va": 268471204,
+          "static_metacall_va": 268439584,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "Am_matrix_web",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": "WorkWidget"
+        },
+        {
+          "va": 268496896,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268470752,
+          "data_va": 268470780,
+          "static_metacall_va": 268439584,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "WorkWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        },
+        {
+          "va": 268496920,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268471060,
+          "data_va": 268471088,
+          "static_metacall_va": 268439584,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "MenuWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        }
+      ]
+    },
+    {
+      "binary": "Model_Visualiser.dll",
+      "sha256": "1187c7a59ae2dbb8eb91bebbbe89850d9724a62ff186865733930f1488bce880",
+      "sections": [
+        {
+          "name": ".text",
+          "va": 268439552,
+          "size": 45268
+        },
+        {
+          "name": ".rdata",
+          "va": 268488704,
+          "size": 30978
+        },
+        {
+          "name": ".data",
+          "va": 268521472,
+          "size": 1024
+        },
+        {
+          "name": ".gfids",
+          "va": 268525568,
+          "size": 68
+        },
+        {
+          "name": ".rsrc",
+          "va": 268529664,
+          "size": 480
+        },
+        {
+          "name": ".reloc",
+          "va": 268533760,
+          "size": 5524
+        }
+      ],
+      "qmetaobject_count": 4,
+      "total_methods": 10,
+      "total_signals": 1,
+      "connect_slots_by_name_imports": [
+        {
+          "dll": "Qt5Core.dll",
+          "symbol": "?connectSlotsByName@QMetaObject@@SAXPAVQObject@@@Z"
+        }
+      ],
+      "qmetaobjects": [
+        {
+          "va": 268491024,
+          "section": ".rdata",
+          "super_va": 268521528,
+          "stringdata_va": 268491048,
+          "data_va": 268491504,
+          "static_metacall_va": 268465312,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "Model_Visualiser",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 9,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [
+            {
+              "index": 0,
+              "name": "on_tabWidget_currentChanged",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "int",
+                  "name": "index"
+                }
+              ],
+              "signature": "on_tabWidget_currentChanged(int index)",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 59
+            },
+            {
+              "index": 1,
+              "name": "on_pbShort_toggled",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "bool",
+                  "name": "checked"
+                }
+              ],
+              "signature": "on_pbShort_toggled(bool checked)",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 62
+            },
+            {
+              "index": 2,
+              "name": "on_pbSave_pressed",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_pbSave_pressed()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 65
+            },
+            {
+              "index": 3,
+              "name": "on_pbSaveAll_pressed",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_pbSaveAll_pressed()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 66
+            },
+            {
+              "index": 4,
+              "name": "change_tab_clot",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "QString",
+                  "name": "arg0"
+                }
+              ],
+              "signature": "change_tab_clot(QString arg0)",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 67
+            },
+            {
+              "index": 5,
+              "name": "on_pbBack_pressed",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_pbBack_pressed()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 70
+            },
+            {
+              "index": 6,
+              "name": "on_pbFront_pressed",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [],
+              "signature": "on_pbFront_pressed()",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 71
+            },
+            {
+              "index": 7,
+              "name": "on_cb_Codes_stateChanged",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "int",
+                  "name": "state"
+                }
+              ],
+              "signature": "on_cb_Codes_stateChanged(int state)",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 72
+            },
+            {
+              "index": 8,
+              "name": "on_cb_Symbols_stateChanged",
+              "kind": "slot",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "int",
+                  "name": "state"
+                }
+              ],
+              "signature": "on_cb_Symbols_stateChanged(int state)",
+              "tag": "",
+              "flags": 10,
+              "parameter_data_index": 75
+            }
+          ],
+          "super_class": "WorkWidget"
+        },
+        {
+          "va": 268521496,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268490832,
+          "data_va": 268490928,
+          "static_metacall_va": 268465120,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "Deca::QDecomposeTab",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 1,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 1,
+          "flags": 0,
+          "methods": [
+            {
+              "index": 0,
+              "name": "difficuldActionClicked",
+              "kind": "signal",
+              "access": "public",
+              "return_type": "void",
+              "arguments": [
+                {
+                  "type": "QString",
+                  "name": "arg0"
+                }
+              ],
+              "signature": "difficuldActionClicked(QString arg0)",
+              "tag": "",
+              "flags": 6,
+              "parameter_data_index": 19
+            }
+          ],
+          "super_class": null
+        },
+        {
+          "va": 268521528,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268494736,
+          "data_va": 268494764,
+          "static_metacall_va": 268442704,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "WorkWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        },
+        {
+          "va": 268521552,
+          "section": ".data",
+          "super_va": 0,
+          "stringdata_va": 268495288,
+          "data_va": 268495316,
+          "static_metacall_va": 268442704,
+          "related_metaobjects_va": 0,
+          "extradata_va": 0,
+          "class_name": "MenuWidget",
+          "revision": 7,
+          "classinfo_count": 0,
+          "method_count": 0,
+          "property_count": 0,
+          "enum_count": 0,
+          "constructor_count": 0,
+          "signal_count": 0,
+          "flags": 0,
+          "methods": [],
+          "super_class": null
+        }
+      ]
+    }
+  ]
+}

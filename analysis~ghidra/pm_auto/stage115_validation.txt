@@ -1,0 +1,27 @@
+Stage 1.15 validation
+====================
+Exact source binaries checked:
+- PM_auto.dll SHA-256: c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018
+- MAIWmodels.dll SHA-256: 80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525
+
+Static audit:
+- 8 PM_auto function ranges: PASS
+- 6 MAIWmodels core implementation ranges: PASS
+- 7 required core import symbols: PASS
+- audit status: PASS
+
+Automated tests:
+- pytest: 40 passed
+
+Native ABI checks:
+- abi_layout_check.cpp: PASS
+- diagram_block_observed_check.cpp: PASS
+- is_module_contract_check.cpp: PASS
+- is_module_vtable_contract_check.cpp: PASS
+- legacy_is_module_abi_check.cpp: PASS
+- pm_auto_typed_connections_contract_check.cpp: PASS
+- workwidget_contract_check.cpp: PASS
+- compilation flags: -std=c++17 -Wall -Wextra -Werror -pedantic
+
+Limitations:
+- Static analysis only; no Windows runtime, Ghidra/IDA decompilation, or original project edit/save round-trip was performed.

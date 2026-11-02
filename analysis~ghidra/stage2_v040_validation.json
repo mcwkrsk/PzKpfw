@@ -1,0 +1,23 @@
+{
+  "version": "0.4.0",
+  "date": "2026-11-02",
+  "python_tests": "190/190 PASS",
+  "native_cpp_abi_layout": "8/8 PASS (g++ C++17, -Wall -Wextra -Werror -pedantic)",
+  "gui_smoke": "PASS (open sample, add AElement through model, refresh tree)",
+  "offline_wheel_install": "PASS (clean venv, no index, no dependencies)",
+  "cli_spz_roundtrip": "PASS (add-spz-element + validate)",
+  "sample_corpus": "5/5 existing sample projects covered by regression tests",
+  "spz_editor": "typed scalar CRUD for AElement fields: id/name/type/status/formalization/level/number/symbol",
+  "opaque_preservation": "unknown AElement attributes/children retained; spz/links and content read-only",
+  "original_runtime": "NOT TESTED (no Windows runtime in this environment)",
+  "original_binary_sha256": {
+    "original/IS.exe": "ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2",
+    "original/MAIWmodels.dll": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525",
+    "original/modules/Model_Visualiser.dll": "1187c7a59ae2dbb8eb91bebbbe89850d9724a62ff186865733930f1488bce880",
+    "original/modules/PM_auto.dll": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+    "original/modules/PM_matrix_web.dll": "55d25ef0f07a069d80226abae1583928be92cf023fb66ffddbdd32b4f1a66f22",
+    "original/modules/PM_params.dll": "22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781",
+    "original/modules/PM_spec_WEB.dll": "ef0365f6fd3f69648ccf28c5eb564312f70faa9bbd892543a933ec4ae7fa6d68"
+  },
+  "wheel_sha256": "7c38e56ab2b35fb5345f21c746d15155bfba0a992103bb55da9dfc98b618f068"
+}

@@ -1,0 +1,5 @@
+Stage 1.17 ConceptStructure audit — 2026-11-01
+Source: supplied MAIWmodels.dll
+SHA-256: 80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525
+Result: 26/26 PASS
+Checks include: relation factories; SubjectCategory factory; SCcompare and class-char map; object/private allocations and release; three endpoint slots and relation type; getCode/getName strings; range accessors; initial CodingType==0 pass; ALinkBinding endpoint index; exact type-3 auto-range predicate; sorting/rank assignment; distinct CodingType/CStype/CategoryStatus; observed CStype return domain {0,1}; decorated exports; source SHA-256; UTF-16 labels.

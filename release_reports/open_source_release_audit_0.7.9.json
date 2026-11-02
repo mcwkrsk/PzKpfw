@@ -1,0 +1,29 @@
+{
+  "release": "0.7.9",
+  "status": "PASS",
+  "license": "MIT for original PzKpfw-authored components within LICENSE and NOTICE scope",
+  "source_tree_includes": [
+    "runtime Python source",
+    "complete Python test suite",
+    "native C++ ABI/layout contract tests",
+    "build and source packaging scripts",
+    "technical documentation",
+    "sanitized project fixtures",
+    "dependency SBOM and third-party notices",
+    "installable wheel built from source"
+  ],
+  "public_git_repository_created": false,
+  "contribution_workflow_created": false,
+  "original_is2_binaries_included": false,
+  "private_reference_material_included": false,
+  "compiled_runtime_artifacts_included": false,
+  "original_is2_runtime_acceptance": "NOT_TESTED",
+  "wheel_sha256": "af7081ac0ac3a81f96e6c1f8a2a990dba8749ccd05df5d98cc5936ca1a62182c",
+  "source_archive_file_count": 644,
+  "python_runtime_source_files": 20,
+  "python_test_files": 58,
+  "native_cpp_contract_test_files": 8,
+  "wheel_included_in_source_archive": "pzkpfw-0.7.9-py3-none-any.whl",
+  "forbidden_archive_entries": [],
+  "archive_integrity": "PASS"
+}

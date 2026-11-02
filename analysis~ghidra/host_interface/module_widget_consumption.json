@@ -1,0 +1,26 @@
+{
+  "static_only": true,
+  "binary": "IS.exe",
+  "sha256": "ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2",
+  "module_widget_list": {
+    "source_member_offset": "0x0c",
+    "copy_helper_va": "0x00404320",
+    "range_helper_va": "0x00403ad0",
+    "list_copy": "Qt QList implicit-sharing copy; source is IsModule+0x0c",
+    "iteration": "begin/end pointers are cached in a local range wrapper; each pointer-sized entry is treated as WorkWidget*",
+    "registration_helper_va": "0x00410b10",
+    "back_pointer_written": "WorkWidget+0x18 = owning IsModule*",
+    "registry_append_va": "0x00404c50",
+    "module_registry_global_va": "0x004696b8"
+  },
+  "destroy_handler": {
+    "function_va": "0x00411a00",
+    "menu_pointer_offset": "WorkWidget+0x20",
+    "mainform_widget_list_offset": "MainForm+0x30",
+    "operation": "remove destroyed WorkWidget from MainForm+0x30 QList and remove its menu tab",
+    "reads_workwidget_owner_back_pointer_0x18": false,
+    "touches_IsModule_widget_list_0x0c": false,
+    "interpretation": "no module-side list removal is present in this bounded handler; possible stale raw pointer if widget dies after registration"
+  },
+  "caveat": "This proves absence only in the bounded destroy handler and traced registration path, not absence of every indirect cleanup path in all loaded code. No runtime test was performed."
+}

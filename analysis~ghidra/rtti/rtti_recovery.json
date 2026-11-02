@@ -1,0 +1,4377 @@
+{
+  "dll": "/mnt/data/is2_work/rar_extracted/IS2_PMauto_beta/MAIWmodels.dll",
+  "sha256": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525",
+  "image_base": "0x10000000",
+  "types": 57,
+  "class_object_locators": [
+    {
+      "col_va": 268531420,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAIStructure@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAIStructure@@",
+          "type_descriptor_va": "0x10021020",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017708"
+        }
+      ]
+    },
+    {
+      "col_va": 268531492,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAFStructure@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAFStructure@@",
+          "type_descriptor_va": "0x1002103c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017750"
+        }
+      ]
+    },
+    {
+      "col_va": 268531564,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAbstractModelPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAbstractModelPrivate@@",
+          "type_descriptor_va": "0x10021058",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017798"
+        }
+      ]
+    },
+    {
+      "col_va": 268531636,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAbstractModel@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAbstractModel@@",
+          "type_descriptor_va": "0x1002107c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100177e0"
+        }
+      ]
+    },
+    {
+      "col_va": 268531708,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAElement@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268531780,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAFElement@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAFElement@@",
+          "type_descriptor_va": "0x100210b0",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017874"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268531856,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAEContentLink@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAEContentLink@@",
+          "type_descriptor_va": "0x10021100",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178c4"
+        },
+        {
+          "type": ".?AVAEBinaryLink@@",
+          "type_descriptor_va": "0x1002111c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178e0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268531992,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAEBinaryLink@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAEBinaryLink@@",
+          "type_descriptor_va": "0x1002111c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178e0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268532012,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAContentStructure@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAContentStructure@@",
+          "type_descriptor_va": "0x10021138",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017958"
+        }
+      ]
+    },
+    {
+      "col_va": 268532084,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AV?$_Func_base@X$$V@std@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AV?$_Func_base@X$$V@std@@",
+          "type_descriptor_va": "0x10021158",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100179a0"
+        }
+      ]
+    },
+    {
+      "col_va": 268532156,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AV?$_Func_impl@V<lambda_81a4fdaf458700c6776103a4cbc403ff>@@V?$allocator@H@std@@X$$V@std@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AV?$_Func_impl@V<lambda_81a4fdaf458700c6776103a4cbc403ff>@@V?$allocator@H@std@@X$$V@std@@",
+          "type_descriptor_va": "0x10021180",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100179ec"
+        },
+        {
+          "type": ".?AV?$_Func_base@X$$V@std@@",
+          "type_descriptor_va": "0x10021158",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100179a0"
+        }
+      ]
+    },
+    {
+      "col_va": 268532232,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAElementPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268532304,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAEBinaryLinkPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x10021204",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a80"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268532380,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAEContentLinkPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAEContentLinkPrivate@@",
+          "type_descriptor_va": "0x10021228",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017ad0"
+        },
+        {
+          "type": ".?AVAEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x10021204",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a80"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268532460,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVexception@std@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVexception@std@@",
+          "type_descriptor_va": "0x1002124c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017b18"
+        }
+      ]
+    },
+    {
+      "col_va": 268532532,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAFEBinaryLink@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAFEBinaryLink@@",
+          "type_descriptor_va": "0x10021268",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017b68"
+        },
+        {
+          "type": ".?AVAEBinaryLink@@",
+          "type_descriptor_va": "0x1002111c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178e0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268532612,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAFEBinaryLinkPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAFEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x10021284",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017bb8"
+        },
+        {
+          "type": ".?AVAEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x10021204",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a80"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268532692,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAFElementPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAFElementPrivate@@",
+          "type_descriptor_va": "0x100212a8",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c04"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268532768,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAFStructurePrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAFStructurePrivate@@",
+          "type_descriptor_va": "0x10021300",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c4c"
+        }
+      ]
+    },
+    {
+      "col_va": 268532840,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AV?$_Func_impl@V<lambda_3c96259353852f2fb8bb4a18497c2700>@@V?$allocator@H@std@@X$$V@std@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AV?$_Func_impl@V<lambda_3c96259353852f2fb8bb4a18497c2700>@@V?$allocator@H@std@@X$$V@std@@",
+          "type_descriptor_va": "0x10021328",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c98"
+        },
+        {
+          "type": ".?AV?$_Func_base@X$$V@std@@",
+          "type_descriptor_va": "0x10021158",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100179a0"
+        }
+      ]
+    },
+    {
+      "col_va": 268532916,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAIEBinaryLinkPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAIEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x1002138c",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017ce8"
+        },
+        {
+          "type": ".?AVAEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x10021204",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a80"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268532996,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAIEBinaryLink@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAIEBinaryLink@@",
+          "type_descriptor_va": "0x100213b0",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d38"
+        },
+        {
+          "type": ".?AVAEBinaryLink@@",
+          "type_descriptor_va": "0x1002111c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178e0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268533076,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAIElementPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAIElementPrivate@@",
+          "type_descriptor_va": "0x100213cc",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d84"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268533152,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAIElement@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAIElement@@",
+          "type_descriptor_va": "0x100213ec",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017dd0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268533228,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVAIStructurePrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVAIStructurePrivate@@",
+          "type_descriptor_va": "0x1002143c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017e18"
+        }
+      ]
+    },
+    {
+      "col_va": 268533300,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AV?$_Func_impl@V<lambda_0e69c46b503226abaf98e81d37253090>@@V?$allocator@H@std@@X$$V@std@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AV?$_Func_impl@V<lambda_0e69c46b503226abaf98e81d37253090>@@V?$allocator@H@std@@X$$V@std@@",
+          "type_descriptor_va": "0x10021460",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017e64"
+        },
+        {
+          "type": ".?AV?$_Func_base@X$$V@std@@",
+          "type_descriptor_va": "0x10021158",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100179a0"
+        }
+      ]
+    },
+    {
+      "col_va": 268533376,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVConceptStructure@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVConceptStructure@@",
+          "type_descriptor_va": "0x100214c4",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017eb0"
+        },
+        {
+          "type": ".?AVAIStructure@@",
+          "type_descriptor_va": "0x10021020",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017708"
+        }
+      ]
+    },
+    {
+      "col_va": 268533452,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVConceptModelPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVConceptModelPrivate@@",
+          "type_descriptor_va": "0x100214e4",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017efc"
+        },
+        {
+          "type": ".?AVAbstractModelPrivate@@",
+          "type_descriptor_va": "0x10021058",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017798"
+        }
+      ]
+    },
+    {
+      "col_va": 268533528,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVConceptModel@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVConceptModel@@",
+          "type_descriptor_va": "0x10021508",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017f48"
+        },
+        {
+          "type": ".?AVAbstractModel@@",
+          "type_descriptor_va": "0x1002107c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100177e0"
+        }
+      ]
+    },
+    {
+      "col_va": 268533604,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVSubjectRelationStructure@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVSubjectRelationStructure@@",
+          "type_descriptor_va": "0x10021524",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017f94"
+        },
+        {
+          "type": ".?AVAFStructure@@",
+          "type_descriptor_va": "0x1002103c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017750"
+        }
+      ]
+    },
+    {
+      "col_va": 268533680,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVConceptStructurePrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVConceptStructurePrivate@@",
+          "type_descriptor_va": "0x1002154c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017fe0"
+        },
+        {
+          "type": ".?AVAIStructurePrivate@@",
+          "type_descriptor_va": "0x1002143c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017e18"
+        }
+      ]
+    },
+    {
+      "col_va": 268533756,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVSubjectCategory@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVSubjectCategory@@",
+          "type_descriptor_va": "0x10021574",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018030"
+        },
+        {
+          "type": ".?AVAIElement@@",
+          "type_descriptor_va": "0x100213ec",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017dd0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268533836,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVSCBinaryLink@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVSCBinaryLink@@",
+          "type_descriptor_va": "0x10021594",
+          "num_contained_bases": 3,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018084"
+        },
+        {
+          "type": ".?AVAIEBinaryLink@@",
+          "type_descriptor_va": "0x100213b0",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d38"
+        },
+        {
+          "type": ".?AVAEBinaryLink@@",
+          "type_descriptor_va": "0x1002111c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178e0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268533920,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVSubjectCategoryPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVSubjectCategoryPrivate@@",
+          "type_descriptor_va": "0x100215b0",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100180d4"
+        },
+        {
+          "type": ".?AVAIElementPrivate@@",
+          "type_descriptor_va": "0x100213cc",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d84"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268534000,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVSubjectRelationPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVSubjectRelationPrivate@@",
+          "type_descriptor_va": "0x100215d8",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018124"
+        },
+        {
+          "type": ".?AVAFElementPrivate@@",
+          "type_descriptor_va": "0x100212a8",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c04"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268534080,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVSubjectRelation@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVSubjectRelation@@",
+          "type_descriptor_va": "0x10021600",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018174"
+        },
+        {
+          "type": ".?AVAFElement@@",
+          "type_descriptor_va": "0x100210b0",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017874"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268534160,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVSubjectRelationStructurePrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVSubjectRelationStructurePrivate@@",
+          "type_descriptor_va": "0x10021620",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100181c0"
+        },
+        {
+          "type": ".?AVAFStructurePrivate@@",
+          "type_descriptor_va": "0x10021300",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c4c"
+        }
+      ]
+    },
+    {
+      "col_va": 268534236,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVObjectPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVObjectPrivate@@",
+          "type_descriptor_va": "0x10021650",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018210"
+        },
+        {
+          "type": ".?AVAIElementPrivate@@",
+          "type_descriptor_va": "0x100213cc",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d84"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268534316,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVObject@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVObject@@",
+          "type_descriptor_va": "0x1002166c",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018260"
+        },
+        {
+          "type": ".?AVAIElement@@",
+          "type_descriptor_va": "0x100213ec",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x4d",
+          "bcd_va": "0x1001827c"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x49",
+          "bcd_va": "0x10018298"
+        }
+      ]
+    },
+    {
+      "col_va": 268534452,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVObjectsListPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVObjectsListPrivate@@",
+          "type_descriptor_va": "0x10021684",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100182e4"
+        },
+        {
+          "type": ".?AVAIStructurePrivate@@",
+          "type_descriptor_va": "0x1002143c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017e18"
+        }
+      ]
+    },
+    {
+      "col_va": 268534528,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVObjectsList@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVObjectsList@@",
+          "type_descriptor_va": "0x100216a8",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018330"
+        },
+        {
+          "type": ".?AVAIStructure@@",
+          "type_descriptor_va": "0x10021020",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017708"
+        }
+      ]
+    },
+    {
+      "col_va": 268534604,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVParameterPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVParameterPrivate@@",
+          "type_descriptor_va": "0x100216c4",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018380"
+        },
+        {
+          "type": ".?AVAIElementPrivate@@",
+          "type_descriptor_va": "0x100213cc",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d84"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268534684,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVParameter@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVParameter@@",
+          "type_descriptor_va": "0x100216e4",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100183d0"
+        },
+        {
+          "type": ".?AVAIElement@@",
+          "type_descriptor_va": "0x100213ec",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017dd0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268534764,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVParametersListPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVParametersListPrivate@@",
+          "type_descriptor_va": "0x100216fc",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x1001841c"
+        },
+        {
+          "type": ".?AVAIStructurePrivate@@",
+          "type_descriptor_va": "0x1002143c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017e18"
+        }
+      ]
+    },
+    {
+      "col_va": 268534840,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVParametersList@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVParametersList@@",
+          "type_descriptor_va": "0x10021720",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018468"
+        },
+        {
+          "type": ".?AVAIStructure@@",
+          "type_descriptor_va": "0x10021020",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017708"
+        }
+      ]
+    },
+    {
+      "col_va": 268534916,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVSubjectOperationsStructure@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVSubjectOperationsStructure@@",
+          "type_descriptor_va": "0x10021740",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100184b4"
+        },
+        {
+          "type": ".?AVAFStructure@@",
+          "type_descriptor_va": "0x1002103c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017750"
+        }
+      ]
+    },
+    {
+      "col_va": 268534992,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVPrimaryModelPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVPrimaryModelPrivate@@",
+          "type_descriptor_va": "0x1002176c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018500"
+        },
+        {
+          "type": ".?AVAbstractModelPrivate@@",
+          "type_descriptor_va": "0x10021058",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017798"
+        }
+      ]
+    },
+    {
+      "col_va": 268535068,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVPrimaryModel@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVPrimaryModel@@",
+          "type_descriptor_va": "0x10021790",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x1001854c"
+        },
+        {
+          "type": ".?AVAbstractModel@@",
+          "type_descriptor_va": "0x1002107c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100177e0"
+        }
+      ]
+    },
+    {
+      "col_va": 268535144,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVSubjectOperationPrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVSubjectOperationPrivate@@",
+          "type_descriptor_va": "0x100217ac",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x1001859c"
+        },
+        {
+          "type": ".?AVAFElementPrivate@@",
+          "type_descriptor_va": "0x100212a8",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c04"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "col_va": 268535224,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVSubjectOperation@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVSubjectOperation@@",
+          "type_descriptor_va": "0x100217d4",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100185ec"
+        },
+        {
+          "type": ".?AVAFElement@@",
+          "type_descriptor_va": "0x100210b0",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017874"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "col_va": 268535304,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVSubjectOperationsStructurePrivate@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVSubjectOperationsStructurePrivate@@",
+          "type_descriptor_va": "0x100217f4",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018638"
+        },
+        {
+          "type": ".?AVAFStructurePrivate@@",
+          "type_descriptor_va": "0x10021300",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c4c"
+        }
+      ]
+    },
+    {
+      "col_va": 268535380,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVtype_info@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVtype_info@@",
+          "type_descriptor_va": "0x10021824",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018680"
+        }
+      ]
+    },
+    {
+      "col_va": 268535452,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVbad_alloc@std@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVbad_alloc@std@@",
+          "type_descriptor_va": "0x1002183c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100186cc"
+        },
+        {
+          "type": ".?AVexception@std@@",
+          "type_descriptor_va": "0x1002124c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017b18"
+        }
+      ]
+    },
+    {
+      "col_va": 268535528,
+      "col_offset": 0,
+      "cd_offset": 0,
+      "type": ".?AVbad_array_new_length@std@@",
+      "chd_attributes": "0x0",
+      "bases": [
+        {
+          "type": ".?AVbad_array_new_length@std@@",
+          "type_descriptor_va": "0x10021858",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x1001871c"
+        },
+        {
+          "type": ".?AVbad_alloc@std@@",
+          "type_descriptor_va": "0x1002183c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100186cc"
+        },
+        {
+          "type": ".?AVexception@std@@",
+          "type_descriptor_va": "0x1002124c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017b18"
+        }
+      ]
+    }
+  ],
+  "vftables": [
+    {
+      "type": ".?AVAIStructure@@",
+      "col_va": "0x100176dc",
+      "vftable_va": "0x100170fc",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10001a30",
+          "rva": "0x01a30",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAIStructure@@",
+          "type_descriptor_va": "0x10021020",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017708"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAFStructure@@",
+      "col_va": "0x10017724",
+      "vftable_va": "0x1001713c",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10001990",
+          "rva": "0x01990",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10015aa2",
+          "rva": "0x15aa2",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAFStructure@@",
+          "type_descriptor_va": "0x1002103c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017750"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAbstractModelPrivate@@",
+      "col_va": "0x1001776c",
+      "vftable_va": "0x10017148",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10001b70",
+          "rva": "0x01b70",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAbstractModelPrivate@@",
+          "type_descriptor_va": "0x10021058",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017798"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAbstractModel@@",
+      "col_va": "0x100177b4",
+      "vftable_va": "0x100170f4",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10001ad0",
+          "rva": "0x01ad0",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAbstractModel@@",
+          "type_descriptor_va": "0x1002107c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100177e0"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAElement@@",
+      "col_va": "0x100177fc",
+      "vftable_va": "0x10017104",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10001850",
+          "rva": "0x01850",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10015aa2",
+          "rva": "0x15aa2",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAFElement@@",
+      "col_va": "0x10017844",
+      "vftable_va": "0x10017120",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x100018f0",
+          "rva": "0x018f0",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10008af0",
+          "rva": "0x08af0",
+          "exports": [
+            "?getCode@AFElement@@UAE?AVMString@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAFElement@@",
+          "type_descriptor_va": "0x100210b0",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017874"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAEContentLink@@",
+      "col_va": "0x10017890",
+      "vftable_va": "0x10017188",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x100023e0",
+          "rva": "0x023e0",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10004360",
+          "rva": "0x04360",
+          "exports": [
+            "?getClassStr@AIElement@@UAE?AVMString@@XZ",
+            "?getCode@AEContentLink@@UAE?AVMString@@XZ",
+            "?getCode@AFEBinaryLink@@UAE?AVMString@@XZ",
+            "?getCode@AIElement@@UAE?AVMString@@XZ",
+            "?getName@AIEBinaryLink@@UAE?AVMString@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAEContentLink@@",
+          "type_descriptor_va": "0x10021100",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178c4"
+        },
+        {
+          "type": ".?AVAEBinaryLink@@",
+          "type_descriptor_va": "0x1002111c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178e0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAEBinaryLink@@",
+      "col_va": "0x10017918",
+      "vftable_va": "0x1001716c",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10002340",
+          "rva": "0x02340",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10015aa2",
+          "rva": "0x15aa2",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAEBinaryLink@@",
+          "type_descriptor_va": "0x1002111c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178e0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAContentStructure@@",
+      "col_va": "0x1001792c",
+      "vftable_va": "0x10017164",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x100022a0",
+          "rva": "0x022a0",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAContentStructure@@",
+          "type_descriptor_va": "0x10021138",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017958"
+        }
+      ]
+    },
+    {
+      "type": ".?AV?$_Func_base@X$$V@std@@",
+      "col_va": "0x10017974",
+      "vftable_va": "0x100171a4",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10015aa2",
+          "rva": "0x15aa2",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10015aa2",
+          "rva": "0x15aa2",
+          "exports": []
+        },
+        {
+          "index": 2,
+          "target_va": "0x10015aa2",
+          "rva": "0x15aa2",
+          "exports": []
+        },
+        {
+          "index": 3,
+          "target_va": "0x10015aa2",
+          "rva": "0x15aa2",
+          "exports": []
+        },
+        {
+          "index": 4,
+          "target_va": "0x10015aa2",
+          "rva": "0x15aa2",
+          "exports": []
+        },
+        {
+          "index": 5,
+          "target_va": "0x10015aa2",
+          "rva": "0x15aa2",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AV?$_Func_base@X$$V@std@@",
+          "type_descriptor_va": "0x10021158",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100179a0"
+        }
+      ]
+    },
+    {
+      "type": ".?AV?$_Func_impl@V<lambda_81a4fdaf458700c6776103a4cbc403ff>@@V?$allocator@H@std@@X$$V@std@@",
+      "col_va": "0x100179bc",
+      "vftable_va": "0x100171c0",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10002480",
+          "rva": "0x02480",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10002480",
+          "rva": "0x02480",
+          "exports": []
+        },
+        {
+          "index": 2,
+          "target_va": "0x100024a0",
+          "rva": "0x024a0",
+          "exports": []
+        },
+        {
+          "index": 3,
+          "target_va": "0x10002690",
+          "rva": "0x02690",
+          "exports": []
+        },
+        {
+          "index": 4,
+          "target_va": "0x1000aac0",
+          "rva": "0x0aac0",
+          "exports": []
+        },
+        {
+          "index": 5,
+          "target_va": "0x10002500",
+          "rva": "0x02500",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AV?$_Func_impl@V<lambda_81a4fdaf458700c6776103a4cbc403ff>@@V?$allocator@H@std@@X$$V@std@@",
+          "type_descriptor_va": "0x10021180",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100179ec"
+        },
+        {
+          "type": ".?AV?$_Func_base@X$$V@std@@",
+          "type_descriptor_va": "0x10021158",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100179a0"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAElementPrivate@@",
+      "col_va": "0x10017a08",
+      "vftable_va": "0x100171dc",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10002f20",
+          "rva": "0x02f20",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAEBinaryLinkPrivate@@",
+      "col_va": "0x10017a50",
+      "vftable_va": "0x100171e8",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10004250",
+          "rva": "0x04250",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x10021204",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a80"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAEContentLinkPrivate@@",
+      "col_va": "0x10017a9c",
+      "vftable_va": "0x1001720c",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x100035a0",
+          "rva": "0x035a0",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAEContentLinkPrivate@@",
+          "type_descriptor_va": "0x10021228",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017ad0"
+        },
+        {
+          "type": ".?AVAEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x10021204",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a80"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVexception@std@@",
+      "col_va": "0x10017aec",
+      "vftable_va": "0x10017214",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10003820",
+          "rva": "0x03820",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003e90",
+          "rva": "0x03e90",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVexception@std@@",
+          "type_descriptor_va": "0x1002124c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017b18"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAFEBinaryLink@@",
+      "col_va": "0x10017b34",
+      "vftable_va": "0x10017254",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x100041a0",
+          "rva": "0x041a0",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10004360",
+          "rva": "0x04360",
+          "exports": [
+            "?getClassStr@AIElement@@UAE?AVMString@@XZ",
+            "?getCode@AEContentLink@@UAE?AVMString@@XZ",
+            "?getCode@AFEBinaryLink@@UAE?AVMString@@XZ",
+            "?getCode@AIElement@@UAE?AVMString@@XZ",
+            "?getName@AIEBinaryLink@@UAE?AVMString@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAFEBinaryLink@@",
+          "type_descriptor_va": "0x10021268",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017b68"
+        },
+        {
+          "type": ".?AVAEBinaryLink@@",
+          "type_descriptor_va": "0x1002111c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178e0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAFEBinaryLinkPrivate@@",
+      "col_va": "0x10017b84",
+      "vftable_va": "0x10017270",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10004250",
+          "rva": "0x04250",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAFEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x10021284",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017bb8"
+        },
+        {
+          "type": ".?AVAEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x10021204",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a80"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAFElementPrivate@@",
+      "col_va": "0x10017bd4",
+      "vftable_va": "0x10017278",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10006b50",
+          "rva": "0x06b50",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAFElementPrivate@@",
+          "type_descriptor_va": "0x100212a8",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c04"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAFStructurePrivate@@",
+      "col_va": "0x10017c20",
+      "vftable_va": "0x100172d8",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000aa20",
+          "rva": "0x0aa20",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAFStructurePrivate@@",
+          "type_descriptor_va": "0x10021300",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c4c"
+        }
+      ]
+    },
+    {
+      "type": ".?AV?$_Func_impl@V<lambda_3c96259353852f2fb8bb4a18497c2700>@@V?$allocator@H@std@@X$$V@std@@",
+      "col_va": "0x10017c68",
+      "vftable_va": "0x100172e0",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000ab50",
+          "rva": "0x0ab50",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x1000ab50",
+          "rva": "0x0ab50",
+          "exports": []
+        },
+        {
+          "index": 2,
+          "target_va": "0x1000aae0",
+          "rva": "0x0aae0",
+          "exports": []
+        },
+        {
+          "index": 3,
+          "target_va": "0x1000ab70",
+          "rva": "0x0ab70",
+          "exports": []
+        },
+        {
+          "index": 4,
+          "target_va": "0x1000aac0",
+          "rva": "0x0aac0",
+          "exports": []
+        },
+        {
+          "index": 5,
+          "target_va": "0x10002500",
+          "rva": "0x02500",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AV?$_Func_impl@V<lambda_3c96259353852f2fb8bb4a18497c2700>@@V?$allocator@H@std@@X$$V@std@@",
+          "type_descriptor_va": "0x10021328",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c98"
+        },
+        {
+          "type": ".?AV?$_Func_base@X$$V@std@@",
+          "type_descriptor_va": "0x10021158",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100179a0"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAIEBinaryLinkPrivate@@",
+      "col_va": "0x10017cb4",
+      "vftable_va": "0x10017330",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000cb00",
+          "rva": "0x0cb00",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAIEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x1002138c",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017ce8"
+        },
+        {
+          "type": ".?AVAEBinaryLinkPrivate@@",
+          "type_descriptor_va": "0x10021204",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a80"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAIEBinaryLink@@",
+      "col_va": "0x10017d04",
+      "vftable_va": "0x10017310",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000ca50",
+          "rva": "0x0ca50",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10015aa2",
+          "rva": "0x15aa2",
+          "exports": []
+        },
+        {
+          "index": 6,
+          "target_va": "0x10004360",
+          "rva": "0x04360",
+          "exports": [
+            "?getClassStr@AIElement@@UAE?AVMString@@XZ",
+            "?getCode@AEContentLink@@UAE?AVMString@@XZ",
+            "?getCode@AFEBinaryLink@@UAE?AVMString@@XZ",
+            "?getCode@AIElement@@UAE?AVMString@@XZ",
+            "?getName@AIEBinaryLink@@UAE?AVMString@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAIEBinaryLink@@",
+          "type_descriptor_va": "0x100213b0",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d38"
+        },
+        {
+          "type": ".?AVAEBinaryLink@@",
+          "type_descriptor_va": "0x1002111c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178e0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAIElementPrivate@@",
+      "col_va": "0x10017d54",
+      "vftable_va": "0x10017338",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000cbe0",
+          "rva": "0x0cbe0",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAIElementPrivate@@",
+          "type_descriptor_va": "0x100213cc",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d84"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAIElement@@",
+      "col_va": "0x10017da0",
+      "vftable_va": "0x10017340",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000d2b0",
+          "rva": "0x0d2b0",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10004360",
+          "rva": "0x04360",
+          "exports": [
+            "?getClassStr@AIElement@@UAE?AVMString@@XZ",
+            "?getCode@AEContentLink@@UAE?AVMString@@XZ",
+            "?getCode@AFEBinaryLink@@UAE?AVMString@@XZ",
+            "?getCode@AIElement@@UAE?AVMString@@XZ",
+            "?getName@AIEBinaryLink@@UAE?AVMString@@XZ"
+          ]
+        },
+        {
+          "index": 6,
+          "target_va": "0x10004360",
+          "rva": "0x04360",
+          "exports": [
+            "?getClassStr@AIElement@@UAE?AVMString@@XZ",
+            "?getCode@AEContentLink@@UAE?AVMString@@XZ",
+            "?getCode@AFEBinaryLink@@UAE?AVMString@@XZ",
+            "?getCode@AIElement@@UAE?AVMString@@XZ",
+            "?getName@AIEBinaryLink@@UAE?AVMString@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAIElement@@",
+          "type_descriptor_va": "0x100213ec",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017dd0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVAIStructurePrivate@@",
+      "col_va": "0x10017dec",
+      "vftable_va": "0x10017360",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000daf0",
+          "rva": "0x0daf0",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVAIStructurePrivate@@",
+          "type_descriptor_va": "0x1002143c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017e18"
+        }
+      ]
+    },
+    {
+      "type": ".?AV?$_Func_impl@V<lambda_0e69c46b503226abaf98e81d37253090>@@V?$allocator@H@std@@X$$V@std@@",
+      "col_va": "0x10017e34",
+      "vftable_va": "0x10017368",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000dc20",
+          "rva": "0x0dc20",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x1000dc20",
+          "rva": "0x0dc20",
+          "exports": []
+        },
+        {
+          "index": 2,
+          "target_va": "0x1000dc40",
+          "rva": "0x0dc40",
+          "exports": []
+        },
+        {
+          "index": 3,
+          "target_va": "0x1000dd20",
+          "rva": "0x0dd20",
+          "exports": []
+        },
+        {
+          "index": 4,
+          "target_va": "0x1000aac0",
+          "rva": "0x0aac0",
+          "exports": []
+        },
+        {
+          "index": 5,
+          "target_va": "0x10002500",
+          "rva": "0x02500",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AV?$_Func_impl@V<lambda_0e69c46b503226abaf98e81d37253090>@@V?$allocator@H@std@@X$$V@std@@",
+          "type_descriptor_va": "0x10021460",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017e64"
+        },
+        {
+          "type": ".?AV?$_Func_base@X$$V@std@@",
+          "type_descriptor_va": "0x10021158",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100179a0"
+        }
+      ]
+    },
+    {
+      "type": ".?AVConceptStructure@@",
+      "col_va": "0x10017e80",
+      "vftable_va": "0x100173a0",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000e810",
+          "rva": "0x0e810",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVConceptStructure@@",
+          "type_descriptor_va": "0x100214c4",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017eb0"
+        },
+        {
+          "type": ".?AVAIStructure@@",
+          "type_descriptor_va": "0x10021020",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017708"
+        }
+      ]
+    },
+    {
+      "type": ".?AVConceptModelPrivate@@",
+      "col_va": "0x10017ecc",
+      "vftable_va": "0x1001738c",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000e950",
+          "rva": "0x0e950",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVConceptModelPrivate@@",
+          "type_descriptor_va": "0x100214e4",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017efc"
+        },
+        {
+          "type": ".?AVAbstractModelPrivate@@",
+          "type_descriptor_va": "0x10021058",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017798"
+        }
+      ]
+    },
+    {
+      "type": ".?AVConceptModel@@",
+      "col_va": "0x10017f18",
+      "vftable_va": "0x10017384",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000e760",
+          "rva": "0x0e760",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVConceptModel@@",
+          "type_descriptor_va": "0x10021508",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017f48"
+        },
+        {
+          "type": ".?AVAbstractModel@@",
+          "type_descriptor_va": "0x1002107c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100177e0"
+        }
+      ]
+    },
+    {
+      "type": ".?AVSubjectRelationStructure@@",
+      "col_va": "0x10017f64",
+      "vftable_va": "0x10017394",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000e8b0",
+          "rva": "0x0e8b0",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10011b20",
+          "rva": "0x11b20",
+          "exports": [
+            "?createAFElement@SubjectRelationStructure@@UAEPAVAFElement@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVSubjectRelationStructure@@",
+          "type_descriptor_va": "0x10021524",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017f94"
+        },
+        {
+          "type": ".?AVAFStructure@@",
+          "type_descriptor_va": "0x1002103c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017750"
+        }
+      ]
+    },
+    {
+      "type": ".?AVConceptStructurePrivate@@",
+      "col_va": "0x10017fb0",
+      "vftable_va": "0x100173ac",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000f880",
+          "rva": "0x0f880",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVConceptStructurePrivate@@",
+          "type_descriptor_va": "0x1002154c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017fe0"
+        },
+        {
+          "type": ".?AVAIStructurePrivate@@",
+          "type_descriptor_va": "0x1002143c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017e18"
+        }
+      ]
+    },
+    {
+      "type": ".?AVSubjectCategory@@",
+      "col_va": "0x10017ffc",
+      "vftable_va": "0x100173b4",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000f7e0",
+          "rva": "0x0f7e0",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x100114a0",
+          "rva": "0x114a0",
+          "exports": [
+            "?getCode@SubjectCategory@@UAE?AVMString@@XZ"
+          ]
+        },
+        {
+          "index": 6,
+          "target_va": "0x10004360",
+          "rva": "0x04360",
+          "exports": [
+            "?getClassStr@AIElement@@UAE?AVMString@@XZ",
+            "?getCode@AEContentLink@@UAE?AVMString@@XZ",
+            "?getCode@AFEBinaryLink@@UAE?AVMString@@XZ",
+            "?getCode@AIElement@@UAE?AVMString@@XZ",
+            "?getName@AIEBinaryLink@@UAE?AVMString@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVSubjectCategory@@",
+          "type_descriptor_va": "0x10021574",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018030"
+        },
+        {
+          "type": ".?AVAIElement@@",
+          "type_descriptor_va": "0x100213ec",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017dd0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVSCBinaryLink@@",
+      "col_va": "0x1001804c",
+      "vftable_va": "0x100173d4",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x1000f740",
+          "rva": "0x0f740",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10010800",
+          "rva": "0x10800",
+          "exports": [
+            "?getCode@SCBinaryLink@@UAE?AVMString@@XZ"
+          ]
+        },
+        {
+          "index": 6,
+          "target_va": "0x100109e0",
+          "rva": "0x109e0",
+          "exports": [
+            "?getName@SCBinaryLink@@UAE?AVMString@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVSCBinaryLink@@",
+          "type_descriptor_va": "0x10021594",
+          "num_contained_bases": 3,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018084"
+        },
+        {
+          "type": ".?AVAIEBinaryLink@@",
+          "type_descriptor_va": "0x100213b0",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d38"
+        },
+        {
+          "type": ".?AVAEBinaryLink@@",
+          "type_descriptor_va": "0x1002111c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100178e0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVSubjectCategoryPrivate@@",
+      "col_va": "0x100180a0",
+      "vftable_va": "0x100174f8",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10011300",
+          "rva": "0x11300",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVSubjectCategoryPrivate@@",
+          "type_descriptor_va": "0x100215b0",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100180d4"
+        },
+        {
+          "type": ".?AVAIElementPrivate@@",
+          "type_descriptor_va": "0x100213cc",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d84"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVSubjectRelationPrivate@@",
+      "col_va": "0x100180f0",
+      "vftable_va": "0x10017520",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x100119b0",
+          "rva": "0x119b0",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVSubjectRelationPrivate@@",
+          "type_descriptor_va": "0x100215d8",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018124"
+        },
+        {
+          "type": ".?AVAFElementPrivate@@",
+          "type_descriptor_va": "0x100212a8",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c04"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVSubjectRelation@@",
+      "col_va": "0x10018140",
+      "vftable_va": "0x10017504",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10011900",
+          "rva": "0x11900",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10008af0",
+          "rva": "0x08af0",
+          "exports": [
+            "?getCode@AFElement@@UAE?AVMString@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVSubjectRelation@@",
+          "type_descriptor_va": "0x10021600",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018174"
+        },
+        {
+          "type": ".?AVAFElement@@",
+          "type_descriptor_va": "0x100210b0",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017874"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVSubjectRelationStructurePrivate@@",
+      "col_va": "0x10018190",
+      "vftable_va": "0x10017528",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10011af0",
+          "rva": "0x11af0",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVSubjectRelationStructurePrivate@@",
+          "type_descriptor_va": "0x10021620",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100181c0"
+        },
+        {
+          "type": ".?AVAFStructurePrivate@@",
+          "type_descriptor_va": "0x10021300",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c4c"
+        }
+      ]
+    },
+    {
+      "type": ".?AVObjectPrivate@@",
+      "col_va": "0x100181dc",
+      "vftable_va": "0x1001755c",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10012580",
+          "rva": "0x12580",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVObjectPrivate@@",
+          "type_descriptor_va": "0x10021650",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018210"
+        },
+        {
+          "type": ".?AVAIElementPrivate@@",
+          "type_descriptor_va": "0x100213cc",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d84"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVObject@@",
+      "col_va": "0x1001822c",
+      "vftable_va": "0x1001753c",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x100124d0",
+          "rva": "0x124d0",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10004360",
+          "rva": "0x04360",
+          "exports": [
+            "?getClassStr@AIElement@@UAE?AVMString@@XZ",
+            "?getCode@AEContentLink@@UAE?AVMString@@XZ",
+            "?getCode@AFEBinaryLink@@UAE?AVMString@@XZ",
+            "?getCode@AIElement@@UAE?AVMString@@XZ",
+            "?getName@AIEBinaryLink@@UAE?AVMString@@XZ"
+          ]
+        },
+        {
+          "index": 6,
+          "target_va": "0x10004360",
+          "rva": "0x04360",
+          "exports": [
+            "?getClassStr@AIElement@@UAE?AVMString@@XZ",
+            "?getCode@AEContentLink@@UAE?AVMString@@XZ",
+            "?getCode@AFEBinaryLink@@UAE?AVMString@@XZ",
+            "?getCode@AIElement@@UAE?AVMString@@XZ",
+            "?getName@AIEBinaryLink@@UAE?AVMString@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVObject@@",
+          "type_descriptor_va": "0x1002166c",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018260"
+        },
+        {
+          "type": ".?AVAIElement@@",
+          "type_descriptor_va": "0x100213ec",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x4d",
+          "bcd_va": "0x1001827c"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x49",
+          "bcd_va": "0x10018298"
+        }
+      ]
+    },
+    {
+      "type": ".?AVObjectsListPrivate@@",
+      "col_va": "0x100182b4",
+      "vftable_va": "0x1001756c",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x100128d0",
+          "rva": "0x128d0",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVObjectsListPrivate@@",
+          "type_descriptor_va": "0x10021684",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100182e4"
+        },
+        {
+          "type": ".?AVAIStructurePrivate@@",
+          "type_descriptor_va": "0x1002143c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017e18"
+        }
+      ]
+    },
+    {
+      "type": ".?AVObjectsList@@",
+      "col_va": "0x10018300",
+      "vftable_va": "0x10017564",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10012820",
+          "rva": "0x12820",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVObjectsList@@",
+          "type_descriptor_va": "0x100216a8",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018330"
+        },
+        {
+          "type": ".?AVAIStructure@@",
+          "type_descriptor_va": "0x10021020",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017708"
+        }
+      ]
+    },
+    {
+      "type": ".?AVParameterPrivate@@",
+      "col_va": "0x1001834c",
+      "vftable_va": "0x10017594",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10012d90",
+          "rva": "0x12d90",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVParameterPrivate@@",
+          "type_descriptor_va": "0x100216c4",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018380"
+        },
+        {
+          "type": ".?AVAIElementPrivate@@",
+          "type_descriptor_va": "0x100213cc",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017d84"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVParameter@@",
+      "col_va": "0x1001839c",
+      "vftable_va": "0x10017574",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10012ce0",
+          "rva": "0x12ce0",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10012e40",
+          "rva": "0x12e40",
+          "exports": [
+            "?getCode@Parameter@@UAE?AVMString@@XZ"
+          ]
+        },
+        {
+          "index": 6,
+          "target_va": "0x10004360",
+          "rva": "0x04360",
+          "exports": [
+            "?getClassStr@AIElement@@UAE?AVMString@@XZ",
+            "?getCode@AEContentLink@@UAE?AVMString@@XZ",
+            "?getCode@AFEBinaryLink@@UAE?AVMString@@XZ",
+            "?getCode@AIElement@@UAE?AVMString@@XZ",
+            "?getName@AIEBinaryLink@@UAE?AVMString@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVParameter@@",
+          "type_descriptor_va": "0x100216e4",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100183d0"
+        },
+        {
+          "type": ".?AVAIElement@@",
+          "type_descriptor_va": "0x100213ec",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017dd0"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVParametersListPrivate@@",
+      "col_va": "0x100183ec",
+      "vftable_va": "0x100175ac",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10013830",
+          "rva": "0x13830",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVParametersListPrivate@@",
+          "type_descriptor_va": "0x100216fc",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x1001841c"
+        },
+        {
+          "type": ".?AVAIStructurePrivate@@",
+          "type_descriptor_va": "0x1002143c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017e18"
+        }
+      ]
+    },
+    {
+      "type": ".?AVParametersList@@",
+      "col_va": "0x10018438",
+      "vftable_va": "0x100175a4",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10013780",
+          "rva": "0x13780",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVParametersList@@",
+          "type_descriptor_va": "0x10021720",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018468"
+        },
+        {
+          "type": ".?AVAIStructure@@",
+          "type_descriptor_va": "0x10021020",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017708"
+        }
+      ]
+    },
+    {
+      "type": ".?AVSubjectOperationsStructure@@",
+      "col_va": "0x10018484",
+      "vftable_va": "0x100175c4",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x100141b0",
+          "rva": "0x141b0",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10014b40",
+          "rva": "0x14b40",
+          "exports": [
+            "?createAFElement@SubjectOperationsStructure@@EAEPAVAFElement@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVSubjectOperationsStructure@@",
+          "type_descriptor_va": "0x10021740",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100184b4"
+        },
+        {
+          "type": ".?AVAFStructure@@",
+          "type_descriptor_va": "0x1002103c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017750"
+        }
+      ]
+    },
+    {
+      "type": ".?AVPrimaryModelPrivate@@",
+      "col_va": "0x100184d0",
+      "vftable_va": "0x100175bc",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10014100",
+          "rva": "0x14100",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVPrimaryModelPrivate@@",
+          "type_descriptor_va": "0x1002176c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018500"
+        },
+        {
+          "type": ".?AVAbstractModelPrivate@@",
+          "type_descriptor_va": "0x10021058",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017798"
+        }
+      ]
+    },
+    {
+      "type": ".?AVPrimaryModel@@",
+      "col_va": "0x1001851c",
+      "vftable_va": "0x100175b4",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10014050",
+          "rva": "0x14050",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVPrimaryModel@@",
+          "type_descriptor_va": "0x10021790",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x1001854c"
+        },
+        {
+          "type": ".?AVAbstractModel@@",
+          "type_descriptor_va": "0x1002107c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100177e0"
+        }
+      ]
+    },
+    {
+      "type": ".?AVSubjectOperationPrivate@@",
+      "col_va": "0x10018568",
+      "vftable_va": "0x100175ec",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10014600",
+          "rva": "0x14600",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVSubjectOperationPrivate@@",
+          "type_descriptor_va": "0x100217ac",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x1001859c"
+        },
+        {
+          "type": ".?AVAFElementPrivate@@",
+          "type_descriptor_va": "0x100212a8",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c04"
+        },
+        {
+          "type": ".?AVAElementPrivate@@",
+          "type_descriptor_va": "0x100211e4",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017a34"
+        }
+      ]
+    },
+    {
+      "type": ".?AVSubjectOperation@@",
+      "col_va": "0x100185b8",
+      "vftable_va": "0x100175d0",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10014550",
+          "rva": "0x14550",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003aa0",
+          "rva": "0x03aa0",
+          "exports": [
+            "?getBinaryLinksCount@AElement@@UAEHXZ",
+            "?getDynamicStructureCount@AbstractModel@@QAEHXZ"
+          ]
+        },
+        {
+          "index": 2,
+          "target_va": "0x10003a20",
+          "rva": "0x03a20",
+          "exports": [
+            "?getBiaryLink@AElement@@UAE?AUALinkBinding@@H@Z"
+          ]
+        },
+        {
+          "index": 3,
+          "target_va": "0x10003ab0",
+          "rva": "0x03ab0",
+          "exports": [
+            "?getBinaryLinksList@AElement@@UAE?AVALElementList@@XZ"
+          ]
+        },
+        {
+          "index": 4,
+          "target_va": "0x10003db0",
+          "rva": "0x03db0",
+          "exports": [
+            "?unlink@AElement@@UAEXXZ"
+          ]
+        },
+        {
+          "index": 5,
+          "target_va": "0x10008af0",
+          "rva": "0x08af0",
+          "exports": [
+            "?getCode@AFElement@@UAE?AVMString@@XZ"
+          ]
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVSubjectOperation@@",
+          "type_descriptor_va": "0x100217d4",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100185ec"
+        },
+        {
+          "type": ".?AVAFElement@@",
+          "type_descriptor_va": "0x100210b0",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017874"
+        },
+        {
+          "type": ".?AVAElement@@",
+          "type_descriptor_va": "0x10021098",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017828"
+        }
+      ]
+    },
+    {
+      "type": ".?AVSubjectOperationsStructurePrivate@@",
+      "col_va": "0x10018608",
+      "vftable_va": "0x100175f4",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10014a80",
+          "rva": "0x14a80",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVSubjectOperationsStructurePrivate@@",
+          "type_descriptor_va": "0x100217f4",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018638"
+        },
+        {
+          "type": ".?AVAFStructurePrivate@@",
+          "type_descriptor_va": "0x10021300",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017c4c"
+        }
+      ]
+    },
+    {
+      "type": ".?AVtype_info@@",
+      "col_va": "0x10018654",
+      "vftable_va": "0x10017608",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x10014d5e",
+          "rva": "0x14d5e",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVtype_info@@",
+          "type_descriptor_va": "0x10021824",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10018680"
+        }
+      ]
+    },
+    {
+      "type": ".?AVbad_alloc@std@@",
+      "col_va": "0x1001869c",
+      "vftable_va": "0x10017614",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x100151b5",
+          "rva": "0x151b5",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003e90",
+          "rva": "0x03e90",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVbad_alloc@std@@",
+          "type_descriptor_va": "0x1002183c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100186cc"
+        },
+        {
+          "type": ".?AVexception@std@@",
+          "type_descriptor_va": "0x1002124c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017b18"
+        }
+      ]
+    },
+    {
+      "type": ".?AVbad_array_new_length@std@@",
+      "col_va": "0x100186e8",
+      "vftable_va": "0x10017630",
+      "slots": [
+        {
+          "index": 0,
+          "target_va": "0x100151b5",
+          "rva": "0x151b5",
+          "exports": []
+        },
+        {
+          "index": 1,
+          "target_va": "0x10003e90",
+          "rva": "0x03e90",
+          "exports": []
+        }
+      ],
+      "bases": [
+        {
+          "type": ".?AVbad_array_new_length@std@@",
+          "type_descriptor_va": "0x10021858",
+          "num_contained_bases": 2,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x1001871c"
+        },
+        {
+          "type": ".?AVbad_alloc@std@@",
+          "type_descriptor_va": "0x1002183c",
+          "num_contained_bases": 1,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x100186cc"
+        },
+        {
+          "type": ".?AVexception@std@@",
+          "type_descriptor_va": "0x1002124c",
+          "num_contained_bases": 0,
+          "mdisp": 0,
+          "pdisp": -1,
+          "vdisp": 0,
+          "attributes": "0x40",
+          "bcd_va": "0x10017b18"
+        }
+      ]
+    }
+  ]
+}

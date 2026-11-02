@@ -1,0 +1,45 @@
+Stage 1 closeout validation
+Date: 2026-11-01
+Scope: final reproducibility gate for the static reverse-engineering baseline.
+
+Python regression suite
+-----------------------
+Command: pytest -q
+Result: 110 passed.
+
+Native ABI/layout checks
+------------------------
+Each tests/native/*.cpp file was separately compiled using:
+  g++ -std=c++17 -Wall -Wextra -Werror -pedantic -I.
+All eight programs compiled and executed successfully:
+  abi_layout_check
+  diagram_block_observed_check
+  is_module_contract_check
+  is_module_vtable_contract_check
+  legacy_is_module_abi_check
+  pm_auto_stage116_contract_check
+  pm_auto_typed_connections_contract_check
+  workwidget_contract_check
+
+SHA-pinned static audits
+------------------------
+- Plugin module shutdown: 33/33 PASS.
+- WorkWidget/MenuWidget parent lifecycle: 31/31 PASS.
+- Concrete WorkWidget/deferred cleanup: 49/49 PASS.
+- ConceptModel writer/reader tree symmetry: 42/42 PASS.
+- Project writer/range persistence: 21/21 PASS.
+- ConceptStructure/SCBinaryLink: 26/26 PASS.
+- AIStructure nested-tree topology: 38/38 PASS.
+- Parameter/Object post-erase ownership: 30/30 PASS.
+- Source PE32 identity: 7/7 SHA-256 PASS (see hashes/stage1_closeout_binary_manifest.json).
+
+Corrections made in final gate
+------------------------------
+- Refreshed the parent-lifecycle regression expectation from the historical 28 to the current audit's 31 fingerprints.
+- Aligned the Qt-version caveat assertion with the actual machine-readable wording.
+- Updated the concrete widget report's stage-status assertion to the superseding closeout decision.
+- Added a dedicated closeout regression test for status, evidence counts, source hashes and Stage 2 transfer.
+
+Scope limitations
+-----------------
+No Windows application runtime, matching Qt runtime, debugger/heap trace, full C++ decompilation, original kursach_.is2 byte-level fixture, or true non-empty ConceptModel/cs save/reopen round-trip was run. Static audit PASS means fingerprints and structural assertions match the exact pinned inputs; it does not mean runtime behavior was exercised.

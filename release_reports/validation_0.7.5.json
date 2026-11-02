@@ -1,0 +1,46 @@
+{
+  "release": "PzKpfw Desktop Alpha 0.7.5",
+  "release_date": "2026-11-02",
+  "python_tests": {
+    "passed": 274,
+    "failed": 0,
+    "status": "PASS"
+  },
+  "supplied_project_roundtrip": {
+    "passed": 5,
+    "total": 5,
+    "status": "PASS"
+  },
+  "compatibility_corpus": {
+    "passed": 6,
+    "total": 6,
+    "includes_synthetic_relationship_fixture": true,
+    "status": "PASS"
+  },
+  "native_cpp_abi_layout_checks": {
+    "passed": 8,
+    "total": 8,
+    "status": "PASS"
+  },
+  "gui_smoke": {
+    "status": "PASS",
+    "covered": [
+      "PrimaryModel parameter-object assignment and clear",
+      "safe object deletion with explicit reference clearing",
+      "parameter-object graph representation",
+      "graph CRUD, node navigation, zoom and drag",
+      "group collapse/expand and sidecar persistence",
+      "ConceptModel edit history and bulk edit navigation",
+      "Undo/Redo and dirty/savepoint tracking"
+    ]
+  },
+  "wheel": {
+    "filename": "pzkpfw-0.7.5-py3-none-any.whl",
+    "build": "PASS",
+    "clean_environment_install": "PASS",
+    "clean_environment_version": "0.7.5",
+    "cli_and_gui_import": "PASS"
+  },
+  "original_is2_windows_runtime_acceptance": "NOT_TESTED",
+  "note": "Structural XML round-trip checks do not establish acceptance by the original Windows IS-2 executable."
+}

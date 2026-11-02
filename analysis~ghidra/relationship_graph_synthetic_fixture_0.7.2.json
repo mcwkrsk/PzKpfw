@@ -1,0 +1,226 @@
+{
+  "schema_version": 1,
+  "model": "IS-2 relationship endpoint graph",
+  "semantics": "Each relation is a record node; edges represent serialized endpoint slots and do not infer direction.",
+  "nodes": [
+    {
+      "key": "action:1",
+      "kind": "action",
+      "id": "1",
+      "label": "#1 · Synthetic action",
+      "detail": "AFElementtype=0",
+      "attributes": {
+        "id": "1",
+        "name": "Synthetic action",
+        "type": "0",
+        "formalization": "0",
+        "mark": "",
+        "status": "0"
+      }
+    },
+    {
+      "key": "category:1",
+      "kind": "category",
+      "id": "1",
+      "label": "#1 · Synthetic category A",
+      "detail": "AIElement / SubjectCategoryclass=1 · group=-1 · number=-1 · status=0",
+      "attributes": {
+        "id": "1",
+        "name": "Synthetic category A",
+        "class": "1",
+        "group": "-1",
+        "number": "-1",
+        "status": "0",
+        "autoRange": "1",
+        "codingType": "1"
+      }
+    },
+    {
+      "key": "category:2",
+      "kind": "category",
+      "id": "2",
+      "label": "#2 · Synthetic category B",
+      "detail": "AIElement / SubjectCategoryclass=2 · group=-1 · number=-1 · status=0",
+      "attributes": {
+        "id": "2",
+        "name": "Synthetic category B",
+        "class": "2",
+        "group": "-1",
+        "number": "-1",
+        "status": "0",
+        "autoRange": "1",
+        "codingType": "1"
+      }
+    },
+    {
+      "key": "spz_element:1",
+      "kind": "spz_element",
+      "id": "1",
+      "label": "#1 · Synthetic AElement A",
+      "detail": "AIElement / spz AElementtype=0 · status=0 · level=1 · number=1",
+      "attributes": {
+        "id": "1",
+        "name": "Synthetic AElement A",
+        "type": "0",
+        "status": "0",
+        "formalization": "0",
+        "level": "1",
+        "number": "1",
+        "symbol": "99"
+      }
+    },
+    {
+      "key": "spz_element:2",
+      "kind": "spz_element",
+      "id": "2",
+      "label": "#2 · Synthetic AElement B",
+      "detail": "AIElement / spz AElementtype=0 · status=0 · level=1 · number=2",
+      "attributes": {
+        "id": "2",
+        "name": "Synthetic AElement B",
+        "type": "0",
+        "status": "0",
+        "formalization": "0",
+        "level": "1",
+        "number": "2",
+        "symbol": "99"
+      }
+    },
+    {
+      "key": "relation:scbinarylink:1:0",
+      "kind": "relation",
+      "relation_kind": "scbinarylink",
+      "label": "SCBinaryLink · #1 · type=2",
+      "detail": "ConceptModel/cs/link · id=1 · type=2 · range=1",
+      "attributes": {
+        "id": "1",
+        "name": "",
+        "e1": "1",
+        "e2": "2",
+        "e3": "0",
+        "type": "2",
+        "range": "1"
+      },
+      "record_index": 0
+    },
+    {
+      "key": "relation:aie_binary_link:0",
+      "kind": "relation",
+      "relation_kind": "aie_binary_link",
+      "label": "AIEBinaryLink · #1 · Synthetic AIEBinaryLink",
+      "detail": "ConceptModel/spz/links/AElement · index=0 · id=0 · type=0",
+      "attributes": {
+        "id": "0",
+        "name": "Synthetic AIEBinaryLink",
+        "type": "0",
+        "status": "0",
+        "formalization": "0",
+        "level": "0",
+        "number": "0",
+        "symbol": "0",
+        "e1": "1",
+        "e2": "2",
+        "e3": "0"
+      },
+      "record_index": 0
+    },
+    {
+      "key": "relation:ae_content_link:0",
+      "kind": "relation",
+      "relation_kind": "ae_content_link",
+      "label": "AEContentLink · #1 · char=46",
+      "detail": "ConceptModel/content/AElement · index=0 · type=4 · char=46 · power=3",
+      "attributes": {
+        "id": "0",
+        "name": "",
+        "e1": "1",
+        "e2": "2",
+        "type": "4",
+        "char": "46",
+        "power": "3"
+      },
+      "record_index": 0
+    }
+  ],
+  "edges": [
+    {
+      "key": "relation:scbinarylink:1:0:e1",
+      "relation_key": "relation:scbinarylink:1:0",
+      "slot": "e1",
+      "endpoint_id": "1",
+      "target_key": "category:1",
+      "target_domain": "category",
+      "valid": true
+    },
+    {
+      "key": "relation:scbinarylink:1:0:e2",
+      "relation_key": "relation:scbinarylink:1:0",
+      "slot": "e2",
+      "endpoint_id": "2",
+      "target_key": "category:2",
+      "target_domain": "category",
+      "valid": true
+    },
+    {
+      "key": "relation:aie_binary_link:0:e1",
+      "relation_key": "relation:aie_binary_link:0",
+      "slot": "e1",
+      "endpoint_id": "1",
+      "target_key": "spz_element:1",
+      "target_domain": "spz_element",
+      "valid": true
+    },
+    {
+      "key": "relation:aie_binary_link:0:e2",
+      "relation_key": "relation:aie_binary_link:0",
+      "slot": "e2",
+      "endpoint_id": "2",
+      "target_key": "spz_element:2",
+      "target_domain": "spz_element",
+      "valid": true
+    },
+    {
+      "key": "relation:ae_content_link:0:e1",
+      "relation_key": "relation:ae_content_link:0",
+      "slot": "e1",
+      "endpoint_id": "1",
+      "target_key": "action:1",
+      "target_domain": "action",
+      "valid": true
+    },
+    {
+      "key": "relation:ae_content_link:0:e2",
+      "relation_key": "relation:ae_content_link:0",
+      "slot": "e2",
+      "endpoint_id": "2",
+      "target_key": "category:2",
+      "target_domain": "category",
+      "valid": true
+    }
+  ],
+  "dangling_references": [],
+  "opaque_records": [],
+  "duplicate_ids": [],
+  "summary": {
+    "node_count": 8,
+    "entity_node_count": 5,
+    "relation_node_count": 3,
+    "endpoint_count": 6,
+    "resolved_endpoint_count": 6,
+    "dangling_endpoint_count": 0,
+    "opaque_record_count": 0,
+    "duplicate_id_count": 0,
+    "nodes_by_kind": {
+      "action": 1,
+      "category": 2,
+      "relation": 3,
+      "spz_element": 2
+    },
+    "relations_by_kind": {
+      "ae_content_link": 1,
+      "aie_binary_link": 1,
+      "scbinarylink": 1
+    }
+  },
+  "fixture_note": "Synthetic test-only fixture constructed from recovered XML contracts; not an original IS-2 project sample."
+}

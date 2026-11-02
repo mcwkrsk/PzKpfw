@@ -1,0 +1,34 @@
+{
+  "audit": "conceptstructure-codestructure-autorange",
+  "static_only": true,
+  "dll_sha256": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525",
+  "function_va": "0x1000FC10",
+  "checks": {
+    "codeStructure_export_body_exists": true,
+    "codeStructure_calls_getAutoRange": true,
+    "codeStructure_filters_link_type_3": true,
+    "codeStructure_checks_third_endpoint": true,
+    "codeStructure_sorts_with_SCcompare": true,
+    "codeStructure_uses_second_endpoint_key": true,
+    "codeStructure_assigns_range_with_setter": true,
+    "codeStructure_increments_rank": true,
+    "getAutoRange_field_offset_58": true,
+    "getParent_filters_type_2": true,
+    "getParent_checks_endpoint_2": true,
+    "getParent_returns_endpoint_1": true,
+    "class_4_group_inheritance": true,
+    "number_getter_and_setter": true,
+    "group_getter_and_setter": true,
+    "class_getter": true,
+    "parameter_ieclass_not_read": true,
+    "comparator_uses_SCcompare": true
+  },
+  "passed": 18,
+  "total": 18,
+  "status": "PASS",
+  "confirmed_autorange_rule": "autoRange category -> links with type 3 and null endpoint 3 -> sort by endpoint 2 using SCcompare -> range 1..N",
+  "limitations": [
+    "Full numbering-group partitioning across all SubjectCategory classes is not yet formalized.",
+    "No runtime save/reopen or UI behavior test."
+  ]
+}

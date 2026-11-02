@@ -1,0 +1,43 @@
+Stage 1.17 host refresh / ParametersList validation — 2026-11-01
+
+Pinned input hashes accepted:
+  IS.exe         ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2
+  PM_auto.dll    c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018
+  PM_params.dll  22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781
+  MAIWmodels.dll 80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525
+
+New host-refresh / ownership audit:
+  Tool: tools/audit_pm_auto_host_refresh.py
+  JSON: analysis/host_interface/pm_auto_host_refresh.json
+  Disassembly: analysis/disassembly/pm_auto_host_context_refresh.asm
+  Result: 31/31 static fingerprints PASS
+
+Other exact-build static audits rerun:
+  Stage 1.14 PM_auto content handlers: PASS (5 handler ranges + core import fingerprints)
+  Stage 1.15 structural edit commands: PASS (8 PM_auto handlers + 6 core implementation ranges + required exports)
+  Stage 1.16 model views/context: PASS (3 input project samples valid)
+  Stage 1.17 nested diagram lifecycle: PASS (14 static checks; 3 samples)
+
+Regression tests:
+  pytest -q
+  Result: 53 passed
+
+Native C++ ABI/layout checks:
+  Compiler: g++ -std=c++17 -Wall -Wextra -Werror -pedantic -I.
+  Eight tests/native/*.cpp files compiled and executed; all returned 0.
+  Result: 8/8 PASS
+
+New findings:
+  - IS.exe tab currentChanged handler dispatches WorkWidget vslot 47 after show().
+  - Complete PM_auto vtable overrides slot 47 with 0x100019D0; PM_params slot 47 remains a RET stub.
+  - PM_auto and PM_params resolve PrimaryModel from the same host context path.
+  - PM_auto slot 47 rebuilds the shared ParametersList-backed picker model.
+  - ParametersList::deleteParameter erases the pointer from the first vector; no Parameter deleting-destructor is called in that erase path.
+  - ParametersList destructor invokes deleting-destructor slots for entries remaining in its two pointer vectors.
+
+Limitations:
+  Static PE32 analysis only; no Windows/Qt runtime execution.
+  Parameter ownership after deleteParameter erase remains unresolved; no leak claim is made.
+  Stale Parameter* QVariant payload lifetime and cross-plugin synchronization remain untested.
+  Exact Qt repaint/event scheduling is not established.
+  Stage 1.17 remains in progress; Stage 2 serializer work has not started.

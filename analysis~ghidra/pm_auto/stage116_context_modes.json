@@ -1,0 +1,74 @@
+{
+  "source": "stage116_audit.json",
+  "selection_context_field": {
+    "offset": "DecompositionWidget+0x2C",
+    "setter": "0x10009930",
+    "selection_handler": "0x100073B0",
+    "observed_conditions": [
+      {
+        "condition": "AFElement::getStatus() == 0",
+        "value": 2
+      },
+      {
+        "condition": "status == 1 and AFElement::getType() == 2",
+        "value": 1
+      },
+      {
+        "condition": "status == 1 and type == 1 branch",
+        "value": 3
+      },
+      {
+        "condition": "status == 1 and type == 3 branch",
+        "value": 4
+      },
+      {
+        "condition": "invalid/deselected current block",
+        "value": 0
+      }
+    ],
+    "enum_names_assigned": false
+  },
+  "widget_enable_matrix": {
+    "apply_range": "0x10011B00-0x10011D4F",
+    "api": "QWidget::setEnabled(true)",
+    "always_enabled_offsets": [
+      "0x58",
+      "0x54",
+      "0xB8"
+    ],
+    "modes": {
+      "1": [
+        "0x70",
+        "0x78",
+        "0x6C",
+        "0xA0"
+      ],
+      "2": [
+        "0x7C",
+        "0x78",
+        "0x6C",
+        "0xA0"
+      ],
+      "3": [
+        "0x70",
+        "0x7C",
+        "0x78",
+        "0xA0"
+      ],
+      "4": [
+        "0x70",
+        "0x7C",
+        "0x6C",
+        "0xA0"
+      ]
+    },
+    "conditional_offsets": [
+      "0xA8",
+      "0x90",
+      "0x8C",
+      "0x9C",
+      "0x94"
+    ],
+    "widget_names_resolved": false
+  }
+}

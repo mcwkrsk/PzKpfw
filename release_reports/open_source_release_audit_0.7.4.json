@@ -1,0 +1,26 @@
+{
+  "release": "PzKpfw Desktop Alpha 0.7.4",
+  "archive": "PzKpfw_Desktop_Alpha_0.7.4.zip",
+  "archive_file_count": 582,
+  "excluded_content_checks": {
+    "reference_private_directory_present": false,
+    "original_is2_exe_dll_ocx_or_runtime_present": false,
+    "private_image_capture_present": false,
+    "python_or_test_cache_present": false,
+    "compiled_object_or_library_present": false,
+    "old_0_7_3_wheel_present": false
+  },
+  "required_public_source_contents": {
+    "license_and_notice": true,
+    "python_runtime_source": true,
+    "tests": true,
+    "native_contract_headers_and_tests": true,
+    "technical_docs": true,
+    "build_and_packaging_scripts": true,
+    "0_7_4_installable_wheel": true
+  },
+  "git_repository_published": false,
+  "git_version_history_created": false,
+  "contribution_workflow_created": false,
+  "license_scope": "MIT applies only to original PzKpfw-authored materials, subject to LICENSE and NOTICE. Research evidence and sample fixtures have separate scope notices."
+}

@@ -1,0 +1,13 @@
+{
+  "stage": "2",
+  "milestone": "reader-writer-mvp",
+  "status": "implemented",
+  "python_tests": 156,
+  "native_abi_layout_checks": 8,
+  "sample_projects": 5,
+  "sample_semantic_roundtrips_passed": 5,
+  "sample_semantic_roundtrips_failed": 0,
+  "original_windows_runtime_executed": false,
+  "nonempty_conceptmodel_cs_golden_sample_available": false,
+  "scope_note": "Fork-side reader/writer MVP verified; original-app parity is not claimed."
+}

@@ -1,0 +1,60 @@
+# Evidence file: MAIWmodels.dll
+# VA range: 0x1000bba0..0x1000bc14
+# Tool: GNU objdump -d -Mintel
+# This is assembly/disassembly, not decompiled original source.
+
+
+/mnt/data/is2_work/rar_extracted/IS2_PMauto_beta/MAIWmodels.dll:     file format pei-i386
+
+
+Disassembly of section .text:
+
+1000bba0 <.text+0xaba0>:
+1000bba0:	55                   	push   ebp
+1000bba1:	8b ec                	mov    ebp,esp
+1000bba3:	51                   	push   ecx
+1000bba4:	53                   	push   ebx
+1000bba5:	8b d9                	mov    ebx,ecx
+1000bba7:	56                   	push   esi
+1000bba8:	57                   	push   edi
+1000bba9:	8b 03                	mov    eax,DWORD PTR [ebx]
+1000bbab:	ff 50 04             	call   DWORD PTR [eax+0x4]
+1000bbae:	8b 4b 0c             	mov    ecx,DWORD PTR [ebx+0xc]
+1000bbb1:	89 45 fc             	mov    DWORD PTR [ebp-0x4],eax
+1000bbb4:	83 c1 04             	add    ecx,0x4
+1000bbb7:	8d 45 fc             	lea    eax,[ebp-0x4]
+1000bbba:	50                   	push   eax
+1000bbbb:	e8 a0 6e ff ff       	call   0x10002a60
+1000bbc0:	8b 43 0c             	mov    eax,DWORD PTR [ebx+0xc]
+1000bbc3:	8b 75 fc             	mov    esi,DWORD PTR [ebp-0x4]
+1000bbc6:	8b 7d 08             	mov    edi,DWORD PTR [ebp+0x8]
+1000bbc9:	56                   	push   esi
+1000bbca:	ff 40 24             	inc    DWORD PTR [eax+0x24]
+1000bbcd:	8b 4e 04             	mov    ecx,DWORD PTR [esi+0x4]
+1000bbd0:	8b 40 24             	mov    eax,DWORD PTR [eax+0x24]
+1000bbd3:	57                   	push   edi
+1000bbd4:	89 41 04             	mov    DWORD PTR [ecx+0x4],eax
+1000bbd7:	8b cb                	mov    ecx,ebx
+1000bbd9:	e8 d2 f2 ff ff       	call   0x1000aeb0
+1000bbde:	6a 00                	push   0x0
+1000bbe0:	56                   	push   esi
+1000bbe1:	57                   	push   edi
+1000bbe2:	8b cb                	mov    ecx,ebx
+1000bbe4:	e8 e7 f1 ff ff       	call   0x1000add0
+1000bbe9:	6a 03                	push   0x3
+1000bbeb:	8b cf                	mov    ecx,edi
+1000bbed:	e8 be e2 ff ff       	call   0x10009eb0
+1000bbf2:	6a 00                	push   0x0
+1000bbf4:	8b cf                	mov    ecx,edi
+1000bbf6:	e8 45 e1 ff ff       	call   0x10009d40
+1000bbfb:	6a 01                	push   0x1
+1000bbfd:	8b cf                	mov    ecx,edi
+1000bbff:	e8 5c e1 ff ff       	call   0x10009d60
+1000bc04:	8b cb                	mov    ecx,ebx
+1000bc06:	e8 f5 f4 ff ff       	call   0x1000b100
+1000bc0b:	5f                   	pop    edi
+1000bc0c:	5e                   	pop    esi
+1000bc0d:	5b                   	pop    ebx
+1000bc0e:	8b e5                	mov    esp,ebp
+1000bc10:	5d                   	pop    ebp
+1000bc11:	c2 04 00             	ret    0x4

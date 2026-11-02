@@ -1,0 +1,54 @@
+{
+  "release": "0.7.9",
+  "installed_wheel_cli": "PASS",
+  "three_way_merge": {
+    "status": "PASS",
+    "ready_to_write": true,
+    "conflicts": 0,
+    "unresolved_conflicts": 0,
+    "writer_preflight": {
+      "xml_reopens": true,
+      "semantic_preserved": true,
+      "writer_idempotent": true,
+      "validation_issues": [
+        "missing integer attribute cs@last_elem_id",
+        "missing integer attribute cs@last_link_id",
+        "missing integer attribute spz@last_id"
+      ],
+      "payload_bytes": 845,
+      "output_encoding": "utf-8"
+    },
+    "native_is2_metadata_added": false,
+    "output_created": true
+  },
+  "related_restore": {
+    "status": "PASS",
+    "selected_operation_ids": [
+      "D000001"
+    ],
+    "expanded_operation_ids": [
+      "D000001",
+      "D000002"
+    ],
+    "added_operation_ids": [
+      "D000002"
+    ],
+    "validation_status": "PASS",
+    "writer_preflight": {
+      "xml_reopens": true,
+      "semantic_preserved": true,
+      "writer_idempotent": true,
+      "validation_issues": [],
+      "payload_bytes": 1684,
+      "output_encoding": "utf-8"
+    },
+    "output_created": true,
+    "automatic_id_guessing": false
+  },
+  "sample_input_hashes": {
+    "base": "2ccced1f22666047f626c2e7de6852a7282454e8f87272ea54eaf99ebfab5f57",
+    "ours": "b132be2b27fd2dc056a9382ecbf9ccbbca48c6dbec23d2a2693e07ea3474cee1",
+    "theirs": "857e529a225d381fd247faabf237f7a64280f4a8910e8ab3ddbf34544167d8e5",
+    "inputs_remained_unchanged": true
+  }
+}

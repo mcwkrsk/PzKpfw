@@ -1,0 +1,53 @@
+{
+  "audit": "subjectcategory-number-group-algorithm",
+  "static_only": true,
+  "binary": {
+    "name": "MAIWmodels.dll",
+    "sha256": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525",
+    "function_va": "0x1000FC10"
+  },
+  "confirmed": {
+    "reserved_index": {
+      "coding_type_gate": "getCodingType()==0",
+      "key": [
+        "class",
+        "group",
+        "number"
+      ],
+      "insert_helper": "0x1000F1C0",
+      "stack_local": "-0x44"
+    },
+    "automatic_number_index": {
+      "key": [
+        "class",
+        "group"
+      ],
+      "counter_field": "tree node +0x18",
+      "candidate": "last assigned number + 1",
+      "collision_check": "reserved (class, group, candidate) tuple",
+      "collision_action": "increment candidate until unused",
+      "write": "SubjectCategory::setNumber@0x100117B0",
+      "stack_local": "-0x3C"
+    },
+    "class_rules": {
+      "class_5_object": "deferred list; if parent exists, group=parent.number; then auto-number when group!=-1 and codingType!=0",
+      "class_4_component": "if parent and grandparent exist, group=grandparent.group and skip general numbering for that pass; otherwise may reach general path",
+      "general_gate": "group!=-1 and codingType!=0"
+    },
+    "auto_range": {
+      "autoRange_nonzero": true,
+      "binding_endpoint_index": 0,
+      "link_type": 3,
+      "endpoint_slot_2_null": true,
+      "sort_key": "endpoint 1 SubjectCategory via SCcompare",
+      "assigned_range": "1..N"
+    }
+  },
+  "not_established": [
+    "Semantic enum label for CodingType==0 versus nonzero.",
+    "Runtime behavior on malformed or duplicate pre-existing tuples.",
+    "The exact business meaning of range values 1 and 99.",
+    "Windows runtime save/reopen and non-empty ConceptModel/cs golden sample."
+  ],
+  "source_excerpt": "analysis/disassembly/codeStructure_number_group_and_helpers.asm"
+}

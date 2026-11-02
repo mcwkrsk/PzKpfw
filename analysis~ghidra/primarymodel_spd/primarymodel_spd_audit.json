@@ -1,0 +1,48 @@
+{
+  "audit": "primarymodel-spd-reader-writer",
+  "static_only": true,
+  "binary": "IS.exe",
+  "sha256": "ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2",
+  "writer_va": "0x0040ACD0",
+  "reader_va": "0x004071C0",
+  "checks": {
+    "top_writer_calls_primary_writer": true,
+    "top_reader_calls_primary_reader": true,
+    "writer_creates_spd": true,
+    "writer_creates_actions": true,
+    "writer_creates_pd": true,
+    "writer_creates_links": true,
+    "writer_uses_actions_lastid": true,
+    "writer_uses_sos_count_and_index_getters": true,
+    "writer_uses_link_count_and_index_getters": true,
+    "writer_uses_three_endpoint_getters_and_type": true,
+    "reader_reads_actions_lastid": true,
+    "reader_reads_links_and_endpoints": true,
+    "reader_branches_on_type_2_and_3": true,
+    "reader_calls_arrangement_link_for_type3": true,
+    "reader_calls_composition_link_for_type2": true,
+    "iat_getafe1": true,
+    "iat_getafe2": true,
+    "iat_getafe3": true,
+    "iat_gettype": true,
+    "iat_add_arragment": true,
+    "iat_add_composition": true
+  },
+  "passed": 21,
+  "total": 21,
+  "status": "PASS",
+  "type_mapping": {
+    "2": "AFStructure::addCompositionLink(afe1, afe2)",
+    "3": "AFStructure::addArragmentLink(afe1, afe2, afe3)"
+  },
+  "last_id": {
+    "xml_attribute": "actions.lastID",
+    "private_field": "SubjectOperationsStructure+0x24",
+    "reader_writer_symmetry": "static"
+  },
+  "limitations": [
+    "No original Windows runtime save/reopen was executed.",
+    "The meaning of the third endpoint as next sibling is corroborated by four XML samples; the original API exposes it as the third AFElement endpoint.",
+    "This audit covers primaryModel/spd only, not the complete project format."
+  ]
+}

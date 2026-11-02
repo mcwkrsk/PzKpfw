@@ -1,0 +1,46 @@
+IS-2 STUDIO — STAGE 2 DESKTOP ALPHA VALIDATION
+Date: 2026-11-01
+Application version: 0.3.0
+
+PYTHON REGRESSION SUITE
+Command: PYTHONPATH=src python -m pytest -q
+Result: 180 passed.
+
+NATIVE ABI/LAYOUT CHECKS
+Compiler: g++ -std=c++17 -Wall -Wextra -Werror -pedantic -I. -Isrc/native -Isdk
+Result: 8/8 programs compiled and exited 0.
+Programs: abi_layout_check, diagram_block_observed_check, is_module_contract_check,
+          is_module_vtable_contract_check, legacy_is_module_abi_check,
+          pm_auto_stage116_contract_check, pm_auto_typed_connections_contract_check,
+          workwidget_contract_check.
+
+REAL PROJECT CORPUS
+Command: python tools/validate_stage2.py --out analysis/stage2_sample_roundtrip.json
+Result: 5/5 projects loaded, validated, written, reopened and semantically compared.
+  schaefer.is2:                         7 actions, 12 links, 1 parameter, 0 objects
+  untitled.is2:                         7 actions, 12 links, 1 parameter, 0 objects
+  kaka2.xml:                           73 actions, 144 links, 0 parameters, 0 objects
+  kursach.is2:                         68 actions, 134 links, 0 parameters, 0 objects
+  kursach_user_supplied_42_actions.is2:42 actions,  82 links, 10 parameters, 2 objects
+All reports have semantic_roundtrip=true and no validation issues.
+
+DESKTOP GUI
+Command: xvfb-run -a python tools/smoke_gui.py samples/kursach_user_supplied_42_actions.is2
+Result: GUI_SMOKE_PASS; 42 action records, 10 parameters, 2 objects, 42 rendered action nodes; GUI_NEW_PROJECT_SMOKE_PASS.
+The diagram layout includes composition edges (type=2) and sibling-order edges (type=3).
+
+PACKAGE
+Distribution: is2-re-analysis-kit 0.3.0
+Wheel: dist/is2_re_analysis_kit-0.3.0-py3-none-any.whl
+Editable install: pip install -e . --no-build-isolation --no-deps — PASS in this offline environment.
+Entry points: is2-project -> is2_re.cli:main; is2-studio -> is2_re.gui:main.
+Wheel contents checked; package includes gui, gui_models, document, concept, cli.
+
+IMPORTANT LIMITS
+- The GUI smoke test ran on Linux with Tk 8.6 under a virtual display; native Windows GUI
+  launch and the supplied .bat launcher have not been executed on Windows.
+- Original IS.exe was not run. Original-app load/save/reopen compatibility is unverified.
+- spz/content, matrix, and the five original plugin feature sets are not yet implemented
+  as editable replacement modules.
+- XML semantic preservation is tested; byte-identical Qt serialization is not claimed.
+- This build is Desktop Alpha, not full feature parity or release-ready software.

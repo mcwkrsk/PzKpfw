@@ -1,0 +1,385 @@
+{
+  "file": "kaka2_reference.xml",
+  "project_name": "Проектировочный расчет цилиндрической передачи",
+  "sha256": "24251e96014518731f1f3f92571d6999afeb069ae33c89e68585b8c8d21082dc",
+  "bytes": 20509,
+  "action_count": 73,
+  "unique_action_ids": 73,
+  "action_type_counts": {
+    "2": 30,
+    "0": 33,
+    "3": 1,
+    "1": 9
+  },
+  "link_count": 144,
+  "link_type_counts": {
+    "2": 72,
+    "3": 72
+  },
+  "composition_roots": [
+    1
+  ],
+  "composition_edges": 72,
+  "arrangement_records": 72,
+  "dangling_link_references": [],
+  "level_violations": [],
+  "sibling_chain_parent_count": 40,
+  "sibling_chain_valid_count": 40,
+  "sibling_chains": [
+    {
+      "parent_id": 1,
+      "child_count": 2,
+      "ordered_children": [
+        54,
+        5
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 2,
+      "child_count": 4,
+      "ordered_children": [
+        6,
+        7,
+        8,
+        9
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 3,
+      "child_count": 2,
+      "ordered_children": [
+        10,
+        11
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 4,
+      "child_count": 1,
+      "ordered_children": [
+        65
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 5,
+      "child_count": 2,
+      "ordered_children": [
+        15,
+        73
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 10,
+      "child_count": 3,
+      "ordered_children": [
+        59,
+        19,
+        20
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 11,
+      "child_count": 2,
+      "ordered_children": [
+        60,
+        24
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 12,
+      "child_count": 2,
+      "ordered_children": [
+        25,
+        26
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 13,
+      "child_count": 2,
+      "ordered_children": [
+        27,
+        69
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 14,
+      "child_count": 1,
+      "ordered_children": [
+        31
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 17,
+      "child_count": 2,
+      "ordered_children": [
+        32,
+        33
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 20,
+      "child_count": 2,
+      "ordered_children": [
+        34,
+        35
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 22,
+      "child_count": 2,
+      "ordered_children": [
+        36,
+        37
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 23,
+      "child_count": 2,
+      "ordered_children": [
+        38,
+        39
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 25,
+      "child_count": 2,
+      "ordered_children": [
+        40,
+        41
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 27,
+      "child_count": 2,
+      "ordered_children": [
+        42,
+        43
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 29,
+      "child_count": 2,
+      "ordered_children": [
+        44,
+        45
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 31,
+      "child_count": 2,
+      "ordered_children": [
+        71,
+        49
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 43,
+      "child_count": 2,
+      "ordered_children": [
+        50,
+        51
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 45,
+      "child_count": 2,
+      "ordered_children": [
+        52,
+        53
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 54,
+      "child_count": 1,
+      "ordered_children": [
+        55
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 55,
+      "child_count": 2,
+      "ordered_children": [
+        2,
+        56
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 56,
+      "child_count": 2,
+      "ordered_children": [
+        3,
+        57
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 57,
+      "child_count": 1,
+      "ordered_children": [
+        58
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 58,
+      "child_count": 1,
+      "ordered_children": [
+        4
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 59,
+      "child_count": 2,
+      "ordered_children": [
+        17,
+        18
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 60,
+      "child_count": 1,
+      "ordered_children": [
+        61
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 61,
+      "child_count": 2,
+      "ordered_children": [
+        21,
+        62
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 62,
+      "child_count": 1,
+      "ordered_children": [
+        63
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 63,
+      "child_count": 2,
+      "ordered_children": [
+        22,
+        64
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 64,
+      "child_count": 1,
+      "ordered_children": [
+        23
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 65,
+      "child_count": 2,
+      "ordered_children": [
+        12,
+        66
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 66,
+      "child_count": 1,
+      "ordered_children": [
+        67
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 67,
+      "child_count": 2,
+      "ordered_children": [
+        68,
+        14
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 68,
+      "child_count": 1,
+      "ordered_children": [
+        13
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 69,
+      "child_count": 2,
+      "ordered_children": [
+        70,
+        30
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 70,
+      "child_count": 2,
+      "ordered_children": [
+        28,
+        29
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 71,
+      "child_count": 2,
+      "ordered_children": [
+        46,
+        72
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 72,
+      "child_count": 2,
+      "ordered_children": [
+        47,
+        48
+      ],
+      "valid": true
+    },
+    {
+      "parent_id": 73,
+      "child_count": 1,
+      "ordered_children": [
+        16
+      ],
+      "valid": true
+    }
+  ],
+  "primary_parameters": 0,
+  "primary_objects": 0,
+  "alternatives": 18
+}

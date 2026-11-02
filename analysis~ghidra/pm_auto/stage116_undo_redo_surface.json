@@ -1,0 +1,17 @@
+{
+  "source": "stage116_audit.json",
+  "QUndoStack_or_QUndoCommand_imports": {},
+  "raw_undo_redo_tokens": {},
+  "PM_auto_QAbstractItemModel_revert_submit_imports": {
+    "PM_auto.dll": [
+      "00022308  <none>  157e  ?revert@QAbstractItemModel@@UAEXXZ",
+      "00022310  <none>  18e1  ?submit@QAbstractItemModel@@UAE_NXZ"
+    ]
+  },
+  "PM_auto_revert_submit_iat_references": [
+    "1001dd22:\tff 25 08 23 02 10    \tjmp    DWORD PTR ds:0x10022308",
+    "1001dd2e:\tff 25 10 23 02 10    \tjmp    DWORD PTR ds:0x10022310"
+  ],
+  "PM_auto_revert_submit_real_call_instructions": [],
+  "assessment": "No explicit QUndoStack/QUndoCommand or undo/redo import/token was found. PM_auto imports QAbstractItemModel::revert/submit but objdump shows only their forwarding IAT thunks and no direct call instruction to those IAT entries. This is not proof that no custom undo/history logic exists."
+}

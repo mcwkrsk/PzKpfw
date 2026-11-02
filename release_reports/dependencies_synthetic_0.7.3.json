@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "entity_count": 6,
+  "reference_count": 8,
+  "dangling_count": 0,
+  "opaque_count": 0,
+  "entities": [
+    {
+      "key": "action:1",
+      "domain": "action",
+      "id": "1",
+      "label": "#1 · Synthetic action A",
+      "references": [
+        {
+          "relation_kind": "ae_content_link",
+          "record_index": 0,
+          "slot": "e1",
+          "endpoint_id": "1"
+        }
+      ],
+      "reference_count": 1,
+      "opaque_risk": false,
+      "safe_without_cascade": false
+    },
+    {
+      "key": "action:2",
+      "domain": "action",
+      "id": "2",
+      "label": "#2 · Synthetic action B",
+      "references": [
+        {
+          "relation_kind": "ae_content_link",
+          "record_index": 1,
+          "slot": "e1",
+          "endpoint_id": "2"
+        }
+      ],
+      "reference_count": 1,
+      "opaque_risk": false,
+      "safe_without_cascade": false
+    },
+    {
+      "key": "category:1",
+      "domain": "category",
+      "id": "1",
+      "label": "#1 · Synthetic category A",
+      "references": [
+        {
+          "relation_kind": "scbinarylink",
+          "record_index": 0,
+          "slot": "e1",
+          "endpoint_id": "1"
+        },
+        {
+          "relation_kind": "ae_content_link",
+          "record_index": 1,
+          "slot": "e2",
+          "endpoint_id": "1"
+        }
+      ],
+      "reference_count": 2,
+      "opaque_risk": false,
+      "safe_without_cascade": false
+    },
+    {
+      "key": "category:2",
+      "domain": "category",
+      "id": "2",
+      "label": "#2 · Synthetic category B",
+      "references": [
+        {
+          "relation_kind": "scbinarylink",
+          "record_index": 0,
+          "slot": "e2",
+          "endpoint_id": "2"
+        },
+        {
+          "relation_kind": "ae_content_link",
+          "record_index": 0,
+          "slot": "e2",
+          "endpoint_id": "2"
+        }
+      ],
+      "reference_count": 2,
+      "opaque_risk": false,
+      "safe_without_cascade": false
+    },
+    {
+      "key": "spz_element:1",
+      "domain": "spz_element",
+      "id": "1",
+      "label": "#1 · Synthetic spz A",
+      "references": [
+        {
+          "relation_kind": "aie_binary_link",
+          "record_index": 0,
+          "slot": "e1",
+          "endpoint_id": "1"
+        }
+      ],
+      "reference_count": 1,
+      "opaque_risk": false,
+      "safe_without_cascade": false
+    },
+    {
+      "key": "spz_element:2",
+      "domain": "spz_element",
+      "id": "2",
+      "label": "#2 · Synthetic spz B",
+      "references": [
+        {
+          "relation_kind": "aie_binary_link",
+          "record_index": 0,
+          "slot": "e2",
+          "endpoint_id": "2"
+        }
+      ],
+      "reference_count": 1,
+      "opaque_risk": false,
+      "safe_without_cascade": false
+    }
+  ],
+  "dangling_references": [],
+  "opaque_records": [],
+  "note": "Advisory only. Deletion methods perform their own complete preflight and remain authoritative.",
+  "file": "samples/synthetic_relationships_0.7.3.is2"
+}

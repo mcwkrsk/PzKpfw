@@ -1,0 +1,13 @@
+Analysis environment (2026-10-31):
+- Python 3 runtime, `xml.etree.ElementTree`, `zipfile`, `hashlib`, `rarfile` (RAR metadata)
+- Custom target-pinned Python parser for MSVC x86 RTTI: TypeDescriptor, CompleteObjectLocator, ClassHierarchyDescriptor, BaseClassDescriptor and vftable candidates
+- GNU `objdump -d -Mintel`, `strings`, `file`
+- GNU g++ C++17 for compile-time recovered ABI layout validation
+- `libarchive` native library via a small C extraction helper; returned checksum error for qwindows.dll
+- Not available: 7-Zip/UnRAR/WinRAR, Wine, Ghidra, IDA, rizin/radare2
+- Native IS-2 execution: not attempted (no Windows runtime)
+- Full C++ decompilation: not attempted; manually analysed selected disassembly only
+
+The RTTI parser is pinned to the analyzed `MAIWmodels.dll` SHA-256 `80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525`. It intentionally rejects other binaries because section offsets/image layout are build-specific.
+
+qwindows.dll note: libarchive emitted a block-level checksum warning, but zlib CRC32 of the extracted file is 0x722187d5, exactly matching the RAR entry CRC32. This is strong file-level integrity evidence; independent 7-Zip extraction remains a recommended cross-check.

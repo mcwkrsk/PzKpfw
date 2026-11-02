@@ -1,0 +1,39 @@
+Stage 1.11 — Qt auto-connect endpoint correlation validation
+Date: 2026-10-31
+
+Re-run MOC parser:
+  python tools/recover_qt_moc_contracts.py /path/to/IS2_PMauto_beta --out analysis/plugins
+  Result: 28 QMetaObjects, 44 own methods, 6 signals
+
+Per-plugin counts:
+  PM_auto.dll:          10 QMetaObjects, 25 methods, 5 signals
+  PM_params.dll:         4 QMetaObjects,  8 methods, 0 signals
+  PM_spec_WEB.dll:       6 QMetaObjects,  1 method,  0 signals
+  PM_matrix_web.dll:     4 QMetaObjects,  0 methods, 0 signals
+  Model_Visualiser.dll:  4 QMetaObjects, 10 methods, 1 signal
+
+Re-run auto-connect identifier correlation:
+  python tools/audit_qt_autoconnect_object_names.py /path/to/IS2_PMauto_beta --moc-json analysis/plugins/qt_moc_contracts.json --out analysis/plugins
+  Result: 20 MOC on_* candidates; 20/20 UTF-16LE object-name identifier matches.
+
+Static connectSlotsByName evidence:
+  All five plugin DLLs import and call QMetaObject::connectSlotsByName.
+  Exact static caller VAs: analysis/plugins/qt_moc_connections.tsv
+
+Python regression tests:
+  pytest -q
+  Result: 23 passed
+
+Native C++ layout tests:
+  abi_layout_check.cpp                   PASS
+  is_module_contract_check.cpp           PASS
+  is_module_vtable_contract_check.cpp    PASS
+  legacy_is_module_abi_check.cpp          PASS
+  workwidget_contract_check.cpp          PASS
+  Compiler: g++ -std=c++17 -Wall -Wextra -Werror -pedantic -I.
+
+Limitations:
+  - Static PE/string/MOC analysis only; no Qt 5.9.1 Windows runtime was used.
+  - UTF-16LE object-name strings are strong evidence, but exact setObjectName callsites are not yet individually tied to every string.
+  - connectSlotsByName calls are confirmed; live QObject existence and actual signal delivery are not.
+  - Full PM_auto QObject::connectImpl graph remains incomplete.

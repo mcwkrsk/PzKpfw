@@ -1,0 +1,278 @@
+<project info="" name="Проектировочный расчет цилиндрической передачи">
+ <user info="" name="IS-2 User" />
+ <models>
+  <primaryModel>
+   <params LastID="0" />
+   <objects LastID="0" />
+   <spd>
+    <actions lastID="73">
+     <pd id="1" mark="" formalization="2" level="1" type="2" name="Проектировочный расчет цилиндрической передачи редуктора общего назначения" number="1" symbol="122" status="1" />
+     <pd id="2" mark="" formalization="2" level="4" type="2" name="Исходные данные и выбор параметров" number="1" symbol="122" status="1" />
+     <pd id="3" mark="" formalization="2" level="5" type="2" name="Допускаемые напряжения" number="5" symbol="122" status="1" />
+     <pd id="4" mark="" formalization="2" level="7" type="2" name="Геометрические параметры передачи" number="6" symbol="122" status="1" />
+     <pd id="5" mark="" formalization="2" level="2" type="2" name="Завершение проектировочного расчета" number="2" symbol="122" status="1" />
+     <pd id="6" mark="" formalization="0" level="5" type="0" name="Задать T1 (по циклограмме), u, n, tч" number="1" symbol="122" status="0" />
+     <pd id="7" mark="" formalization="0" level="5" type="0" name="Выбрать материал колес и термообработку" number="2" symbol="122" status="0" />
+     <pd id="8" mark="" formalization="0" level="5" type="0" name="Выбрать вид зубьев и угол β" number="3" symbol="122" status="0" />
+     <pd id="9" mark="" formalization="0" level="5" type="0" name="Принять ψbd, ψba; определить KHβ, Ka (табл. 6.3, 6.4)" number="4" symbol="122" status="0" />
+     <pd id="10" mark="" formalization="2" level="6" type="2" name="Допускаемое контактное напряжение σHP" number="1" symbol="122" status="1" />
+     <pd id="11" mark="" formalization="2" level="6" type="2" name="Допускаемое напряжение изгиба σFP" number="2" symbol="122" status="1" />
+     <pd id="12" mark="" formalization="2" level="9" type="2" name="Межосевое расстояние aw" number="5" symbol="122" status="1" />
+     <pd id="13" mark="" formalization="2" level="12" type="2" name="Предварительный расчет модуля" number="4" symbol="122" status="1" />
+     <pd id="14" mark="" formalization="0" level="11" type="3" name="Уточнение модуля и чисел зубьев" number="6" symbol="122" status="1" />
+     <pd id="15" mark="" formalization="0" level="3" type="0" name="Уточнить aw и принять по ГОСТ 2185–66 (табл. 6.9)" number="2" symbol="122" status="0" />
+     <pd id="16" mark="" formalization="0" level="4" type="0" name="Передать параметры в компоновку и проверочный расчет (6.2)" number="3" symbol="122" status="0" />
+     <pd id="17" mark="" formalization="0" level="8" type="1" name="Эквивалентное число циклов NHE" number="1" symbol="122" status="1">
+      <alts text="Постоянная нагрузка" />
+      <alts text="Ступенчатая циклограмма" />
+     </pd>
+     <pd id="18" mark="" formalization="0" level="8" type="0" name="Определить σ'HP, NH0 (табл. 6.5) и KHL (6.4)" number="2" symbol="122" status="0" />
+     <pd id="19" mark="" formalization="0" level="7" type="0" name="Вычислить σHP колес (6.3)" number="2" symbol="122" status="0" />
+     <pd id="20" mark="" formalization="0" level="7" type="1" name="Расчетное σHP передачи" number="3" symbol="122" status="1">
+      <alts text="Прямозубые" />
+      <alts text="Косозубые / шевронные" />
+     </pd>
+     <pd id="21" mark="" formalization="0" level="9" type="0" name="Определить σ'FP и NF0 (табл. 6.5)" number="3" symbol="122" status="0" />
+     <pd id="22" mark="" formalization="0" level="11" type="1" name="Эквивалентное число циклов NFE" number="1" symbol="122" status="1">
+      <alts text="Постоянная нагрузка" />
+      <alts text="Ступенчатая циклограмма" />
+     </pd>
+     <pd id="23" mark="" formalization="0" level="12" type="1" name="Показатель степени mF" number="3" symbol="122" status="1">
+      <alts text="mF = 6" />
+      <alts text="mF = 9" />
+     </pd>
+     <pd id="24" mark="" formalization="0" level="7" type="0" name="Вычислить KFL (6.10) и σFP=σ'FP·KFL (6.9)" number="5" symbol="122" status="0" />
+     <pd id="25" mark="" formalization="0" level="10" type="1" name="Вид зацепления (знак в (u±1))" number="2" symbol="122" status="1">
+      <alts text="Внешнее зацепление (+)" />
+      <alts text="Внутреннее зацепление (−)" />
+     </pd>
+     <pd id="26" mark="" formalization="0" level="10" type="0" name="Вычислить aw по формуле (6.1)" number="3" symbol="122" status="0" />
+     <pd id="27" mark="" formalization="0" level="13" type="1" name="Выбор z1: прямозубые или нет" number="3" symbol="122" status="1">
+      <alts text="Прямозубые" />
+      <alts text="Косозубые / шевронные" />
+     </pd>
+     <pd id="28" mark="" formalization="0" level="15" type="0" name="Выбрать YF1 по табл. 6.7" number="3" symbol="122" status="0" />
+     <pd id="29" mark="" formalization="0" level="15" type="1" name="Выбор Kma: прямозубые или нет" number="4" symbol="122" status="1">
+      <alts text="Прямозубые" />
+      <alts text="Косозубые / шевронные" />
+     </pd>
+     <pd id="30" mark="" formalization="0" level="14" type="0" name="Найти bw=ψba·aw и вычислить m по (6.8)" number="4" symbol="122" status="0" />
+     <pd id="31" mark="" formalization="2" level="12" type="2" name="Итерация уточнения" number="5" symbol="122" status="1" />
+     <pd id="32" mark="" formalization="0" level="9" type="0" name="Постоянная нагрузка: NHE=60·tч·n (6.5)" number="1" symbol="122" status="0" />
+     <pd id="33" mark="" formalization="0" level="9" type="0" name="Ступенчатая циклограмма (6.6)" number="2" symbol="122" status="0" />
+     <pd id="34" mark="" formalization="0" level="8" type="0" name="Прямозубая: σHP меньшего из колес" number="3" symbol="122" status="0" />
+     <pd id="35" mark="" formalization="0" level="8" type="0" name="Косозубая, шевронная: по (6.7)" number="4" symbol="122" status="0" />
+     <pd id="36" mark="" formalization="0" level="12" type="0" name="Постоянная нагрузка: NFE=60·tч·n" number="1" symbol="122" status="0" />
+     <pd id="37" mark="" formalization="0" level="12" type="0" name="Ступенчатая циклограмма (6.11)" number="2" symbol="122" status="0" />
+     <pd id="38" mark="" formalization="0" level="13" type="0" name="mF=6 (HB≤350, шлифованный переход и др.)" number="1" symbol="122" status="0" />
+     <pd id="39" mark="" formalization="0" level="13" type="0" name="mF=9 (HB&gt;350 без шлифовки, чугун)" number="2" symbol="122" status="0" />
+     <pd id="40" mark="" formalization="0" level="11" type="0" name="Внешнее: знак «+»" number="3" symbol="122" status="0" />
+     <pd id="41" mark="" formalization="0" level="11" type="0" name="Внутреннее: знак «−»" number="4" symbol="122" status="0" />
+     <pd id="42" mark="" formalization="0" level="14" type="0" name="Прямозубые: z1=20…25 (u≤3), 18…20 (u&gt;3)" number="1" symbol="122" status="0" />
+     <pd id="43" mark="" formalization="0" level="14" type="1" name="Косозубые или шевронные" number="2" symbol="122" status="1">
+      <alts text="Косозубые" />
+      <alts text="Шевронные" />
+     </pd>
+     <pd id="44" mark="" formalization="0" level="16" type="0" name="Прямозубые: Kma=1400" number="1" symbol="122" status="0" />
+     <pd id="45" mark="" formalization="0" level="16" type="1" name="Косозубые или шевронные" number="2" symbol="122" status="1">
+      <alts text="Косозубые при εβ ≤ 1" />
+      <alts text="Косозубые при εβ &gt; 1 или шевронные" />
+     </pd>
+     <pd id="46" mark="" formalization="0" level="14" type="0" name="Округлить m до стандартного (табл. 6.8)" number="5" symbol="122" status="0" />
+     <pd id="47" mark="" formalization="0" level="15" type="0" name="Вычислить z1, z2 и округлить до целых" number="5" symbol="122" status="0" />
+     <pd id="48" mark="" formalization="0" level="15" type="0" name="Сравнить z1 с принятым для выбора YF1" number="6" symbol="122" status="0" />
+     <pd id="49" mark="" formalization="0" level="13" type="0" name="При значительном отличии скорректировать YF1 и m" number="6" symbol="122" status="0" />
+     <pd id="50" mark="" formalization="0" level="15" type="0" name="Косозубые: z1=16 (u≤4), 14 (u&gt;4)" number="1" symbol="122" status="0" />
+     <pd id="51" mark="" formalization="0" level="15" type="0" name="Шевронные: z1=14 (u≤4), 12 (u&gt;4)" number="2" symbol="122" status="0" />
+     <pd id="52" mark="" formalization="0" level="17" type="0" name="Косозубые при εβ≤1: Kma=1100" number="1" symbol="122" status="0" />
+     <pd id="53" mark="" formalization="0" level="17" type="0" name="Косозубые при εβ&gt;1, шевронные: Kma=850" number="2" symbol="122" status="0" />
+     <pd id="54" mark="" formalization="2" level="2" type="2" name="Группа 1" number="1" symbol="122" status="1" />
+     <pd id="55" mark="" formalization="2" level="3" type="2" name="Группа 2" number="1" symbol="122" status="1" />
+     <pd id="56" mark="" formalization="2" level="4" type="2" name="Группа 3" number="2" symbol="122" status="1" />
+     <pd id="57" mark="" formalization="2" level="5" type="2" name="Группа 4" number="6" symbol="122" status="1" />
+     <pd id="58" mark="" formalization="2" level="6" type="2" name="Группа 5" number="3" symbol="122" status="1" />
+     <pd id="59" mark="" formalization="2" level="7" type="2" name="Группа 6" number="1" symbol="122" status="1" />
+     <pd id="60" mark="" formalization="2" level="7" type="2" name="Группа 7" number="4" symbol="122" status="1" />
+     <pd id="61" mark="" formalization="2" level="8" type="2" name="Группа 8" number="5" symbol="122" status="1" />
+     <pd id="62" mark="" formalization="2" level="9" type="2" name="Группа 9" number="4" symbol="122" status="1" />
+     <pd id="63" mark="" formalization="2" level="10" type="2" name="Группа 10" number="1" symbol="122" status="1" />
+     <pd id="64" mark="" formalization="2" level="11" type="2" name="Группа 11" number="2" symbol="122" status="1" />
+     <pd id="65" mark="" formalization="2" level="8" type="2" name="Группа 12" number="6" symbol="122" status="1" />
+     <pd id="66" mark="" formalization="2" level="9" type="2" name="Группа 13" number="6" symbol="122" status="1" />
+     <pd id="67" mark="" formalization="2" level="10" type="2" name="Группа 14" number="4" symbol="122" status="1" />
+     <pd id="68" mark="" formalization="2" level="11" type="2" name="Группа 15" number="5" symbol="122" status="1" />
+     <pd id="69" mark="" formalization="2" level="13" type="2" name="Группа 16" number="4" symbol="122" status="1" />
+     <pd id="70" mark="" formalization="2" level="14" type="2" name="Группа 17" number="3" symbol="122" status="1" />
+     <pd id="71" mark="" formalization="2" level="13" type="2" name="Группа 18" number="5" symbol="122" status="1" />
+     <pd id="72" mark="" formalization="2" level="14" type="2" name="Группа 19" number="6" symbol="122" status="1" />
+     <pd id="73" mark="" formalization="2" level="3" type="2" name="Группа 20" number="3" symbol="122" status="1" />
+    </actions>
+    <links>
+     <link type="2" afe1="1" afe3="0" afe2="54" />
+     <link type="2" afe1="1" afe3="0" afe2="5" />
+     <link type="3" afe1="1" afe3="5" afe2="54" />
+     <link type="3" afe1="1" afe3="0" afe2="5" />
+     <link type="2" afe1="2" afe3="0" afe2="6" />
+     <link type="2" afe1="2" afe3="0" afe2="7" />
+     <link type="2" afe1="2" afe3="0" afe2="8" />
+     <link type="2" afe1="2" afe3="0" afe2="9" />
+     <link type="3" afe1="2" afe3="7" afe2="6" />
+     <link type="3" afe1="2" afe3="8" afe2="7" />
+     <link type="3" afe1="2" afe3="9" afe2="8" />
+     <link type="3" afe1="2" afe3="0" afe2="9" />
+     <link type="2" afe1="3" afe3="0" afe2="10" />
+     <link type="2" afe1="3" afe3="0" afe2="11" />
+     <link type="3" afe1="3" afe3="11" afe2="10" />
+     <link type="3" afe1="3" afe3="0" afe2="11" />
+     <link type="2" afe1="4" afe3="0" afe2="65" />
+     <link type="3" afe1="4" afe3="0" afe2="65" />
+     <link type="2" afe1="5" afe3="0" afe2="15" />
+     <link type="2" afe1="5" afe3="0" afe2="73" />
+     <link type="3" afe1="5" afe3="73" afe2="15" />
+     <link type="3" afe1="5" afe3="0" afe2="73" />
+     <link type="2" afe1="10" afe3="0" afe2="59" />
+     <link type="2" afe1="10" afe3="0" afe2="19" />
+     <link type="2" afe1="10" afe3="0" afe2="20" />
+     <link type="3" afe1="10" afe3="19" afe2="59" />
+     <link type="3" afe1="10" afe3="20" afe2="19" />
+     <link type="3" afe1="10" afe3="0" afe2="20" />
+     <link type="2" afe1="11" afe3="0" afe2="60" />
+     <link type="2" afe1="11" afe3="0" afe2="24" />
+     <link type="3" afe1="11" afe3="24" afe2="60" />
+     <link type="3" afe1="11" afe3="0" afe2="24" />
+     <link type="2" afe1="12" afe3="0" afe2="25" />
+     <link type="2" afe1="12" afe3="0" afe2="26" />
+     <link type="3" afe1="12" afe3="26" afe2="25" />
+     <link type="3" afe1="12" afe3="0" afe2="26" />
+     <link type="2" afe1="13" afe3="0" afe2="27" />
+     <link type="2" afe1="13" afe3="0" afe2="69" />
+     <link type="3" afe1="13" afe3="69" afe2="27" />
+     <link type="3" afe1="13" afe3="0" afe2="69" />
+     <link type="2" afe1="14" afe3="0" afe2="31" />
+     <link type="3" afe1="14" afe3="0" afe2="31" />
+     <link type="2" afe1="17" afe3="0" afe2="32" />
+     <link type="2" afe1="17" afe3="0" afe2="33" />
+     <link type="3" afe1="17" afe3="33" afe2="32" />
+     <link type="3" afe1="17" afe3="0" afe2="33" />
+     <link type="2" afe1="20" afe3="0" afe2="34" />
+     <link type="2" afe1="20" afe3="0" afe2="35" />
+     <link type="3" afe1="20" afe3="35" afe2="34" />
+     <link type="3" afe1="20" afe3="0" afe2="35" />
+     <link type="2" afe1="22" afe3="0" afe2="36" />
+     <link type="2" afe1="22" afe3="0" afe2="37" />
+     <link type="3" afe1="22" afe3="37" afe2="36" />
+     <link type="3" afe1="22" afe3="0" afe2="37" />
+     <link type="2" afe1="23" afe3="0" afe2="38" />
+     <link type="2" afe1="23" afe3="0" afe2="39" />
+     <link type="3" afe1="23" afe3="39" afe2="38" />
+     <link type="3" afe1="23" afe3="0" afe2="39" />
+     <link type="2" afe1="25" afe3="0" afe2="40" />
+     <link type="2" afe1="25" afe3="0" afe2="41" />
+     <link type="3" afe1="25" afe3="41" afe2="40" />
+     <link type="3" afe1="25" afe3="0" afe2="41" />
+     <link type="2" afe1="27" afe3="0" afe2="42" />
+     <link type="2" afe1="27" afe3="0" afe2="43" />
+     <link type="3" afe1="27" afe3="43" afe2="42" />
+     <link type="3" afe1="27" afe3="0" afe2="43" />
+     <link type="2" afe1="29" afe3="0" afe2="44" />
+     <link type="2" afe1="29" afe3="0" afe2="45" />
+     <link type="3" afe1="29" afe3="45" afe2="44" />
+     <link type="3" afe1="29" afe3="0" afe2="45" />
+     <link type="2" afe1="31" afe3="0" afe2="71" />
+     <link type="2" afe1="31" afe3="0" afe2="49" />
+     <link type="3" afe1="31" afe3="49" afe2="71" />
+     <link type="3" afe1="31" afe3="0" afe2="49" />
+     <link type="2" afe1="43" afe3="0" afe2="50" />
+     <link type="2" afe1="43" afe3="0" afe2="51" />
+     <link type="3" afe1="43" afe3="51" afe2="50" />
+     <link type="3" afe1="43" afe3="0" afe2="51" />
+     <link type="2" afe1="45" afe3="0" afe2="52" />
+     <link type="2" afe1="45" afe3="0" afe2="53" />
+     <link type="3" afe1="45" afe3="53" afe2="52" />
+     <link type="3" afe1="45" afe3="0" afe2="53" />
+     <link type="2" afe1="54" afe3="0" afe2="55" />
+     <link type="3" afe1="54" afe3="0" afe2="55" />
+     <link type="2" afe1="55" afe3="0" afe2="2" />
+     <link type="2" afe1="55" afe3="0" afe2="56" />
+     <link type="3" afe1="55" afe3="56" afe2="2" />
+     <link type="3" afe1="55" afe3="0" afe2="56" />
+     <link type="2" afe1="56" afe3="0" afe2="3" />
+     <link type="2" afe1="56" afe3="0" afe2="57" />
+     <link type="3" afe1="56" afe3="57" afe2="3" />
+     <link type="3" afe1="56" afe3="0" afe2="57" />
+     <link type="2" afe1="57" afe3="0" afe2="58" />
+     <link type="3" afe1="57" afe3="0" afe2="58" />
+     <link type="2" afe1="58" afe3="0" afe2="4" />
+     <link type="3" afe1="58" afe3="0" afe2="4" />
+     <link type="2" afe1="59" afe3="0" afe2="17" />
+     <link type="2" afe1="59" afe3="0" afe2="18" />
+     <link type="3" afe1="59" afe3="18" afe2="17" />
+     <link type="3" afe1="59" afe3="0" afe2="18" />
+     <link type="2" afe1="60" afe3="0" afe2="61" />
+     <link type="3" afe1="60" afe3="0" afe2="61" />
+     <link type="2" afe1="61" afe3="0" afe2="21" />
+     <link type="2" afe1="61" afe3="0" afe2="62" />
+     <link type="3" afe1="61" afe3="62" afe2="21" />
+     <link type="3" afe1="61" afe3="0" afe2="62" />
+     <link type="2" afe1="62" afe3="0" afe2="63" />
+     <link type="3" afe1="62" afe3="0" afe2="63" />
+     <link type="2" afe1="63" afe3="0" afe2="22" />
+     <link type="2" afe1="63" afe3="0" afe2="64" />
+     <link type="3" afe1="63" afe3="64" afe2="22" />
+     <link type="3" afe1="63" afe3="0" afe2="64" />
+     <link type="2" afe1="64" afe3="0" afe2="23" />
+     <link type="3" afe1="64" afe3="0" afe2="23" />
+     <link type="2" afe1="65" afe3="0" afe2="12" />
+     <link type="2" afe1="65" afe3="0" afe2="66" />
+     <link type="3" afe1="65" afe3="66" afe2="12" />
+     <link type="3" afe1="65" afe3="0" afe2="66" />
+     <link type="2" afe1="66" afe3="0" afe2="67" />
+     <link type="3" afe1="66" afe3="0" afe2="67" />
+     <link type="2" afe1="67" afe3="0" afe2="68" />
+     <link type="2" afe1="67" afe3="0" afe2="14" />
+     <link type="3" afe1="67" afe3="14" afe2="68" />
+     <link type="3" afe1="67" afe3="0" afe2="14" />
+     <link type="2" afe1="68" afe3="0" afe2="13" />
+     <link type="3" afe1="68" afe3="0" afe2="13" />
+     <link type="2" afe1="69" afe3="0" afe2="70" />
+     <link type="2" afe1="69" afe3="0" afe2="30" />
+     <link type="3" afe1="69" afe3="30" afe2="70" />
+     <link type="3" afe1="69" afe3="0" afe2="30" />
+     <link type="2" afe1="70" afe3="0" afe2="28" />
+     <link type="2" afe1="70" afe3="0" afe2="29" />
+     <link type="3" afe1="70" afe3="29" afe2="28" />
+     <link type="3" afe1="70" afe3="0" afe2="29" />
+     <link type="2" afe1="71" afe3="0" afe2="46" />
+     <link type="2" afe1="71" afe3="0" afe2="72" />
+     <link type="3" afe1="71" afe3="72" afe2="46" />
+     <link type="3" afe1="71" afe3="0" afe2="72" />
+     <link type="2" afe1="72" afe3="0" afe2="47" />
+     <link type="2" afe1="72" afe3="0" afe2="48" />
+     <link type="3" afe1="72" afe3="48" afe2="47" />
+     <link type="3" afe1="72" afe3="0" afe2="48" />
+     <link type="2" afe1="73" afe3="0" afe2="16" />
+     <link type="3" afe1="73" afe3="0" afe2="16" />
+    </links>
+   </spd>
+   <matrix />
+  </primaryModel>
+  <ConceptModel>
+   <cs last_elem_id="0" last_link_id="0">
+    <elemets />
+    <links />
+   </cs>
+   <spz last_id="1">
+    <elemets>
+     <AElement id="1" number="1" formalization="0" symbol="99" type="0" level="1" name="PZ_1" status="0" />
+    </elemets>
+    <links />
+   </spz>
+   <content />
+  </ConceptModel>
+ </models>
+ <ModuleParams>
+  <Module name="PrimaryModelAuto">
+   <param decStr="" />
+  </Module>
+ </ModuleParams>
+</project>

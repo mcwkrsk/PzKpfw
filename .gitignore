@@ -1,0 +1,16 @@
+# Keep supplied originals and derived private evidence out of public commits.
+reference-private/**
+!reference-private/README.md
+analysis/pe/**
+*.ghidra
+*.rep
+*.dll
+*.exe
+*.rar
+*.pdf
+__pycache__/
+.pytest_cache/
+.venv/
+dist/
+build/
+*.egg-info/

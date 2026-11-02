@@ -1,0 +1,352 @@
+{
+  "suite": "PzKpfw 0.7.4 native XML writer, graph and relationship audit",
+  "sample_count": 6,
+  "structural_roundtrip_passed": 6,
+  "structural_roundtrip_failed": 0,
+  "original_is2_runtime_acceptance": "NOT_TESTED",
+  "runtime_note": "Requires a Windows load-save-reopen test with the original IS.exe.",
+  "files": [
+    {
+      "format": "IS-2 project XML",
+      "root_tag": "project",
+      "native_envelope": "PASS",
+      "structural_validation": "PASS",
+      "structural_issues": [],
+      "writer_semantic_roundtrip": "PASS",
+      "writer_semantic_preserved": true,
+      "writer_idempotent_roundtrip": "PASS",
+      "writer_idempotent": true,
+      "writer_reopened_validation": "PASS",
+      "writer_reopened_validation_issues": [],
+      "relationship_graph_summary": {
+        "node_count": 8,
+        "entity_node_count": 8,
+        "relation_node_count": 0,
+        "endpoint_count": 0,
+        "resolved_endpoint_count": 0,
+        "dangling_endpoint_count": 0,
+        "opaque_record_count": 0,
+        "duplicate_id_count": 0,
+        "nodes_by_kind": {
+          "action": 7,
+          "spz_element": 1
+        },
+        "relations_by_kind": {}
+      },
+      "relationship_graph_dangling_references": [],
+      "relationship_graph_opaque_records": [],
+      "pzkpfw_private_markup_added": false,
+      "pzkpfw_marker_count_in_source": 0,
+      "pzkpfw_markers_in_source": [],
+      "module_params_module_count": 1,
+      "module_params_primary_model_auto": {
+        "present": true,
+        "decStr": "z22;",
+        "default_provenance": "multiple supplied native samples contain PrimaryModelAuto with decStr; empty value is sample-backed for a blank project"
+      },
+      "content_endpoint_contract": {
+        "e1": "AFElement in models/primaryModel/spd/actions/pd",
+        "e2": "AIElement in models/ConceptModel/cs/elemets/pk",
+        "link_type": 4,
+        "evidence": "IS.exe reader and MAIWmodels AEContentLink constructor"
+      },
+      "spz_link_endpoint_contract": {
+        "e1_e2_e3": "AIElement in models/ConceptModel/spz/elemets/AElement",
+        "evidence": "IS.exe ConceptModel/spz link reader; typed AIEBinaryLink slots"
+      },
+      "runtime_risk_notes": [],
+      "undo_redo_storage": "memory-only; not serialized into .is2",
+      "original_is2_runtime_acceptance": "NOT_TESTED",
+      "runtime_note": "A Windows run of the original IS.exe is required to certify that it opens a PzKpfw-saved file and that PzKpfw opens an IS-2-saved file.",
+      "file": "schaefer.is2",
+      "actions": 7,
+      "primary_links": 12
+    },
+    {
+      "format": "IS-2 project XML",
+      "root_tag": "project",
+      "native_envelope": "PASS",
+      "structural_validation": "PASS",
+      "structural_issues": [],
+      "writer_semantic_roundtrip": "PASS",
+      "writer_semantic_preserved": true,
+      "writer_idempotent_roundtrip": "PASS",
+      "writer_idempotent": true,
+      "writer_reopened_validation": "PASS",
+      "writer_reopened_validation_issues": [],
+      "relationship_graph_summary": {
+        "node_count": 8,
+        "entity_node_count": 8,
+        "relation_node_count": 0,
+        "endpoint_count": 0,
+        "resolved_endpoint_count": 0,
+        "dangling_endpoint_count": 0,
+        "opaque_record_count": 0,
+        "duplicate_id_count": 0,
+        "nodes_by_kind": {
+          "action": 7,
+          "spz_element": 1
+        },
+        "relations_by_kind": {}
+      },
+      "relationship_graph_dangling_references": [],
+      "relationship_graph_opaque_records": [],
+      "pzkpfw_private_markup_added": false,
+      "pzkpfw_marker_count_in_source": 0,
+      "pzkpfw_markers_in_source": [],
+      "module_params_module_count": 1,
+      "module_params_primary_model_auto": {
+        "present": true,
+        "decStr": "z22;",
+        "default_provenance": "multiple supplied native samples contain PrimaryModelAuto with decStr; empty value is sample-backed for a blank project"
+      },
+      "content_endpoint_contract": {
+        "e1": "AFElement in models/primaryModel/spd/actions/pd",
+        "e2": "AIElement in models/ConceptModel/cs/elemets/pk",
+        "link_type": 4,
+        "evidence": "IS.exe reader and MAIWmodels AEContentLink constructor"
+      },
+      "spz_link_endpoint_contract": {
+        "e1_e2_e3": "AIElement in models/ConceptModel/spz/elemets/AElement",
+        "evidence": "IS.exe ConceptModel/spz link reader; typed AIEBinaryLink slots"
+      },
+      "runtime_risk_notes": [],
+      "undo_redo_storage": "memory-only; not serialized into .is2",
+      "original_is2_runtime_acceptance": "NOT_TESTED",
+      "runtime_note": "A Windows run of the original IS.exe is required to certify that it opens a PzKpfw-saved file and that PzKpfw opens an IS-2-saved file.",
+      "file": "untitled.is2",
+      "actions": 7,
+      "primary_links": 12
+    },
+    {
+      "format": "IS-2 project XML",
+      "root_tag": "project",
+      "native_envelope": "PASS",
+      "structural_validation": "PASS",
+      "structural_issues": [],
+      "writer_semantic_roundtrip": "PASS",
+      "writer_semantic_preserved": true,
+      "writer_idempotent_roundtrip": "PASS",
+      "writer_idempotent": true,
+      "writer_reopened_validation": "PASS",
+      "writer_reopened_validation_issues": [],
+      "relationship_graph_summary": {
+        "node_count": 74,
+        "entity_node_count": 74,
+        "relation_node_count": 0,
+        "endpoint_count": 0,
+        "resolved_endpoint_count": 0,
+        "dangling_endpoint_count": 0,
+        "opaque_record_count": 0,
+        "duplicate_id_count": 0,
+        "nodes_by_kind": {
+          "action": 73,
+          "spz_element": 1
+        },
+        "relations_by_kind": {}
+      },
+      "relationship_graph_dangling_references": [],
+      "relationship_graph_opaque_records": [],
+      "pzkpfw_private_markup_added": false,
+      "pzkpfw_marker_count_in_source": 0,
+      "pzkpfw_markers_in_source": [],
+      "module_params_module_count": 1,
+      "module_params_primary_model_auto": {
+        "present": true,
+        "decStr": "",
+        "default_provenance": "multiple supplied native samples contain PrimaryModelAuto with decStr; empty value is sample-backed for a blank project"
+      },
+      "content_endpoint_contract": {
+        "e1": "AFElement in models/primaryModel/spd/actions/pd",
+        "e2": "AIElement in models/ConceptModel/cs/elemets/pk",
+        "link_type": 4,
+        "evidence": "IS.exe reader and MAIWmodels AEContentLink constructor"
+      },
+      "spz_link_endpoint_contract": {
+        "e1_e2_e3": "AIElement in models/ConceptModel/spz/elemets/AElement",
+        "evidence": "IS.exe ConceptModel/spz link reader; typed AIEBinaryLink slots"
+      },
+      "runtime_risk_notes": [],
+      "undo_redo_storage": "memory-only; not serialized into .is2",
+      "original_is2_runtime_acceptance": "NOT_TESTED",
+      "runtime_note": "A Windows run of the original IS.exe is required to certify that it opens a PzKpfw-saved file and that PzKpfw opens an IS-2-saved file.",
+      "file": "kaka2.xml",
+      "actions": 73,
+      "primary_links": 144
+    },
+    {
+      "format": "IS-2 project XML",
+      "root_tag": "project",
+      "native_envelope": "PASS",
+      "structural_validation": "PASS",
+      "structural_issues": [],
+      "writer_semantic_roundtrip": "PASS",
+      "writer_semantic_preserved": true,
+      "writer_idempotent_roundtrip": "PASS",
+      "writer_idempotent": true,
+      "writer_reopened_validation": "PASS",
+      "writer_reopened_validation_issues": [],
+      "relationship_graph_summary": {
+        "node_count": 69,
+        "entity_node_count": 69,
+        "relation_node_count": 0,
+        "endpoint_count": 0,
+        "resolved_endpoint_count": 0,
+        "dangling_endpoint_count": 0,
+        "opaque_record_count": 0,
+        "duplicate_id_count": 0,
+        "nodes_by_kind": {
+          "action": 68,
+          "spz_element": 1
+        },
+        "relations_by_kind": {}
+      },
+      "relationship_graph_dangling_references": [],
+      "relationship_graph_opaque_records": [],
+      "pzkpfw_private_markup_added": false,
+      "pzkpfw_marker_count_in_source": 0,
+      "pzkpfw_markers_in_source": [],
+      "module_params_module_count": 1,
+      "module_params_primary_model_auto": {
+        "present": true,
+        "decStr": "z23;z24;z31;z32;z33;z34;z35;z37;",
+        "default_provenance": "multiple supplied native samples contain PrimaryModelAuto with decStr; empty value is sample-backed for a blank project"
+      },
+      "content_endpoint_contract": {
+        "e1": "AFElement in models/primaryModel/spd/actions/pd",
+        "e2": "AIElement in models/ConceptModel/cs/elemets/pk",
+        "link_type": 4,
+        "evidence": "IS.exe reader and MAIWmodels AEContentLink constructor"
+      },
+      "spz_link_endpoint_contract": {
+        "e1_e2_e3": "AIElement in models/ConceptModel/spz/elemets/AElement",
+        "evidence": "IS.exe ConceptModel/spz link reader; typed AIEBinaryLink slots"
+      },
+      "runtime_risk_notes": [],
+      "undo_redo_storage": "memory-only; not serialized into .is2",
+      "original_is2_runtime_acceptance": "NOT_TESTED",
+      "runtime_note": "A Windows run of the original IS.exe is required to certify that it opens a PzKpfw-saved file and that PzKpfw opens an IS-2-saved file.",
+      "file": "kursach.is2",
+      "actions": 68,
+      "primary_links": 134
+    },
+    {
+      "format": "IS-2 project XML",
+      "root_tag": "project",
+      "native_envelope": "PASS",
+      "structural_validation": "PASS",
+      "structural_issues": [],
+      "writer_semantic_roundtrip": "PASS",
+      "writer_semantic_preserved": true,
+      "writer_idempotent_roundtrip": "PASS",
+      "writer_idempotent": true,
+      "writer_reopened_validation": "PASS",
+      "writer_reopened_validation_issues": [],
+      "relationship_graph_summary": {
+        "node_count": 43,
+        "entity_node_count": 43,
+        "relation_node_count": 0,
+        "endpoint_count": 0,
+        "resolved_endpoint_count": 0,
+        "dangling_endpoint_count": 0,
+        "opaque_record_count": 0,
+        "duplicate_id_count": 0,
+        "nodes_by_kind": {
+          "action": 42,
+          "spz_element": 1
+        },
+        "relations_by_kind": {}
+      },
+      "relationship_graph_dangling_references": [],
+      "relationship_graph_opaque_records": [],
+      "pzkpfw_private_markup_added": false,
+      "pzkpfw_marker_count_in_source": 0,
+      "pzkpfw_markers_in_source": [],
+      "module_params_module_count": 1,
+      "module_params_primary_model_auto": {
+        "present": true,
+        "decStr": "z31;z32;z33;z34;z35;",
+        "default_provenance": "multiple supplied native samples contain PrimaryModelAuto with decStr; empty value is sample-backed for a blank project"
+      },
+      "content_endpoint_contract": {
+        "e1": "AFElement in models/primaryModel/spd/actions/pd",
+        "e2": "AIElement in models/ConceptModel/cs/elemets/pk",
+        "link_type": 4,
+        "evidence": "IS.exe reader and MAIWmodels AEContentLink constructor"
+      },
+      "spz_link_endpoint_contract": {
+        "e1_e2_e3": "AIElement in models/ConceptModel/spz/elemets/AElement",
+        "evidence": "IS.exe ConceptModel/spz link reader; typed AIEBinaryLink slots"
+      },
+      "runtime_risk_notes": [],
+      "undo_redo_storage": "memory-only; not serialized into .is2",
+      "original_is2_runtime_acceptance": "NOT_TESTED",
+      "runtime_note": "A Windows run of the original IS.exe is required to certify that it opens a PzKpfw-saved file and that PzKpfw opens an IS-2-saved file.",
+      "file": "kursach_user_supplied_42_actions.is2",
+      "actions": 42,
+      "primary_links": 82
+    },
+    {
+      "format": "IS-2 project XML",
+      "root_tag": "project",
+      "native_envelope": "PASS",
+      "structural_validation": "PASS",
+      "structural_issues": [],
+      "writer_semantic_roundtrip": "PASS",
+      "writer_semantic_preserved": true,
+      "writer_idempotent_roundtrip": "PASS",
+      "writer_idempotent": true,
+      "writer_reopened_validation": "PASS",
+      "writer_reopened_validation_issues": [],
+      "relationship_graph_summary": {
+        "node_count": 10,
+        "entity_node_count": 6,
+        "relation_node_count": 4,
+        "endpoint_count": 8,
+        "resolved_endpoint_count": 8,
+        "dangling_endpoint_count": 0,
+        "opaque_record_count": 0,
+        "duplicate_id_count": 0,
+        "nodes_by_kind": {
+          "action": 2,
+          "category": 2,
+          "relation": 4,
+          "spz_element": 2
+        },
+        "relations_by_kind": {
+          "ae_content_link": 2,
+          "aie_binary_link": 1,
+          "scbinarylink": 1
+        }
+      },
+      "relationship_graph_dangling_references": [],
+      "relationship_graph_opaque_records": [],
+      "pzkpfw_private_markup_added": false,
+      "pzkpfw_marker_count_in_source": 0,
+      "pzkpfw_markers_in_source": [],
+      "module_params_module_count": 1,
+      "module_params_primary_model_auto": {
+        "present": true,
+        "decStr": "",
+        "default_provenance": "multiple supplied native samples contain PrimaryModelAuto with decStr; empty value is sample-backed for a blank project"
+      },
+      "content_endpoint_contract": {
+        "e1": "AFElement in models/primaryModel/spd/actions/pd",
+        "e2": "AIElement in models/ConceptModel/cs/elemets/pk",
+        "link_type": 4,
+        "evidence": "IS.exe reader and MAIWmodels AEContentLink constructor"
+      },
+      "spz_link_endpoint_contract": {
+        "e1_e2_e3": "AIElement in models/ConceptModel/spz/elemets/AElement",
+        "evidence": "IS.exe ConceptModel/spz link reader; typed AIEBinaryLink slots"
+      },
+      "runtime_risk_notes": [],
+      "undo_redo_storage": "memory-only; not serialized into .is2",
+      "original_is2_runtime_acceptance": "NOT_TESTED",
+      "runtime_note": "A Windows run of the original IS.exe is required to certify that it opens a PzKpfw-saved file and that PzKpfw opens an IS-2-saved file.",
+      "file": "synthetic_relationships_0.7.3.is2",
+      "actions": 2,
+      "primary_links": 0
+    }
+  ]
+}

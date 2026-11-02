@@ -1,0 +1,5 @@
+Module	VA	Function	Evidence	Result
+PM_auto.dll	0x100064F0	FunctionalDiagram::itemDraged(DiagramBlock*,DiagramBlock*)	Typed connection snapshot; disassembly; Qt/core IAT imports	Reorders QStandardItem and then calls AFStructure::movieElementTo
+MAIWmodels.dll	0x1000C020	AFStructure::movieElementTo(AFElement*,AFElement*,AFElement*)	Export name plus disassembly	Rewires sibling arrangement and composition links, then codeStructure()
+PM_auto.dll	0x10006EB0	FunctionalDiagram::itemDoubleClick(DiagramBlock*)	Typed connection snapshot; disassembly; QTabWidget import	Selects one or two tabs and calls helper 0x10015990
+MAIWmodels.dll	0x1000C140	AFStructure::movieToElementary(AFElement*,AFElement*)	Export name plus wrapper disassembly	Convenience operation obtains target parent and delegates to movieElementTo; not called by drag handler

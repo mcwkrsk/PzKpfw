@@ -1,0 +1,16 @@
+........................................................................ [ 34%]
+........................................................................ [ 69%]
+...............................................................          [100%]
+207 passed in 4.83s
+{"suite": "IS-2 Stage 2 sample reader/writer validation", "sample_count": 5, "passed": 5, "failed": 0}
+{
+  "suite": "PzKpfw 0.6.0 native XML compatibility audit",
+  "sample_count": 5,
+  "structural_roundtrip_passed": 5,
+  "structural_roundtrip_failed": 0,
+  "original_is2_runtime_acceptance": "NOT_TESTED"
+}
+14 20 20
+GUI_UNDO_REDO_SMOKE_PASS
+GUI_SMOKE_PASS file=kursach_user_supplied_42_actions.is2 actions=42 parameters=10 objects=2 categories=0 concept_links=0
+GUI_NEW_PROJECT_SMOKE_PASS

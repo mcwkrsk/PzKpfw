@@ -1,0 +1,94 @@
+{
+  "audit": "stage117-conceptmodel-writer-reader-tree-symmetry",
+  "static_only": true,
+  "binary": "IS.exe",
+  "image_base": "0x00400000",
+  "sha256": "ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2",
+  "writer": {
+    "entry_va": "0x0040A6D0",
+    "output": "returns a newly created ConceptModel QDomElement",
+    "direct_children": [
+      "cs",
+      "spz",
+      "content"
+    ],
+    "cs_factory_va": "0x0040AC20",
+    "cs_temporary_tag": "FStructure",
+    "cs_final_tag": "cs",
+    "spz_template_va": "0x0040A440",
+    "spz_temporary_tag": "IStructure",
+    "spz_final_tag": "spz",
+    "content_helper_va": "0x00409DE0"
+  },
+  "reader": {
+    "project_reader_callsite_va": "0x0040900F",
+    "entry_va": "0x004066D0",
+    "cs_metadata_reader_va": "0x004065B0",
+    "link_range_reader_va": "0x00406380",
+    "content_record_reader_va": "0x004059E0"
+  },
+  "cs_metadata": {
+    "last_elem_id": "ConceptStructurePrivate+0x0C",
+    "last_link_id": "ConceptStructurePrivate+0x10"
+  },
+  "spz_metadata": {
+    "last_id": "DynamicStructurePrivate+0x24"
+  },
+  "link_range": {
+    "xml_attribute": "range",
+    "private_field": "AIEBinaryLinkPrivate+0x2C"
+  },
+  "checks": {
+    "writer_creates_ConceptModel_root": true,
+    "writer_uses_concept_structure_getter": true,
+    "writer_calls_cs_factory": true,
+    "writer_uses_qdomnode_appendchild_for_cs": true,
+    "writer_creates_cs_elemets_collection": true,
+    "writer_cs_element_loop_calls_category_writer": true,
+    "writer_creates_cs_links_collection": true,
+    "writer_cs_link_loop_calls_link_wrapper": true,
+    "cs_factory_calls_FStructure_template": true,
+    "cs_factory_calls_dom_setTagName": true,
+    "cs_template_uses_FStructure_name": true,
+    "cs_template_writes_last_elem_id": true,
+    "cs_template_writes_last_link_id": true,
+    "writer_uses_dynamic_structure_getter": true,
+    "writer_calls_spz_factory": true,
+    "spz_factory_delegates_to_IStructure_template": true,
+    "spz_template_uses_IStructure_name": true,
+    "spz_template_writes_last_id": true,
+    "writer_retags_spz_with_setTagName": true,
+    "writer_creates_spz_elemets_and_links": true,
+    "writer_calls_dynamic_element_wrapper": true,
+    "writer_calls_content_factory": true,
+    "content_factory_creates_content_child": true,
+    "writer_iterates_content_records": true,
+    "project_reader_selects_ConceptModel": true,
+    "project_reader_calls_ConceptModel_reader": true,
+    "reader_selects_cs_child": true,
+    "reader_calls_cs_metadata_reader": true,
+    "reader_selects_cs_elemets_and_links": true,
+    "cs_metadata_reader_parses_last_elem_id": true,
+    "cs_metadata_reader_stores_last_elem_id_plus_0c": true,
+    "cs_metadata_reader_parses_last_link_id": true,
+    "cs_metadata_reader_stores_last_link_id_plus_10": true,
+    "reader_link_loop_calls_range_link_parser": true,
+    "link_reader_parses_range_attribute": true,
+    "link_reader_converts_range_to_integer": true,
+    "link_reader_stores_range_plus_2c": true,
+    "reader_selects_spz_child": true,
+    "reader_parses_spz_last_id": true,
+    "reader_selects_spz_elemets_and_links": true,
+    "reader_selects_content_child": true,
+    "reader_dispatches_content_records": true
+  },
+  "passed": 42,
+  "total": 42,
+  "status": "PASS",
+  "limitations": [
+    "Static PE32 disassembly only; no original Windows Qt runtime was executed.",
+    "The audit establishes writer/reader symmetry for the observed top-level ConceptModel node tree and selected metadata fields; it does not prove byte-for-byte save/reopen round-trip behavior.",
+    "All supplied sample projects have empty cs/elemets and cs/links collections, so non-empty ConceptStructure/SCBinaryLink serialization still lacks a native golden project for format-level comparison.",
+    "The full semantic interpretation of content records and every child field is not claimed by this tree-level audit."
+  ]
+}

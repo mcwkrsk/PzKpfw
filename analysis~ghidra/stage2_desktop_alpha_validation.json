@@ -1,0 +1,108 @@
+{
+  "application": "IS-2 Studio",
+  "version": "0.3.0",
+  "stage": "Stage 2 Desktop Alpha",
+  "date": "2026-11-01",
+  "python_tests": {
+    "passed": 180,
+    "failed": 0
+  },
+  "native_abi_layout": {
+    "passed": 8,
+    "failed": 0,
+    "compiler": "g++ -std=c++17 -Wall -Wextra -Werror -pedantic"
+  },
+  "sample_projects": {
+    "passed": 5,
+    "failed": 0,
+    "results": [
+      {
+        "file": "schaefer.is2",
+        "source_sha256": "d2de1ea9ad205fd1d5a2b64a31c2d0038b3b57e205a5d5b1fa28482eb5314bb9",
+        "output_sha256": "aaf5bddc26f2da7003e722acf3120f1afd9e4d23a21892e9d10ac0db81547cb2",
+        "actions": 7,
+        "links": 12,
+        "parameters": 1,
+        "objects": 0,
+        "sibling_parent_groups": 3,
+        "semantic_roundtrip": true,
+        "issues": []
+      },
+      {
+        "file": "untitled.is2",
+        "source_sha256": "eda85a2a2cc31bcf4e5277980ed401377895e5197e7d7c1826c4b981a9ecce21",
+        "output_sha256": "f4e89e429dcff98b0f37c74ef5feb17dac6b846f4bd304f35dd832d02d8d76c4",
+        "actions": 7,
+        "links": 12,
+        "parameters": 1,
+        "objects": 0,
+        "sibling_parent_groups": 3,
+        "semantic_roundtrip": true,
+        "issues": []
+      },
+      {
+        "file": "kaka2.xml",
+        "source_sha256": "24251e96014518731f1f3f92571d6999afeb069ae33c89e68585b8c8d21082dc",
+        "output_sha256": "4eec4e6c72c95a652d5effc678e086b6c7ee1bfde2fc35c06edac15e9be08e10",
+        "actions": 73,
+        "links": 144,
+        "parameters": 0,
+        "objects": 0,
+        "sibling_parent_groups": 40,
+        "semantic_roundtrip": true,
+        "issues": []
+      },
+      {
+        "file": "kursach.is2",
+        "source_sha256": "7f09cbcfa6e1774551058e1b65aa6a6376c540dc19ee554e221e0ab5145a3028",
+        "output_sha256": "35e20f08bd46ca3935559eae483354aee3041dac057da5e565c1837625acb140",
+        "actions": 68,
+        "links": 134,
+        "parameters": 0,
+        "objects": 0,
+        "sibling_parent_groups": 24,
+        "semantic_roundtrip": true,
+        "issues": []
+      },
+      {
+        "file": "kursach_user_supplied_42_actions.is2",
+        "source_sha256": "096c67d83f6459e24c914b4818a5b3509e3991e7441389aba1a69586d0d650d4",
+        "output_sha256": "3b101d9cb8b533fed1f7fe5cfcd111efc9f05c7497604b0ca81f45785db83e7a",
+        "actions": 42,
+        "links": 82,
+        "parameters": 10,
+        "objects": 2,
+        "sibling_parent_groups": 12,
+        "semantic_roundtrip": true,
+        "issues": []
+      }
+    ]
+  },
+  "gui_smoke": {
+    "passed": true,
+    "sample": "kursach_user_supplied_42_actions.is2",
+    "actions": 42,
+    "parameters": 10,
+    "objects": 2,
+    "diagram_nodes": 42,
+    "display": "Tk 8.6 under xvfb on Linux",
+    "new_project_smoke_passed": true
+  },
+  "package": {
+    "version": "0.3.0",
+    "wheel": "dist/is2_re_analysis_kit-0.3.0-py3-none-any.whl",
+    "editable_install_passed": true,
+    "entrypoints": {
+      "is2-project": "is2_re.cli:main",
+      "is2-studio": "is2_re.gui:main"
+    }
+  },
+  "limitations": [
+    "Original Windows IS.exe runtime not executed",
+    "Native Windows .bat launch not tested",
+    "Original-app load-save-reopen compatibility not verified",
+    "spz/content and matrix editors not implemented",
+    "Five original plugin-equivalent modules not implemented",
+    "Qt byte-identical serialization not claimed"
+  ]
+}

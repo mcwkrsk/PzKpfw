@@ -1,0 +1,5919 @@
+[
+  {
+    "binary": "IS.exe",
+    "sha256": "ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2",
+    "image_base": "0x00400000",
+    "imports_total": 807,
+    "imports_by_dll": {
+      "GDI32.dll": 1,
+      "KERNEL32.dll": 25,
+      "MAIWmodels.dll": 81,
+      "MSVCP140.dll": 3,
+      "Qt5Core.dll": 138,
+      "Qt5Gui.dll": 27,
+      "Qt5Network.dll": 12,
+      "Qt5Widgets.dll": 428,
+      "Qt5Xml.dll": 30,
+      "SHELL32.dll": 1,
+      "USER32.dll": 21,
+      "VCRUNTIME140.dll": 10,
+      "api-ms-win-crt-heap-l1-1-0.dll": 4,
+      "api-ms-win-crt-locale-l1-1-0.dll": 1,
+      "api-ms-win-crt-math-l1-1-0.dll": 1,
+      "api-ms-win-crt-runtime-l1-1-0.dll": 18,
+      "api-ms-win-crt-stdio-l1-1-0.dll": 2,
+      "api-ms-win-crt-time-l1-1-0.dll": 1,
+      "api-ms-win-crt-utility-l1-1-0.dll": 2,
+      "dwmapi.dll": 1
+    },
+    "core_imports": [
+      {
+        "symbol": "??0AFEBinaryLink@@QAE@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x00406db4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x00408983",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??0ConceptModel@@QAE@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x00408fbe",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x004098d8",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??0MString@@QAE@PB_W@Z",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x00405c88",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x00407373",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x004076fb",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x004077f2",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x00407e10",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??0PrimaryModel@@QAE@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x00408f1c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040989d",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??0SCBinaryLink@@QAE@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00406a10",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??0SubjectCategory@@QAE@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00406810",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??0SubjectRelation@@QAE@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00406bc4",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1AFEBinaryLink@@UAE@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00404206",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1ConceptModel@@UAE@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00404236",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1MString@@QAE@XZ",
+        "calls": 4,
+        "sites": [
+          {
+            "site": "0x00407e30",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040af6c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040afd8",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b223",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1PrimaryModel@@UAE@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00404266",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1SCBinaryLink@@UAE@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00404296",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1SubjectCategory@@UAE@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x004042c6",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1SubjectRelation@@UAE@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x004042f6",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??4MString@@QAEAAV0@ABV0@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00407e24",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addAFBinaryLink@AFStructure@@QAEXPAVAFEBinaryLink@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00406ddc",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addAIEBinaryLink@AIStructure@@QAEXPAVAIEBinaryLink@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00406a38",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addArragmentLink@AFStructure@@QAEXPAVAFElement@@00@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x004089c7",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addCompositionLink@AFStructure@@QAEXPAVAFElement@@0@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x004089ed",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addContentLink@AContentStructure@@QAEPAVAEContentLink@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00408ac2",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addIERole@AFElement@@QAEXUIERole@@_N@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x004085f4",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addObject@ObjectsList@@QAEPAVObject@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x004072b0",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addParameter@ParametersList@@QAEPAVParameter@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040755f",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?clear@AFStructure@@QAEXXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x00406a9b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x00407ad8",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?codeStructure@AFStructure@@QAEXXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x00406edd",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x00408b26",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?data@MString@@QBEPB_WXZ",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x0040a1f2",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040af3a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040afa6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b1f1",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b3c9",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?elementsCount@AIStructure@@QAEHXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b11c",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAEContentLink@AContentStructure@@QAEPAVAEContentLink@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b924",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAFE1@AFEBinaryLink@@QAEPAVAFElement@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b762",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAFElementById@AFStructure@@QAEPAVAFElement@@K@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00405bc7",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAIE2@AFEBinaryLink@@QAEPAVAFElement@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b79e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAIE3@AFEBinaryLink@@QAEPAVAFElement@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x0040b7c7",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b7e6",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAIElementById@AIStructure@@QAEPAVAIElement@@K@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00405bba",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getBLCount@SubjectOperationsStructure@@QAEHXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b6ee",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getBLink@SubjectOperationsStructure@@QAEPAVAFEBinaryLink@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b714",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getChar@AEContentLink@@QAEDXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040a0af",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getCodingType@AIElement@@QAE?AW4CodingType@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b000",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getConceptStructure@ConceptModel@@QAEPAVConceptStructure@@XZ",
+        "calls": 6,
+        "sites": [
+          {
+            "site": "0x00406701",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040a7f0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040a83d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040a89b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040a8b0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040a8fd",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getContentStructure@AbstractModel@@QAEPAVAContentStructure@@H@Z",
+        "calls": 7,
+        "sites": [
+          {
+            "site": "0x0040671d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x00408aba",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040ab80",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040abcf",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b8fb",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b91c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b966",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getCount@AContentStructure@@QAEHXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x0040b903",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b96e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getDynamicStructure@AbstractModel@@QAEPAVAFStructure@@H@Z",
+        "calls": 7,
+        "sites": [
+          {
+            "site": "0x00406710",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x00406ed5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040a9eb",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040aa3f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040aab6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040aacd",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040ab1f",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getElement@AEBinaryLink@@QAEPAVAElement@@H@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x00409eb8",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x00409f0f",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getElement@SubjectOperationsStructure@@QAEPAVSubjectOperation@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b372",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getElementById@SubjectOperationsStructure@@QAEPAVSubjectOperation@@K@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00408897",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getElementsCount@SubjectOperationsStructure@@QAEHXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b2f4",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getId@AElement@@QAEKXZ",
+        "calls": 4,
+        "sites": [
+          {
+            "site": "0x004038e6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b76a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b7a6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b7ee",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@AIElement@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040af2c",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@Object@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b1e3",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getObject@ObjectsList@@QAEPAVObject@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b146",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getObjectById@ObjectsList@@QAEPAVObject@@I@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x004078ee",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getObjectsList@PrimaryModel@@QAEPAVObjectsList@@XZ",
+        "calls": 6,
+        "sites": [
+          {
+            "site": "0x004072a8",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x00407475",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x004078e6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b0cc",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b114",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b13e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParameter@ParametersList@@QAEPAVParameter@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040ae22",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParameterById@ParametersList@@QAEPAVParameter@@K@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x004084dd",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParamsCount@ParametersList@@QAEHXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040adef",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParamsList@PrimaryModel@@QAEPAVParametersList@@XZ",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x00407557",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x004079fc",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x004084d5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x00408ad3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040ae1a",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getPower@AEContentLink@@QAEHXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040a0ee",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getSOS@PrimaryModel@@QAEPAVSubjectOperationsStructure@@XZ",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x00408ae3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x00408b1e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b2ec",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b319",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x0040b36a",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getSign@Parameter@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040af98",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getType@AFEBinaryLink@@QAE?AW4LinkType@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040b840",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setAElements@AEContentLink@@QAEXPAVAFElement@@PAVAIElement@@D@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00405bd1",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setAFE1@AFEBinaryLink@@IAEXPAVAFElement@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00405eee",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setAFE2@AFEBinaryLink@@IAEXPAVAFElement@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00405eff",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setAFE3@AFEBinaryLink@@IAEXPAVAFElement@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00405f0e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setAIE1@AIEBinaryLink@@IAEXPAVAIElement@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00406501",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setAIE2@AIEBinaryLink@@IAEXPAVAIElement@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00406512",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setAIE3@AIEBinaryLink@@IAEXPAVAIElement@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00406523",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setName@AElement@@QAEXVMString@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00405c90",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setName@AIElement@@QAEXVMString@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00407706",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setName@Object@@QAEXVMString@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x0040737f",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setPower@AEContentLink@@QAEXH@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x00405bdb",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setSign@Parameter@@QAEXVMString@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x004077fa",
+            "kind": "direct-IAT"
+          }
+        ]
+      }
+    ],
+    "virtual_calls_indirect": [
+      {
+        "site": "0x004032c6",
+        "base_register": "edx",
+        "offset": "0x98"
+      },
+      {
+        "site": "0x0040446c",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x00404476",
+        "base_register": "eax",
+        "offset": "0x4"
+      },
+      {
+        "site": "0x0040447d",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x00407bc0",
+        "base_register": "edx",
+        "offset": "0x4"
+      },
+      {
+        "site": "0x00408c07",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x00408c1a",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x004097ea",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x004097fd",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x0040c432",
+        "base_register": "eax",
+        "offset": "0xc0"
+      },
+      {
+        "site": "0x0040c4f2",
+        "base_register": "eax",
+        "offset": "0xc4"
+      },
+      {
+        "site": "0x0040de00",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x0040f2ee",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x00410b32",
+        "base_register": "eax",
+        "offset": "0xcc"
+      },
+      {
+        "site": "0x00410b3c",
+        "base_register": "eax",
+        "offset": "0xc8"
+      },
+      {
+        "site": "0x00410b46",
+        "base_register": "eax",
+        "offset": "0xb8"
+      },
+      {
+        "site": "0x00410b8d",
+        "base_register": "eax",
+        "offset": "0xb4"
+      },
+      {
+        "site": "0x0041168c",
+        "base_register": "eax",
+        "offset": "0xbc"
+      },
+      {
+        "site": "0x004128a4",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x00413922",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x00413de0",
+        "base_register": "eax",
+        "offset": "0xb4"
+      }
+    ],
+    "import_thunks_resolved": 1138
+  },
+  {
+    "binary": "Model_Visualiser.dll",
+    "sha256": "1187c7a59ae2dbb8eb91bebbbe89850d9724a62ff186865733930f1488bce880",
+    "image_base": "0x10000000",
+    "imports_total": 368,
+    "imports_by_dll": {
+      "KERNEL32.dll": 12,
+      "MAIWmodels.dll": 11,
+      "Qt5Core.dll": 75,
+      "Qt5Gui.dll": 47,
+      "Qt5Widgets.dll": 196,
+      "VCRUNTIME140.dll": 12,
+      "api-ms-win-crt-heap-l1-1-0.dll": 3,
+      "api-ms-win-crt-math-l1-1-0.dll": 2,
+      "api-ms-win-crt-runtime-l1-1-0.dll": 10
+    },
+    "core_imports": [
+      {
+        "symbol": "??1MString@@QAE@XZ",
+        "calls": 4,
+        "sites": [
+          {
+            "site": "0x10008629",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10008720",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10008769",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100087ac",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?childsCount@AFElement@@QAEHXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000852d",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?data@MString@@QBEPB_WXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100085f5",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAFElement@AFStructure@@QAEPAVAFElement@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10007bad",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAlt@AFElement@@QAE?AVMString@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100085e4",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAltCount@AFElement@@QAEHXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100085d3",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getChilds@AFElement@@QAEPAV1@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100086b7",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getDynamicStructure@AbstractModel@@QAEPAVAFStructure@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10007b7d",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@AElement@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100086dc",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getStructureSymbols@AFElement@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10008775",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getType@AFElement@@QAE?AW4FEType@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000853a",
+            "kind": "direct-IAT"
+          }
+        ]
+      }
+    ],
+    "virtual_calls_indirect": [
+      {
+        "site": "0x10002643",
+        "base_register": "edx",
+        "offset": "0x1c"
+      },
+      {
+        "site": "0x10003129",
+        "base_register": "eax",
+        "offset": "0x4"
+      },
+      {
+        "site": "0x10003a3f",
+        "base_register": "eax",
+        "offset": "0x20"
+      },
+      {
+        "site": "0x100040bc",
+        "base_register": "edx",
+        "offset": "0"
+      },
+      {
+        "site": "0x10004c3d",
+        "base_register": "eax",
+        "offset": "0x20"
+      },
+      {
+        "site": "0x10004fcb",
+        "base_register": "edx",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x10005642",
+        "base_register": "eax",
+        "offset": "0x18"
+      },
+      {
+        "site": "0x10005650",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x100056a1",
+        "base_register": "eax",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x100056e8",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x100056f5",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x10005821",
+        "base_register": "eax",
+        "offset": "0x28"
+      },
+      {
+        "site": "0x1000582d",
+        "base_register": "eax",
+        "offset": "0x34"
+      },
+      {
+        "site": "0x100058c2",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x100058ce",
+        "base_register": "eax",
+        "offset": "0x24"
+      },
+      {
+        "site": "0x10005944",
+        "base_register": "eax",
+        "offset": "0x24"
+      },
+      {
+        "site": "0x10005950",
+        "base_register": "eax",
+        "offset": "0x30"
+      },
+      {
+        "site": "0x100059b9",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10005a0a",
+        "base_register": "eax",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10005a4c",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10005a59",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x10005ba8",
+        "base_register": "eax",
+        "offset": "0x24"
+      },
+      {
+        "site": "0x10005bb5",
+        "base_register": "eax",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10005c42",
+        "base_register": "eax",
+        "offset": "0x18"
+      },
+      {
+        "site": "0x10005c50",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10005ca1",
+        "base_register": "eax",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10005cdd",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10005cea",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x10005da4",
+        "base_register": "eax",
+        "offset": "0x24"
+      },
+      {
+        "site": "0x10005db0",
+        "base_register": "eax",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10005e14",
+        "base_register": "eax",
+        "offset": "0x24"
+      },
+      {
+        "site": "0x10005e25",
+        "base_register": "eax",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10005e33",
+        "base_register": "eax",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10006a18",
+        "base_register": "edx",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x10007195",
+        "base_register": "eax",
+        "offset": "0x4"
+      },
+      {
+        "site": "0x10007e4c",
+        "base_register": "eax",
+        "offset": "0x20"
+      },
+      {
+        "site": "0x100086cb",
+        "base_register": "esi",
+        "offset": "0"
+      },
+      {
+        "site": "0x1000872e",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10009c08",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x1000a514",
+        "base_register": "ebp",
+        "offset": "0x14"
+      }
+    ],
+    "import_thunks_resolved": 286
+  },
+  {
+    "binary": "PM_auto.dll",
+    "sha256": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+    "image_base": "0x10000000",
+    "imports_total": 1005,
+    "imports_by_dll": {
+      "KERNEL32.dll": 22,
+      "MAIWmodels.dll": 60,
+      "MSVCP140.dll": 22,
+      "Qt5Core.dll": 186,
+      "Qt5Gui.dll": 112,
+      "Qt5Widgets.dll": 574,
+      "VCRUNTIME140.dll": 13,
+      "api-ms-win-crt-heap-l1-1-0.dll": 3,
+      "api-ms-win-crt-math-l1-1-0.dll": 1,
+      "api-ms-win-crt-runtime-l1-1-0.dll": 12
+    },
+    "core_imports": [
+      {
+        "symbol": "??0MString@@QAE@PB_W@Z",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x10001841",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005a43",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005c0c",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1ALElementList@@QAE@XZ",
+        "calls": 12,
+        "sites": [
+          {
+            "site": "0x10006d70",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007cab",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007fb7",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100081e5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000a4c0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c0b0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c148",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c854",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cdb2",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000ce0a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000d392",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10011788",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1MString@@QAE@XZ",
+        "calls": 27,
+        "sites": [
+          {
+            "site": "0x10001d6c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10001e6f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10001fb0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002679",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000772e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007945",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007a43",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007c61",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007e10",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10009273",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000a909",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b431",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b558",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b7b9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b7ef",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cfb0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10011e15",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018b07",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018d2c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018dcf",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018e93",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018f34",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10019124",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100193b4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100194e3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100195b5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100195fc",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?AFEcodeOrder@AFElement@@SA_NPAV1@0@Z",
+        "calls": 18,
+        "sites": [
+          {
+            "site": "0x100032c5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000331c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003364",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003431",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100034d2",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003513",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003552",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100037cd",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003803",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003856",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000388c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100038f1",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003927",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003999",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100039cf",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003b31",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003be0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b211",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addAElement@AEBinaryLink@@QAEXHPAVAElement@@@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10005e4b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000698b",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addAlt@AFElement@@QAEXVMString@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10005c1d",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addContentLink@AContentStructure@@QAEPAVAEContentLink@@PAVAIElement@@PAVAFElement@@D_N@Z",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x10005f8c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006d52",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006e49",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addContentLink@AContentStructure@@QAEPAVAEContentLink@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10005db8",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100068f8",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?childsCount@AFElement@@QAEHXZ",
+        "calls": 11,
+        "sites": [
+          {
+            "site": "0x100066cc",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000a524",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000a53a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b439",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b565",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bd25",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c54e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000ca2e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000db9b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1001161e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10011d0b",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?clearAlt@AFElement@@QAEXXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10005b48",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?codeStructure@AFStructure@@QAEXXZ",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x1000be27",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c10b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c81e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cb36",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cdcb",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?data@MString@@QBEPB_WXZ",
+        "calls": 23,
+        "sites": [
+          {
+            "site": "0x10001c77",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10001d83",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10001ec9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002648",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007697",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100078b0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100079ac",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007bd6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007dd9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000923f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000a8d5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b416",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b51c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b79e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b7d4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000ced4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10011de1",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018ad3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018e05",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018ec9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10019090",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100192ff",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10019472",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAEContentLink@AContentStructure@@QAEPAVAEContentLink@@H@Z",
+        "calls": 4,
+        "sites": [
+          {
+            "site": "0x10005fd3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005fe6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006078",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006095",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAFElement@AFStructure@@QAEPAVAFElement@@H@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x1000830b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b6be",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAFElementContentLinks@AContentStructure@@QAE?AVALElementList@@PAVAFElement@@@Z",
+        "calls": 8,
+        "sites": [
+          {
+            "site": "0x10006c91",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007592",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bbcc",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bf4b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c40e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c8db",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cc53",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100114b4",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAFelement@AEContentLink@@QAEPAVAFElement@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10005fee",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006ccc",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAIelement@AEContentLink@@QAEPAVAIElement@@XZ",
+        "calls": 7,
+        "sites": [
+          {
+            "site": "0x10005fdb",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006cd5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100075e7",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000764f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007968",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007f17",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100080a4",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAlt@AFElement@@QAE?AVMString@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10007dcb",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAltCount@AFElement@@QAEHXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10007da3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007e7d",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getChar@AEContentLink@@QAEDXZ",
+        "calls": 4,
+        "sites": [
+          {
+            "site": "0x10006080",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100075db",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000763f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007958",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getChildrenStructure@AFStructure@@QAE?AVALElementList@@PAVAFElement@@@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x1000a448",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cfd3",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getChilds@AFElement@@QAEPAV1@H@Z",
+        "calls": 8,
+        "sites": [
+          {
+            "site": "0x100066e4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100066f8",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bd2f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bda7",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c558",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000ca39",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cab2",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10011634",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getContentLinks@AFElement@@QAE?AVALElementList@@D@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10007edb",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000802f",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getContentStructure@AbstractModel@@QAEPAVAContentStructure@@H@Z",
+        "calls": 12,
+        "sites": [
+          {
+            "site": "0x10005db0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005f34",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100068f0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006c7d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006df4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007583",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bbc4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bf43",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c406",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c8d3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cc4b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100114ac",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getCount@AContentStructure@@QAEHXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10005fba",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100060f4",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getDynamicStructure@AbstractModel@@QAEPAVAFStructure@@H@Z",
+        "calls": 22,
+        "sites": [
+          {
+            "site": "0x10006719",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10008303",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000a440",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b68d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b6b6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b744",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bb0f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bd15",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000be1f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c00d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c103",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c1b7",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c2e0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c53e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c816",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000ca1d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cb2e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cd11",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cdc3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cfcb",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000dc3c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10011719",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getElementsCount@AFStructure@@QAEHXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x1000b695",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b74c",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getFormalization@AFElement@@QAE?AW4FEFormalization@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10008187",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getFunction@AFElement@@QAEPAVAIElement@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100195c1",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getId@AElement@@QAEKXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10009075",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100118e3",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getMark@SubjectOperation@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10002637",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@AElement@@QAE?AVMString@@XZ",
+        "calls": 10,
+        "sites": [
+          {
+            "site": "0x10009774",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100099a4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000a8c4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b7c6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018ac2",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018cb4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018d57",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018df4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018eb8",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1001907f",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@AIElement@@QAE?AVMString@@XZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x10001ebd",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100078a2",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10007bc8",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getNext@AFElement@@QAEPAV1@XZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x1000c039",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c213",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cd3d",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParameter@ParametersList@@QAEPAVParameter@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10001b1c",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParamsCount@ParametersList@@QAEHXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10001af8",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParamsList@PrimaryModel@@QAEPAVParametersList@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10001af0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10001b14",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParent@AFElement@@QAEPAV1@XZ",
+        "calls": 10,
+        "sites": [
+          {
+            "site": "0x1000666d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000a532",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b488",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bafa",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bffe",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c1a8",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c2d1",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cd02",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10011cea",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10011d03",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getPrew@AFElement@@QAEPAV1@XZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x10006660",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c2c7",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c334",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getSign@Parameter@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10001c6b",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getStatus@AFElement@@QAE?AW4FEStatus@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10009fde",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b5a2",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getStructureSymbols@AFElement@@QAE?AVMString@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x100097a5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100099d8",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getType@AFElement@@QAE?AW4FEType@@XZ",
+        "calls": 9,
+        "sites": [
+          {
+            "site": "0x10002601",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000b6c9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018b13",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018c96",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018d3e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018ddb",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10018e9f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10019066",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100192d6",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?makeAlternative@AFStructure@@QAEXPAVAFElement@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000bd1d",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?makeElementary@AFStructure@@QAEXPAVAFElement@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10011721",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?makeIteration@AFStructure@@QAEXPAVAFElement@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000c546",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?makeSequanse@AFStructure@@QAEXPAVAFElement@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000ca25",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?movieElementTo@AFStructure@@QAEXPAVAFElement@@00@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10006721",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bb17",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?pasteNewAFElement@AFStructure@@QAEXPAVAFElement@@0@Z",
+        "calls": 4,
+        "sites": [
+          {
+            "site": "0x1000c015",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c1bf",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c2e8",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cd19",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?removeAFElement@AFStructure@@QAEXPAVAFElement@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000dc44",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?removeContentLink@AContentStructure@@QAEXPAVAIElement@@PAVAFElement@@D_N@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10006cdf",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?removeFromList@AEBinaryLink@@QAEXXZ",
+        "calls": 8,
+        "sites": [
+          {
+            "site": "0x10005950",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005e02",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006942",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000896c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bbf6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bf66",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c8f6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cc6a",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setAElements@AEContentLink@@QAEXPAVAFElement@@PAVAIElement@@D@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10005dcb",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000690b",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setFormalization@AFElement@@QAEXW4FEFormalization@@@Z",
+        "calls": 6,
+        "sites": [
+          {
+            "site": "0x1000acb9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c023",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c0e7",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c7fb",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cb4a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cd27",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setMark@SubjectOperation@@QAEXVMString@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10001849",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setName@AElement@@QAEXVMString@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10005a4e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setStatus@AFElement@@QAEXW4FEStatus@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000c7ed",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setType@AFElement@@QAEXW4FEType@@@Z",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x1000c031",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c0f5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c7df",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cb58",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cd35",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?unlink@AEBinaryLink@@QAEX_N@Z",
+        "calls": 9,
+        "sites": [
+          {
+            "site": "0x10005948",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005dfa",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000693a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10008964",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000bf74",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c438",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000c904",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000cc78",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100114e0",
+            "kind": "direct-IAT"
+          }
+        ]
+      }
+    ],
+    "virtual_calls_indirect": [
+      {
+        "site": "0x10001a7a",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10001aae",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10001d7a",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10002007",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x1000203d",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10004b18",
+        "base_register": "eax",
+        "offset": "0xc4"
+      },
+      {
+        "site": "0x10004b8d",
+        "base_register": "eax",
+        "offset": "0xb4"
+      },
+      {
+        "site": "0x10004b9c",
+        "base_register": "eax",
+        "offset": "0xc4"
+      },
+      {
+        "site": "0x10004f05",
+        "base_register": "eax",
+        "offset": "0xc4"
+      },
+      {
+        "site": "0x1000503c",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10005070",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x1000510c",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10005140",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10005385",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x100053f7",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x10005408",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x10005419",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x1000542a",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x1000590e",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x1000591e",
+        "base_register": "esi",
+        "offset": "0x44"
+      },
+      {
+        "site": "0x10005b70",
+        "base_register": "esi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10005ba9",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10005bbc",
+        "base_register": "esi",
+        "offset": "0x44"
+      },
+      {
+        "site": "0x10005cc9",
+        "base_register": "esi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10005ffe",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10006030",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10006264",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x100062af",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x1000636a",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x1000680e",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10006afa",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10006b79",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x10006d15",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10006d25",
+        "base_register": "esi",
+        "offset": "0x44"
+      },
+      {
+        "site": "0x100074af",
+        "base_register": "eax",
+        "offset": "0x50"
+      },
+      {
+        "site": "0x100074f5",
+        "base_register": "eax",
+        "offset": "0x50"
+      },
+      {
+        "site": "0x10007535",
+        "base_register": "eax",
+        "offset": "0x50"
+      },
+      {
+        "site": "0x10007673",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x1000768c",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x100076f3",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10007705",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x1000770f",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x1000777d",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x1000778f",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10007799",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x100077f5",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10007807",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10007811",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x1000786c",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x1000787e",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10007888",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x1000790c",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10007920",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10007926",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10007988",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x100079a1",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10007a08",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10007a1a",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10007a24",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10007a92",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10007aa4",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10007aae",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10007b0a",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10007b1c",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10007b26",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10007b89",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10007b9b",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10007ba5",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10007c2c",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10007c3b",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10007c45",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10007e53",
+        "base_register": "edi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10007e60",
+        "base_register": "edi",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10007eb7",
+        "base_register": "eax",
+        "offset": "0xc4"
+      },
+      {
+        "site": "0x10007ecc",
+        "base_register": "edx",
+        "offset": "0xc4"
+      },
+      {
+        "site": "0x1000815e",
+        "base_register": "ebx",
+        "offset": "0xbc"
+      },
+      {
+        "site": "0x1000825c",
+        "base_register": "eax",
+        "offset": "0xd0"
+      },
+      {
+        "site": "0x100084b7",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10008a43",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x1000900d",
+        "base_register": "eax",
+        "offset": "0x3c"
+      },
+      {
+        "site": "0x10009032",
+        "base_register": "eax",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10009053",
+        "base_register": "eax",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10009068",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x1000909d",
+        "base_register": "eax",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x1000912b",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10009231",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x100097d1",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x100098dd",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10009a04",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10009aa6",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10009c8e",
+        "base_register": "edx",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x1000a270",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x1000a338",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x1000b27f",
+        "base_register": "edi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x1000b408",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x1000b511",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x1000b793",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x1000b847",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x1000b875",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x1000bc14",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x1000bf88",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x1000c44c",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x1000c918",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x1000cc8c",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x1000cec8",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x1000dc72",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x100105a6",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10010c94",
+        "base_register": "edx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x100112ba",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x100114f4",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x1001168f",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x100116fa",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x1001176f",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10011811",
+        "base_register": "edi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10011849",
+        "base_register": "edx",
+        "offset": "0x4"
+      },
+      {
+        "site": "0x10011dd8",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x1001204c",
+        "base_register": "eax",
+        "offset": "0x98"
+      },
+      {
+        "site": "0x10012b06",
+        "base_register": "esi",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10012b66",
+        "base_register": "esi",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10012bbe",
+        "base_register": "esi",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10013b64",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x1001407a",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10014308",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x10014a4b",
+        "base_register": "eax",
+        "offset": "0x4"
+      },
+      {
+        "site": "0x10014a65",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10014a87",
+        "base_register": "eax",
+        "offset": "0x4"
+      },
+      {
+        "site": "0x10014a9f",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10014ac6",
+        "base_register": "eax",
+        "offset": "0x4"
+      },
+      {
+        "site": "0x10014ae1",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10014cb8",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10014ce4",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10014d58",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10014d76",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10014e43",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10014e6b",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10014ee0",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10014efe",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10015782",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10015b02",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10015b33",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10016ad2",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10016c15",
+        "base_register": "eax",
+        "offset": "0x4"
+      },
+      {
+        "site": "0x10016d5f",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x10016dad",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x10017709",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x1001773a",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10017e05",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10017e24",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10017e43",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10017ec5",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10017ee4",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x10017f03",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x100183d3",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x100183e8",
+        "base_register": "eax",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x100183fd",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x100192f1",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10019437",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10019464",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10019566",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x100195d7",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10019949",
+        "base_register": "eax",
+        "offset": "0xc4"
+      },
+      {
+        "site": "0x10019c8b",
+        "base_register": "edx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10019ea2",
+        "base_register": "edi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10019ea8",
+        "base_register": "edi",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10019eed",
+        "base_register": "edi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10019ef3",
+        "base_register": "edi",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x1001a06c",
+        "base_register": "edx",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x1001b256",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x1001b275",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x1001b359",
+        "base_register": "edx",
+        "offset": "0x10"
+      },
+      {
+        "site": "0x1001b46d",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x1001b51c",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x1001b5e7",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x1001b645",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x1001ca39",
+        "base_register": "ebp",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x1001d3c4",
+        "base_register": "ebp",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x1001d42a",
+        "base_register": "ebp",
+        "offset": "0x14"
+      }
+    ],
+    "import_thunks_resolved": 998
+  },
+  {
+    "binary": "PM_matrix_web.dll",
+    "sha256": "55d25ef0f07a069d80226abae1583928be92cf023fb66ffddbdd32b4f1a66f22",
+    "image_base": "0x10000000",
+    "imports_total": 364,
+    "imports_by_dll": {
+      "KERNEL32.dll": 22,
+      "MAIWmodels.dll": 28,
+      "MSVCP140.dll": 2,
+      "Qt5Core.dll": 65,
+      "Qt5Gui.dll": 15,
+      "Qt5WebEngineWidgets.dll": 18,
+      "Qt5Widgets.dll": 188,
+      "VCRUNTIME140.dll": 12,
+      "api-ms-win-crt-heap-l1-1-0.dll": 3,
+      "api-ms-win-crt-runtime-l1-1-0.dll": 11
+    },
+    "core_imports": [
+      {
+        "symbol": "??1ALElementList@@QAE@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x100049d9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004b44",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1MString@@QAE@XZ",
+        "calls": 10,
+        "sites": [
+          {
+            "site": "0x10002238",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100024b9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002521",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000262c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004522",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004d6a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004d9e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004dd3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005048",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005082",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?data@MString@@QBEPB_WXZ",
+        "calls": 10,
+        "sites": [
+          {
+            "site": "0x1000220a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000249e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100024d4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000257d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004507",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004d4c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004d83",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004db8",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000502d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005064",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?elementsCount@AIStructure@@QAEHXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10002037",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAEContentLink@AContentStructure@@QAEPAVAEContentLink@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000431a",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAFElement@AFStructure@@QAEPAVAFElement@@H@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x100040ed",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000449e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAFelement@AEContentLink@@QAEPAVAFElement@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10004324",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAIElement@AIStructure@@QAEPAVAIElement@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000205e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAIelement@AEContentLink@@QAEPAVAIElement@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10004348",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAutoArg@AFElement@@QAEPAVAIElement@@D@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10004a04",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAutoArgs@AFElement@@QAE?AVALElementList@@D@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10004531",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004881",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getChar@AEContentLink@@QAEDXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100043bf",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getCount@AContentStructure@@QAEHXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10004300",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000445e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getDynamicStructure@AbstractModel@@QAEPAVAFStructure@@H@Z",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x100040a3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100040e5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004478",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004496",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004b63",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getElementsCount@AFStructure@@QAEHXZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x100040ab",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004480",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004b6b",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getFunction@AFElement@@QAEPAVAIElement@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10004730",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@AElement@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10004d3e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@AIElement@@QAE?AVMString@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10002490",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000501f",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@Object@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100021fc",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getObject@Parameter@@QAEPAVObject@@XZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x100021e3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100021f4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002802",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getSign@Parameter@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100024c6",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getStaticStructure@AbstractModel@@QAEPAVAIStructure@@H@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x1000202f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002056",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getStructureSymbols@AFElement@@QAE?AVMString@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x100044f9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004daa",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?sortParams@ParametersList@@SA_NPAVParameter@@0@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100027d3",
+            "kind": "direct-IAT"
+          }
+        ]
+      }
+    ],
+    "virtual_calls_indirect": [
+      {
+        "site": "0x10002572",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10003e55",
+        "base_register": "eax",
+        "offset": "0xd0"
+      },
+      {
+        "site": "0x10004094",
+        "base_register": "eax",
+        "offset": "0xd4"
+      },
+      {
+        "site": "0x1000428f",
+        "base_register": "eax",
+        "offset": "0x50"
+      },
+      {
+        "site": "0x1000438d",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x1000439a",
+        "base_register": "esi",
+        "offset": "0x44"
+      },
+      {
+        "site": "0x1000442b",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10004431",
+        "base_register": "esi",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x100044e3",
+        "base_register": "edx",
+        "offset": "0x50"
+      },
+      {
+        "site": "0x100045c2",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10004630",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10004636",
+        "base_register": "esi",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x100047af",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10004823",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10004829",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10004917",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10004987",
+        "base_register": "ebx",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x1000498d",
+        "base_register": "ebx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10004a7e",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10004ae9",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10004aef",
+        "base_register": "esi",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10004cda",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10004d12",
+        "base_register": "eax",
+        "offset": "0x4c"
+      },
+      {
+        "site": "0x10004d78",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10004ece",
+        "base_register": "edi",
+        "offset": "0x3c"
+      },
+      {
+        "site": "0x10004efe",
+        "base_register": "edi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10004f0b",
+        "base_register": "edi",
+        "offset": "0x44"
+      },
+      {
+        "site": "0x10004ff6",
+        "base_register": "eax",
+        "offset": "0x4c"
+      },
+      {
+        "site": "0x10005059",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10005304",
+        "base_register": "edi",
+        "offset": "0x3c"
+      },
+      {
+        "site": "0x10005354",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x100058c0",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x100063a5",
+        "base_register": "ebp",
+        "offset": "0x14"
+      }
+    ],
+    "import_thunks_resolved": 336
+  },
+  {
+    "binary": "PM_params.dll",
+    "sha256": "22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781",
+    "image_base": "0x10000000",
+    "imports_total": 588,
+    "imports_by_dll": {
+      "KERNEL32.dll": 22,
+      "MAIWmodels.dll": 35,
+      "MSVCP140.dll": 3,
+      "Qt5Core.dll": 86,
+      "Qt5Gui.dll": 45,
+      "Qt5Widgets.dll": 371,
+      "VCRUNTIME140.dll": 12,
+      "api-ms-win-crt-heap-l1-1-0.dll": 3,
+      "api-ms-win-crt-runtime-l1-1-0.dll": 11
+    },
+    "core_imports": [
+      {
+        "symbol": "??0MString@@QAE@PB_W@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10002080",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002243",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1ALElementList@@QAE@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10005b23",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1MString@@QAE@XZ",
+        "calls": 7,
+        "sites": [
+          {
+            "site": "0x100015b0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002043",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002397",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100048bc",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004973",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100063bf",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006de8",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addObject@ObjectsList@@QAEPAVObject@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000220b",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?addParameter@ParametersList@@QAEPAVParameter@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000568b",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?codeList@ParametersList@@QAEXXZ",
+        "calls": 4,
+        "sites": [
+          {
+            "site": "0x10003a5e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003bf6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003d7c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000569d",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?data@MString@@QBEPB_WXZ",
+        "calls": 7,
+        "sites": [
+          {
+            "site": "0x100014b2",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10001f74",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100022d4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004824",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100048d9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100063a4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006dcd",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?deleteObjectById@ObjectsList@@QAEXI@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10002577",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?deleteParameter@ParametersList@@QAEXPAVParameter@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10005afb",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?elementsCount@AIStructure@@QAEHXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10004563",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getCodingType@AIElement@@QAE?AW4CodingType@@XZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x10003b9d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004720",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000580c",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getGroup@Parameter@@QAEHXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10004634",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000573c",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getId@Object@@QAEIXZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x100015ce",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000239f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002565",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@AIElement@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100048c8",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@Object@@QAE?AVMString@@XZ",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x100014a6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10001f68",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100022c5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006393",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006dbc",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getNumber@Parameter@@QAEHXZ",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x10003add",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003c71",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003e01",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100046aa",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100057a7",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getObject@ObjectsList@@QAEPAVObject@@H@Z",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x1000149e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100015c6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10001f57",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002501",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006d5e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getObject@Parameter@@QAEPAVObject@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10002535",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004796",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getObjectsList@PrimaryModel@@QAEPAVObjectsList@@XZ",
+        "calls": 10,
+        "sites": [
+          {
+            "site": "0x1000143a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10001496",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100015be",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10001f4f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002203",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100024f9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000256f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100025e3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000260c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100026ea",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParameter@ParametersList@@QAEPAVParameter@@H@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x1000252b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000458b",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParamsCount@ParametersList@@QAEHXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10002519",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002558",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParamsList@PrimaryModel@@QAEPAVParametersList@@XZ",
+        "calls": 4,
+        "sites": [
+          {
+            "site": "0x10003a56",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003bee",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003d74",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005af3",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getSign@Parameter@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10004813",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?objectsCount@ObjectsList@@QAEHXZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x10001442",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100025eb",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10006e53",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?removeFromList@AEBinaryLink@@QAEXXZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10005acd",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setCodingType@AIElement@@QAEXW4CodingType@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10003b88",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setGroup@Parameter@@QAEXH@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10003a3e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setName@AIElement@@QAEXVMString@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10004086",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setName@Object@@QAEXVMString@@@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10002088",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000224b",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setNumber@Parameter@@QAEXH@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10003d5c",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setObject@Parameter@@QAEXPAVObject@@@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10002544",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003ee6",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?setSign@Parameter@@QAEXVMString@@@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10003f69",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?switchElements@AIStructure@@QAEXHH@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10002614",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100026f2",
+            "kind": "direct-IAT"
+          }
+        ]
+      }
+    ],
+    "virtual_calls_indirect": [
+      {
+        "site": "0x100013cf",
+        "base_register": "eax",
+        "offset": "0xc4"
+      },
+      {
+        "site": "0x1000141c",
+        "base_register": "eax",
+        "offset": "0x50"
+      },
+      {
+        "site": "0x1000152a",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x100015ef",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10001ea1",
+        "base_register": "esi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10001ed0",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10001eda",
+        "base_register": "esi",
+        "offset": "0x44"
+      },
+      {
+        "site": "0x10001f1b",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10001f25",
+        "base_register": "esi",
+        "offset": "0x44"
+      },
+      {
+        "site": "0x100020e4",
+        "base_register": "esi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x1000234d",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x100023c3",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x100024c6",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x100024d1",
+        "base_register": "esi",
+        "offset": "0x44"
+      },
+      {
+        "site": "0x10002688",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10002764",
+        "base_register": "esi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10002b59",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x100034ec",
+        "base_register": "eax",
+        "offset": "0xc4"
+      },
+      {
+        "site": "0x10005a8f",
+        "base_register": "edx",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x10005ae1",
+        "base_register": "eax",
+        "offset": "0"
+      },
+      {
+        "site": "0x1000625b",
+        "base_register": "eax",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x100062cd",
+        "base_register": "eax",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10006343",
+        "base_register": "edx",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x100063e4",
+        "base_register": "eax",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x1000642c",
+        "base_register": "eax",
+        "offset": "0x48"
+      },
+      {
+        "site": "0x10006a3e",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10006ebc",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10006ef9",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10007faf",
+        "base_register": "ebp",
+        "offset": "0x14"
+      }
+    ],
+    "import_thunks_resolved": 546
+  },
+  {
+    "binary": "PM_spec_WEB.dll",
+    "sha256": "ef0365f6fd3f69648ccf28c5eb564312f70faa9bbd892543a933ec4ae7fa6d68",
+    "image_base": "0x10000000",
+    "imports_total": 438,
+    "imports_by_dll": {
+      "KERNEL32.dll": 22,
+      "MAIWmodels.dll": 37,
+      "MSVCP140.dll": 2,
+      "Qt5Core.dll": 63,
+      "Qt5Gui.dll": 14,
+      "Qt5WebEngineWidgets.dll": 19,
+      "Qt5Widgets.dll": 255,
+      "VCRUNTIME140.dll": 12,
+      "api-ms-win-crt-heap-l1-1-0.dll": 3,
+      "api-ms-win-crt-runtime-l1-1-0.dll": 11
+    },
+    "core_imports": [
+      {
+        "symbol": "??1ALElementList@@QAE@XZ",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x10004ccd",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004cd9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004ce5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005ec7",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005ed3",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "??1MString@@QAE@XZ",
+        "calls": 25,
+        "sites": [
+          {
+            "site": "0x10002a71",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002b66",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002c8b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000333f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100033d7",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003ac6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003b5b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003c28",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003ce5",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000412b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004179",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100044dd",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000488d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004b1d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100050d9",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005113",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005149",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100055a1",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100055ff",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000573b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005798",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000593f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005998",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005b1a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005b73",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?data@MString@@QBEPB_WXZ",
+        "calls": 18,
+        "sites": [
+          {
+            "site": "0x100029bb",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002ab3",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002bd4",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100032da",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000337d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003a61",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003b01",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003bce",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003c7f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000410d",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004158",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100044bc",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000486c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004afc",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005561",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100055bf",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100056fe",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005758",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAFE1@AFEBinaryLink@@QAEPAVAFElement@@XZ",
+        "calls": 4,
+        "sites": [
+          {
+            "site": "0x1000292a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002999",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002b81",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002d64",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAFElement@AFStructure@@QAEPAVAFElement@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000302e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAIE2@AFEBinaryLink@@QAEPAVAFElement@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10002a94",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAIE3@AFEBinaryLink@@QAEPAVAFElement@@XZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x1000293f",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002b71",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002bb5",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAIelement@AEContentLink@@QAEPAVAIElement@@XZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x10005281",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100053ac",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100054d6",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getAutoArgs@AFElement@@QAE?AVALElementList@@D@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10004a47",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100058ba",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getChar@AEContentLink@@QAEDXZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x10005270",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000539b",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100054c9",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getContentArgs@AFElement@@QAE?AVALElementList@@D@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10004327",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004709",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getDynamicStructure@AbstractModel@@QAEPAVAFStructure@@H@Z",
+        "calls": 7,
+        "sites": [
+          {
+            "site": "0x100026f0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000270c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002731",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100027bd",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003001",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003026",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003136",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getElement@SubjectOperationsStructure@@QAEPAVSubjectOperation@@H@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x1000401c",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004e1d",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getElementsCount@AFStructure@@QAEHXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10003009",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000313e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getElementsCount@SubjectOperationsStructure@@QAEHXZ",
+        "calls": 4,
+        "sites": [
+          {
+            "site": "0x10004004",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100040b0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004e08",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004ea5",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getFormalization@AFElement@@QAE?AW4FEFormalization@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10003480",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005173",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getFunction@AFElement@@QAEPAVAIElement@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10004134",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getLink@AFStructure@@QAEPAVAFEBinaryLink@@H@Z",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10002714",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002739",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getLinksCount@AFStructure@@QAEHXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x100026f8",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100027c5",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getMark@SubjectOperation@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10005122",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@AElement@@QAE?AVMString@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10003369",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100050e8",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@AIElement@@QAE?AVMString@@XZ",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x10003aed",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005553",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100056f0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100058f2",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005aca",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getName@Object@@QAE?AVMString@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x10003c6b",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getObject@Parameter@@QAEPAVObject@@XZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x10003c31",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10003c63",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParameter@ParametersList@@QAEPAVParameter@@H@Z",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x100037c2",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParamsCount@ParametersList@@QAEHXZ",
+        "calls": 2,
+        "sites": [
+          {
+            "site": "0x100037a6",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100038c5",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getParamsList@PrimaryModel@@QAEPAVParametersList@@XZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x1000379e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100037ba",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100038bd",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getSign@Parameter@@QAE?AVMString@@XZ",
+        "calls": 5,
+        "sites": [
+          {
+            "site": "0x10003bba",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x100055b1",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000574a",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x1000594e",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10005b29",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getStatus@AFElement@@QAE?AW4FEStatus@@XZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x100033f0",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004029",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10004e2a",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getType@AEBinaryLink@@QAE?AW4LinkType@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000525e",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getType@AFEBinaryLink@@QAE?AW4LinkType@@XZ",
+        "calls": 1,
+        "sites": [
+          {
+            "site": "0x1000271c",
+            "kind": "direct-IAT"
+          }
+        ]
+      },
+      {
+        "symbol": "?getType@AFElement@@QAE?AW4FEType@@XZ",
+        "calls": 3,
+        "sites": [
+          {
+            "site": "0x10002932",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002b89",
+            "kind": "direct-IAT"
+          },
+          {
+            "site": "0x10002d6c",
+            "kind": "direct-IAT"
+          }
+        ]
+      }
+    ],
+    "virtual_calls_indirect": [
+      {
+        "site": "0x100029a7",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10002aa2",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10002bc3",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x100032c9",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10003a50",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10003b86",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10004102",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x1000414d",
+        "base_register": "edx",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x100044b1",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10004861",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x10004af1",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x100050b4",
+        "base_register": "eax",
+        "offset": "0x14"
+      },
+      {
+        "site": "0x1000522d",
+        "base_register": "eax",
+        "offset": "0xc"
+      },
+      {
+        "site": "0x10005c93",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10005d44",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10005dba",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10005e33",
+        "base_register": "eax",
+        "offset": "0x8"
+      },
+      {
+        "site": "0x10007554",
+        "base_register": "edi",
+        "offset": "0x3c"
+      },
+      {
+        "site": "0x10007572",
+        "base_register": "eax",
+        "offset": "0x4c"
+      },
+      {
+        "site": "0x100075ef",
+        "base_register": "edi",
+        "offset": "0x3c"
+      },
+      {
+        "site": "0x10007627",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x1000765e",
+        "base_register": "edi",
+        "offset": "0x3c"
+      },
+      {
+        "site": "0x1000768e",
+        "base_register": "edi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10007698",
+        "base_register": "edi",
+        "offset": "0x44"
+      },
+      {
+        "site": "0x100076d6",
+        "base_register": "edi",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x100076e0",
+        "base_register": "edi",
+        "offset": "0x44"
+      },
+      {
+        "site": "0x100077a5",
+        "base_register": "edi",
+        "offset": "0x3c"
+      },
+      {
+        "site": "0x100077e8",
+        "base_register": "edi",
+        "offset": "0x38"
+      },
+      {
+        "site": "0x10008080",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x100085c7",
+        "base_register": "eax",
+        "offset": "0x2c"
+      },
+      {
+        "site": "0x10009297",
+        "base_register": "ebp",
+        "offset": "0x14"
+      }
+    ],
+    "import_thunks_resolved": 462
+  }
+]

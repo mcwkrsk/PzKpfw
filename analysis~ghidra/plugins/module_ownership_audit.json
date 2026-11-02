@@ -1,0 +1,185 @@
+{
+  "static_only": true,
+  "main_exe_sha256": "ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2",
+  "base_interface": {
+    "slots": [
+      "default RET body",
+      "default RET body",
+      "pure virtual (_purecall)"
+    ],
+    "virtual_destructor_observed": false,
+    "interpretation": "the recovered three-slot IsModule base interface exposes no virtual destructor"
+  },
+  "plugins": [
+    {
+      "module": "PM_auto.dll",
+      "sha256": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+      "base_vtable": {
+        "va": "0x10057654",
+        "slot0_va": "0x10002c70",
+        "slot1_va": "0x10002c70",
+        "slot2_va": "0x1001db60",
+        "slot2_iat_va": "0x10022f60",
+        "slot2_iat_symbol": "_purecall",
+        "interpretation": "abstract base: slots 0/1 have default RET bodies; slot 2 is pure virtual"
+      },
+      "derived_vtable": {
+        "va": "0x1005795c",
+        "slot_targets": [
+          "0x10002c70",
+          "0x100027d0",
+          "0x100027b0"
+        ]
+      },
+      "widget_list": {
+        "member_offset": "0x0c",
+        "append_helper_va": "0x100095b0",
+        "qlistdata_append_iat_va": [
+          "0x10022378"
+        ],
+        "stored_value": "raw WorkWidget* copied into QListData storage",
+        "qt_ownership": "Qt implicit sharing applies to the list backing store, not to the pointed-to widgets",
+        "removal_or_disposal_of_this_member": "not established by this audit"
+      }
+    },
+    {
+      "module": "PM_params.dll",
+      "sha256": "22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781",
+      "base_vtable": {
+        "va": "0x10018d20",
+        "slot0_va": "0x10007e10",
+        "slot1_va": "0x10007e10",
+        "slot2_va": "0x10008edc",
+        "slot2_iat_va": "0x1000a8f0",
+        "slot2_iat_symbol": "_purecall",
+        "interpretation": "abstract base: slots 0/1 have default RET bodies; slot 2 is pure virtual"
+      },
+      "derived_vtable": {
+        "va": "0x10018d30",
+        "slot_targets": [
+          "0x10007e10",
+          "0x10007310",
+          "0x100072f0"
+        ]
+      },
+      "widget_list": {
+        "member_offset": "0x0c",
+        "append_helper_va": "0x100070f0",
+        "qlistdata_append_iat_va": [
+          "0x1000a144"
+        ],
+        "stored_value": "raw WorkWidget* copied into QListData storage",
+        "qt_ownership": "Qt implicit sharing applies to the list backing store, not to the pointed-to widgets",
+        "removal_or_disposal_of_this_member": "not established by this audit"
+      }
+    },
+    {
+      "module": "PM_spec_WEB.dll",
+      "sha256": "ef0365f6fd3f69648ccf28c5eb564312f70faa9bbd892543a933ec4ae7fa6d68",
+      "base_vtable": {
+        "va": "0x1000c7bc",
+        "slot0_va": "0x10001040",
+        "slot1_va": "0x10001040",
+        "slot2_va": "0x10009a98",
+        "slot2_iat_va": "0x1000c68c",
+        "slot2_iat_symbol": "_purecall",
+        "interpretation": "abstract base: slots 0/1 have default RET bodies; slot 2 is pure virtual"
+      },
+      "derived_vtable": {
+        "va": "0x1000c8e4",
+        "slot_targets": [
+          "0x10001040",
+          "0x100062c0",
+          "0x100062a0"
+        ]
+      },
+      "widget_list": {
+        "member_offset": "0x0c",
+        "append_helper_va": "0x100023e0",
+        "qlistdata_append_iat_va": [
+          "0x1000c19c"
+        ],
+        "stored_value": "raw WorkWidget* copied into QListData storage",
+        "qt_ownership": "Qt implicit sharing applies to the list backing store, not to the pointed-to widgets",
+        "removal_or_disposal_of_this_member": "not established by this audit"
+      }
+    },
+    {
+      "module": "PM_matrix_web.dll",
+      "sha256": "55d25ef0f07a069d80226abae1583928be92cf023fb66ffddbdd32b4f1a66f22",
+      "base_vtable": {
+        "va": "0x1000868c",
+        "slot0_va": "0x10001020",
+        "slot1_va": "0x10001020",
+        "slot2_va": "0x10006a88",
+        "slot2_iat_va": "0x10008564",
+        "slot2_iat_symbol": "_purecall",
+        "interpretation": "abstract base: slots 0/1 have default RET bodies; slot 2 is pure virtual"
+      },
+      "derived_vtable": {
+        "va": "0x10008798",
+        "slot_targets": [
+          "0x10001020",
+          "0x10002840",
+          "0x10002820"
+        ]
+      },
+      "widget_list": {
+        "member_offset": "0x0c",
+        "append_helper_va": "0x10001a10",
+        "qlistdata_append_iat_va": [
+          "0x10008144"
+        ],
+        "stored_value": "raw WorkWidget* copied into QListData storage",
+        "qt_ownership": "Qt implicit sharing applies to the list backing store, not to the pointed-to widgets",
+        "removal_or_disposal_of_this_member": "not established by this audit"
+      }
+    },
+    {
+      "module": "Model_Visualiser.dll",
+      "sha256": "1187c7a59ae2dbb8eb91bebbbe89850d9724a62ff186865733930f1488bce880",
+      "base_vtable": {
+        "va": "0x1000e4a4",
+        "slot0_va": "0x10001c50",
+        "slot1_va": "0x10001c50",
+        "slot2_va": "0x1000b17e",
+        "slot2_iat_va": "0x1000d580",
+        "slot2_iat_symbol": "_purecall",
+        "interpretation": "abstract base: slots 0/1 have default RET bodies; slot 2 is pure virtual"
+      },
+      "derived_vtable": {
+        "va": "0x1000e5a8",
+        "slot_targets": [
+          "0x10001c50",
+          "0x10009c60",
+          "0x100092b0"
+        ]
+      },
+      "widget_list": {
+        "member_offset": "0x0c",
+        "append_helper_va": "0x10007f30",
+        "qlistdata_append_iat_va": [
+          "0x1000d0ec",
+          "0x1000d0ec"
+        ],
+        "stored_value": "raw WorkWidget* copied into QListData storage",
+        "qt_ownership": "Qt implicit sharing applies to the list backing store, not to the pointed-to widgets",
+        "removal_or_disposal_of_this_member": "not established by this audit"
+      }
+    }
+  ],
+  "host_module_registry_cleanup": {
+    "function_va": "0x00418740",
+    "registry_global_va": "0x004696B8",
+    "cleanup_import_va": "0x004192E0",
+    "cleanup_import": "?deallocate@QArrayData@@SAXPAU1@II@Z",
+    "observed_behavior": "release of Qt container backing allocation with element size/alignment 4",
+    "pointer_iteration_or_module_delete_observed": false,
+    "scope": "bounded cleanup routine only; other indirect destruction paths are not excluded"
+  },
+  "limitations": [
+    "No Windows runtime execution was performed.",
+    "Absence of a statically located destroy path is not proof that no indirect path exists.",
+    "QListData::dispose call sites are not attributed to IsModule unless receiver/data flow is proven."
+  ]
+}

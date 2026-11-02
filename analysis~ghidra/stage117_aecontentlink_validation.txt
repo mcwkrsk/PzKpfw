@@ -1,0 +1,45 @@
+{
+  "stage": "1.17",
+  "topic": "AEContentLink / LinkType 4 class contract",
+  "static_only": true,
+  "sha256": {
+    "MAIWmodels.dll": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525"
+  },
+  "checks_passed": 19,
+  "checks_total": 19,
+  "checks": {
+    "aecontentlink_default_ctor_exported_at_10003400": true,
+    "aecontentlink_vtable_written": true,
+    "constructor_sets_type_4": true,
+    "aecontentlink_vtable_exported": true,
+    "setAElements_exported_at_10003640": true,
+    "setAElements_uses_endpoint_index_0": true,
+    "setAElements_uses_endpoint_index_1": true,
+    "setAElements_writes_marker_at_2c": true,
+    "getAFelement_maps_to_endpoint_0": true,
+    "getAIelement_maps_to_endpoint_1": true,
+    "getType_reads_type_at_28": true,
+    "getChar_and_setChar_use_2c": true,
+    "getPower_and_setPower_use_30": true,
+    "addContentLink_compares_both_endpoints_and_marker": true,
+    "addContentLink_increments_power_on_duplicate": true,
+    "addContentLink_constructs_new_AEContentLink": true,
+    "pm_params_delete_filters_type_4": true,
+    "pm_params_delete_unlinks_and_removes_link": true,
+    "pm_params_imports_AEBinaryLink_type_unlink_remove": true
+  },
+  "contract": {
+    "dynamic_class": "AEContentLink",
+    "link_type": 4,
+    "endpoint_0": "AFElement*",
+    "endpoint_1": "AIElement*",
+    "marker_offset": "AEContentLinkPrivate+0x2C",
+    "power_offset": "AEContentLinkPrivate+0x30",
+    "link_type_offset": "AEBinaryLinkPrivate+0x28"
+  },
+  "limitations": [
+    "Static analysis only; no original Windows runtime execution.",
+    "Power is observed as a duplicate-add integer counter; wider domain semantics are not established.",
+    "Ownership/destruction of Parameter after erase from ParametersList remains unresolved."
+  ]
+}

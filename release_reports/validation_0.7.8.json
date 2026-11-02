@@ -1,0 +1,78 @@
+{
+  "release": "0.7.8",
+  "status": "PASS_STRUCTURAL_TESTS_RUNTIME_NOT_TESTED",
+  "python_tests": {
+    "passed": 316,
+    "failed": 0,
+    "command": "python -m pytest -q"
+  },
+  "sample_roundtrip": {
+    "passed": 5,
+    "failed": 0,
+    "report": "stage2_sample_roundtrip_0.7.8.json"
+  },
+  "compatibility_corpus": {
+    "passed": 6,
+    "failed": 0,
+    "report": "compatibility_0.7.8.json",
+    "pzkpfw_private_markup_added": false
+  },
+  "native_cpp_abi_layout": {
+    "passed": 8,
+    "failed": 0,
+    "standard": "C++17",
+    "warnings_as_errors": true
+  },
+  "gui_smoke": {
+    "status": "PASS",
+    "scenarios": [
+      "project_open_save",
+      "relationship_graph_navigation_and_filtering",
+      "typed_link_crud_and_undo_redo",
+      "link_repair_batch_and_undo_redo",
+      "backup_restore_rollback",
+      "project_diff_and_selective_restore",
+      "dependency_preflight_and_writer_validation",
+      "grouped_undo_redo"
+    ]
+  },
+  "source_build": {
+    "status": "PASS",
+    "wheel": "pzkpfw-0.7.8-py3-none-any.whl",
+    "wheel_sha256": "ff06ae672ff6915a92dce95072afcb15deeab178debea7dd632dc575f5f78f09"
+  },
+  "clean_wheel_install": {
+    "status": "PASS",
+    "method": "fresh venv; pip install --no-index --no-deps",
+    "imported_version": "0.7.8",
+    "cli_entrypoint": "PASS"
+  },
+  "installed_cli_diff_restore": {
+    "status": "PASS",
+    "steps": [
+      "compare valid sample reference/current projects",
+      "select one attribute change by stable operation ID",
+      "restore into a separate output file",
+      "validate restored output with zero issues"
+    ],
+    "reference_sha256_unchanged": true,
+    "current_sha256_unchanged": true,
+    "native_is2_metadata_added": false
+  },
+  "original_is2_runtime_acceptance": {
+    "status": "NOT_TESTED",
+    "reason": "The original Windows IS.exe runtime was not launched in the Linux build environment."
+  },
+  "public_git_repository_created": false,
+  "public_archive_inspection": {
+    "status": "PASS",
+    "source_archive_file_count": 625,
+    "python_runtime_source_files": 18,
+    "python_test_files": 54,
+    "native_cpp_contract_test_files": 8,
+    "private_reference_paths_found": 0,
+    "original_is2_binary_files_found": 0,
+    "compiled_artifacts_found": 0,
+    "wheel_included": "pzkpfw-0.7.8-py3-none-any.whl"
+  }
+}

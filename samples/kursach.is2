@@ -1,0 +1,236 @@
+<project name="Вариант 16 - проектировочный расчет цилиндрической передачи" info="">
+ <user name="IS-2 User" info=""/>
+ <models>
+  <primaryModel>
+   <params LastID="0"/>
+   <objects LastID="0"/>
+   <spd>
+    <actions lastID="71">
+     <pd level="1" name="Осуществление проектировочного расчета цилиндрической передачи редуктора общ. назначения" type="2" id="1" formalization="2" number="1" mark="" status="1" symbol="122"/>
+     <pd level="2" name="Определение исходных данных и параметров расчета" type="2" id="2" formalization="2" number="1" mark="" status="1" symbol="122"/>
+     <pd level="2" name="Определение допускаемых напряжений" type="2" id="3" formalization="2" number="2" mark="" status="1" symbol="122"/>
+     <pd level="2" name="Определение геометрических параметров передачи" type="2" id="4" formalization="2" number="3" mark="" status="1" symbol="122"/>
+     <pd level="2" name="Завершение проектировочного расчета" type="2" id="5" formalization="2" number="4" mark="" status="1" symbol="122"/>
+     <pd level="3" name="Задание режима работы и передаточного числа" type="2" id="6" formalization="2" number="1" mark="" status="1" symbol="122"/>
+     <pd level="3" name="Выбор материала и параметров зубьев" type="2" id="7" formalization="2" number="2" mark="" status="1" symbol="122"/>
+     <pd level="3" name="Определение коэффициентов нагрузки и ширины венца" type="2" id="8" formalization="2" number="3" mark="" status="1" symbol="122"/>
+     <pd level="3" name="Определение допускаемого контактного напряжения" type="2" id="9" formalization="2" number="4" mark="" status="1" symbol="122"/>
+     <pd level="3" name="Определение допускаемого напряжения изгиба" type="2" id="10" formalization="2" number="5" mark="" status="1" symbol="122"/>
+     <pd level="3" name="Определение межосевого расстояния" type="2" id="11" formalization="2" number="6" mark="" status="1" symbol="122"/>
+     <pd level="3" name="Определение расчетного модуля" type="2" id="12" formalization="2" number="7" mark="" status="1" symbol="122"/>
+     <pd level="3" name="Уточнение модуля и чисел зубьев" type="3" id="13" formalization="0" number="8" mark="" status="1" symbol="122"/>
+     <pd level="3" name="Уточнение aw и выбор по ГОСТ 2185-66 (табл. 6.9)" type="0" id="14" formalization="0" number="9" mark="" status="0" symbol="122"/>
+     <pd level="3" name="Передача параметров на компоновку и проверочный расчет (разд. 6.2)" type="0" id="15" formalization="0" number="10" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Определение передаточного числа u" type="0" id="17" formalization="0" number="2" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Задание частоты вращения n" type="0" id="18" formalization="0" number="3" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Задание срока службы tч" type="0" id="19" formalization="0" number="4" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Выбор материала колес и вида термообработки" type="0" id="20" formalization="0" number="5" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Выбор вида зубьев" type="0" id="21" formalization="0" number="6" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Выбор угла наклона зубьев" type="0" id="22" formalization="0" number="7" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Выбор коэффициента ширины венца по диаметру" type="0" id="23" formalization="0" number="8" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Расчет отношения ширины венца к межосевому расстоянию" type="0" id="24" formalization="0" number="9" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Выбор коэффициента KHb по табл. 6.3" type="0" id="25" formalization="0" number="10" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Выбор коэффициента Ka по табл. 6.4" type="0" id="26" formalization="0" number="11" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Определение числа циклов NHE в зависимости от режима нагрузки" type="1" id="27" formalization="0" number="12" mark="" status="1" symbol="122"/>
+     <pd level="4" name="Выбор допускаемого напряжения и числа циклов NH0 по табл. 6.5" type="0" id="28" formalization="0" number="13" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Расчет коэффициента долговечности KHL (6.4)" type="0" id="29" formalization="0" number="14" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Расчет допускаемого контактного напряжения колес (6.3)" type="0" id="30" formalization="0" number="15" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Определение допускаемого напр. в зависимости от вида зубьев" type="1" id="31" formalization="0" number="16" mark="" status="1" symbol="122"/>
+     <pd level="4" name="Выбор допускаемого напряжения и числа циклов NF0 по табл. 6.5" type="0" id="32" formalization="0" number="17" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Определение числа циклов NFE в от режима нагрузки" type="1" id="33" formalization="0" number="18" mark="" status="1" symbol="122"/>
+     <pd level="4" name="Определение показателя степени mF в зависимости от твердости зубьев" type="1" id="34" formalization="0" number="19" mark="" status="1" symbol="122"/>
+     <pd level="4" name="Расчет коэффициента долговечности KFL (6.10)" type="0" id="35" formalization="0" number="20" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Расчет допускаемого напряжения изгиба (6.9)" type="0" id="36" formalization="0" number="21" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Определение знака в формуле (6.1) в зависимости от вида зацепления" type="1" id="37" formalization="0" number="22" mark="" status="1" symbol="122"/>
+     <pd level="4" name="Расчет межосевого расстояния aw по формуле (6.1)" type="0" id="38" formalization="0" number="23" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Выбор числа зубьев шестерни z1 в зависимости от вида зубьев" type="1" id="39" formalization="0" number="24" mark="" status="1" symbol="122"/>
+     <pd level="4" name="Выбор коэффициента YF1 по табл. 6.7" type="0" id="40" formalization="0" number="25" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Выбор коэффициента Kma в зависимости от вида зубьев" type="1" id="41" formalization="0" number="26" mark="" status="1" symbol="122"/>
+     <pd level="4" name="Расчет ширины венца bw" type="0" id="42" formalization="0" number="27" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Расчет модуля по формуле (6.8)" type="0" id="43" formalization="0" number="28" mark="" status="0" symbol="122"/>
+     <pd level="4" name="Выполнение итерации уточнения" type="2" id="44" formalization="2" number="29" mark="" status="1" symbol="122"/>
+     <pd level="5" name="Расчет NHE при постоянной нагрузке (6.5)" type="0" id="45" formalization="0" number="1" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Расчет NHE по ступенчатой циклограмме (6.6)" type="0" id="46" formalization="0" number="2" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Выбор напряжения меньшего из колес для прямозубой передачи" type="0" id="47" formalization="0" number="3" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Расчет напряжения для косозубой и шевронной передачи (6.7)" type="0" id="48" formalization="0" number="4" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Расчет NFE при постоянной нагрузке" type="0" id="49" formalization="0" number="5" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Расчет NFE по ступенчатой циклограмме (6.11)" type="0" id="50" formalization="0" number="6" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Выбор mF при HB&lt;=350 или шлифованном переходе" type="0" id="51" formalization="0" number="7" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Выбор mF при HB>350 без шлифовки перехода и для чугуна" type="0" id="52" formalization="0" number="8" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Выбор знака + для внешнего зацепления" type="0" id="53" formalization="0" number="9" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Выбор знака - для внутреннего зацепления" type="0" id="54" formalization="0" number="10" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Выбор z1 для прямозубой передачи в зависимости от u" type="0" id="55" formalization="0" number="11" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Выбор z1 для косозубой и шевронной передачи" type="1" id="56" formalization="0" number="12" mark="" status="1" symbol="122"/>
+     <pd level="5" name="Выбор Kma для прямозубой передачи" type="0" id="57" formalization="0" number="13" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Выбор Kma для косозубой и шевронной передачи" type="1" id="58" formalization="0" number="14" mark="" status="1" symbol="122"/>
+     <pd level="5" name="Округление модуля до стандартного по табл. 6.8" type="0" id="59" formalization="0" number="15" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Расчет и округление числа зубьев шестерни z1" type="0" id="60" formalization="0" number="16" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Расчет и округление числа зубьев колеса z2" type="0" id="61" formalization="0" number="17" mark="" status="0" symbol="122"/>
+     <pd level="5" name="Сравнение z1 с числом зубьев, принятым для выбора YF1" type="1" id="62" formalization="0" number="18" mark="" status="1" symbol="122"/>
+     <pd level="6" name="Выбор z1 для косозубой передачи в зависимости от u" type="0" id="63" formalization="0" number="1" mark="" status="0" symbol="122"/>
+     <pd level="6" name="Выбор z1 для шевронной передачи в зависимости от u" type="0" id="64" formalization="0" number="2" mark="" status="0" symbol="122"/>
+     <pd level="6" name="Выбор Kma для косозубой передачи при коэффициенте осевого перекрытия &lt;=1" type="0" id="65" formalization="0" number="3" mark="" status="0" symbol="122"/>
+     <pd level="6" name="Выбор Kma для косозубой передачи при перекрытии >1 и для шевронной" type="0" id="66" formalization="0" number="4" mark="" status="0" symbol="122"/>
+     <pd level="6" name="Принятие m, z1 и z2 при незначительном отличии z1" type="0" id="67" formalization="0" number="5" mark="" status="0" symbol="122"/>
+     <pd level="6" name="Коррекция YF1 и модуля при значительном отличии z1" type="0" id="68" formalization="0" number="6" mark="" status="0" symbol="122"/>
+     <pd level="4" name="определение вращающего момента T1 по циклограмме" type="0" id="71" formalization="0" number="1" mark="" status="0" symbol="122"/>
+    </actions>
+    <links>
+     <link type="2" afe3="0" afe1="1" afe2="2"/>
+     <link type="2" afe3="0" afe1="1" afe2="3"/>
+     <link type="2" afe3="0" afe1="1" afe2="4"/>
+     <link type="2" afe3="0" afe1="1" afe2="5"/>
+     <link type="3" afe3="3" afe1="1" afe2="2"/>
+     <link type="3" afe3="4" afe1="1" afe2="3"/>
+     <link type="3" afe3="5" afe1="1" afe2="4"/>
+     <link type="3" afe3="0" afe1="1" afe2="5"/>
+     <link type="2" afe3="0" afe1="2" afe2="6"/>
+     <link type="2" afe3="0" afe1="2" afe2="7"/>
+     <link type="2" afe3="0" afe1="2" afe2="8"/>
+     <link type="3" afe3="7" afe1="2" afe2="6"/>
+     <link type="3" afe3="8" afe1="2" afe2="7"/>
+     <link type="3" afe3="0" afe1="2" afe2="8"/>
+     <link type="2" afe3="0" afe1="6" afe2="17"/>
+     <link type="2" afe3="0" afe1="6" afe2="18"/>
+     <link type="2" afe3="0" afe1="6" afe2="19"/>
+     <link type="3" afe3="19" afe1="6" afe2="18"/>
+     <link type="3" afe3="0" afe1="6" afe2="19"/>
+     <link type="2" afe3="0" afe1="7" afe2="20"/>
+     <link type="2" afe3="0" afe1="7" afe2="21"/>
+     <link type="2" afe3="0" afe1="7" afe2="22"/>
+     <link type="3" afe3="21" afe1="7" afe2="20"/>
+     <link type="3" afe3="22" afe1="7" afe2="21"/>
+     <link type="3" afe3="0" afe1="7" afe2="22"/>
+     <link type="2" afe3="0" afe1="8" afe2="23"/>
+     <link type="2" afe3="0" afe1="8" afe2="24"/>
+     <link type="2" afe3="0" afe1="8" afe2="25"/>
+     <link type="2" afe3="0" afe1="8" afe2="26"/>
+     <link type="3" afe3="24" afe1="8" afe2="23"/>
+     <link type="3" afe3="25" afe1="8" afe2="24"/>
+     <link type="3" afe3="26" afe1="8" afe2="25"/>
+     <link type="3" afe3="0" afe1="8" afe2="26"/>
+     <link type="2" afe3="0" afe1="3" afe2="9"/>
+     <link type="2" afe3="0" afe1="3" afe2="10"/>
+     <link type="3" afe3="10" afe1="3" afe2="9"/>
+     <link type="3" afe3="0" afe1="3" afe2="10"/>
+     <link type="2" afe3="0" afe1="9" afe2="27"/>
+     <link type="2" afe3="0" afe1="9" afe2="28"/>
+     <link type="2" afe3="0" afe1="9" afe2="29"/>
+     <link type="2" afe3="0" afe1="9" afe2="30"/>
+     <link type="2" afe3="0" afe1="9" afe2="31"/>
+     <link type="3" afe3="28" afe1="9" afe2="27"/>
+     <link type="3" afe3="29" afe1="9" afe2="28"/>
+     <link type="3" afe3="30" afe1="9" afe2="29"/>
+     <link type="3" afe3="31" afe1="9" afe2="30"/>
+     <link type="3" afe3="0" afe1="9" afe2="31"/>
+     <link type="2" afe3="0" afe1="27" afe2="45"/>
+     <link type="2" afe3="0" afe1="27" afe2="46"/>
+     <link type="3" afe3="46" afe1="27" afe2="45"/>
+     <link type="3" afe3="0" afe1="27" afe2="46"/>
+     <link type="2" afe3="0" afe1="31" afe2="47"/>
+     <link type="2" afe3="0" afe1="31" afe2="48"/>
+     <link type="3" afe3="48" afe1="31" afe2="47"/>
+     <link type="3" afe3="0" afe1="31" afe2="48"/>
+     <link type="2" afe3="0" afe1="10" afe2="32"/>
+     <link type="2" afe3="0" afe1="10" afe2="33"/>
+     <link type="2" afe3="0" afe1="10" afe2="34"/>
+     <link type="2" afe3="0" afe1="10" afe2="35"/>
+     <link type="2" afe3="0" afe1="10" afe2="36"/>
+     <link type="3" afe3="33" afe1="10" afe2="32"/>
+     <link type="3" afe3="34" afe1="10" afe2="33"/>
+     <link type="3" afe3="35" afe1="10" afe2="34"/>
+     <link type="3" afe3="36" afe1="10" afe2="35"/>
+     <link type="3" afe3="0" afe1="10" afe2="36"/>
+     <link type="2" afe3="0" afe1="33" afe2="49"/>
+     <link type="2" afe3="0" afe1="33" afe2="50"/>
+     <link type="3" afe3="50" afe1="33" afe2="49"/>
+     <link type="3" afe3="0" afe1="33" afe2="50"/>
+     <link type="2" afe3="0" afe1="34" afe2="51"/>
+     <link type="2" afe3="0" afe1="34" afe2="52"/>
+     <link type="3" afe3="52" afe1="34" afe2="51"/>
+     <link type="3" afe3="0" afe1="34" afe2="52"/>
+     <link type="2" afe3="0" afe1="4" afe2="11"/>
+     <link type="2" afe3="0" afe1="4" afe2="12"/>
+     <link type="2" afe3="0" afe1="4" afe2="13"/>
+     <link type="3" afe3="12" afe1="4" afe2="11"/>
+     <link type="3" afe3="13" afe1="4" afe2="12"/>
+     <link type="3" afe3="0" afe1="4" afe2="13"/>
+     <link type="2" afe3="0" afe1="11" afe2="37"/>
+     <link type="2" afe3="0" afe1="11" afe2="38"/>
+     <link type="3" afe3="38" afe1="11" afe2="37"/>
+     <link type="3" afe3="0" afe1="11" afe2="38"/>
+     <link type="2" afe3="0" afe1="37" afe2="53"/>
+     <link type="2" afe3="0" afe1="37" afe2="54"/>
+     <link type="3" afe3="54" afe1="37" afe2="53"/>
+     <link type="3" afe3="0" afe1="37" afe2="54"/>
+     <link type="2" afe3="0" afe1="12" afe2="39"/>
+     <link type="2" afe3="0" afe1="12" afe2="40"/>
+     <link type="2" afe3="0" afe1="12" afe2="41"/>
+     <link type="2" afe3="0" afe1="12" afe2="42"/>
+     <link type="2" afe3="0" afe1="12" afe2="43"/>
+     <link type="3" afe3="40" afe1="12" afe2="39"/>
+     <link type="3" afe3="41" afe1="12" afe2="40"/>
+     <link type="3" afe3="42" afe1="12" afe2="41"/>
+     <link type="3" afe3="43" afe1="12" afe2="42"/>
+     <link type="3" afe3="0" afe1="12" afe2="43"/>
+     <link type="2" afe3="0" afe1="39" afe2="55"/>
+     <link type="2" afe3="0" afe1="39" afe2="56"/>
+     <link type="3" afe3="56" afe1="39" afe2="55"/>
+     <link type="3" afe3="0" afe1="39" afe2="56"/>
+     <link type="2" afe3="0" afe1="56" afe2="63"/>
+     <link type="2" afe3="0" afe1="56" afe2="64"/>
+     <link type="3" afe3="64" afe1="56" afe2="63"/>
+     <link type="3" afe3="0" afe1="56" afe2="64"/>
+     <link type="2" afe3="0" afe1="41" afe2="57"/>
+     <link type="2" afe3="0" afe1="41" afe2="58"/>
+     <link type="3" afe3="58" afe1="41" afe2="57"/>
+     <link type="3" afe3="0" afe1="41" afe2="58"/>
+     <link type="2" afe3="0" afe1="58" afe2="65"/>
+     <link type="2" afe3="0" afe1="58" afe2="66"/>
+     <link type="3" afe3="66" afe1="58" afe2="65"/>
+     <link type="3" afe3="0" afe1="58" afe2="66"/>
+     <link type="2" afe3="0" afe1="13" afe2="44"/>
+     <link type="3" afe3="0" afe1="13" afe2="44"/>
+     <link type="2" afe3="0" afe1="44" afe2="59"/>
+     <link type="2" afe3="0" afe1="44" afe2="60"/>
+     <link type="2" afe3="0" afe1="44" afe2="61"/>
+     <link type="2" afe3="0" afe1="44" afe2="62"/>
+     <link type="3" afe3="60" afe1="44" afe2="59"/>
+     <link type="3" afe3="61" afe1="44" afe2="60"/>
+     <link type="3" afe3="62" afe1="44" afe2="61"/>
+     <link type="3" afe3="0" afe1="44" afe2="62"/>
+     <link type="2" afe3="0" afe1="62" afe2="67"/>
+     <link type="2" afe3="0" afe1="62" afe2="68"/>
+     <link type="3" afe3="68" afe1="62" afe2="67"/>
+     <link type="3" afe3="0" afe1="62" afe2="68"/>
+     <link type="2" afe3="0" afe1="5" afe2="14"/>
+     <link type="2" afe3="0" afe1="5" afe2="15"/>
+     <link type="3" afe3="15" afe1="5" afe2="14"/>
+     <link type="3" afe3="0" afe1="5" afe2="15"/>
+     <link type="2" afe3="0" afe1="6" afe2="71"/>
+     <link type="3" afe3="17" afe1="6" afe2="71"/>
+     <link type="3" afe3="18" afe1="6" afe2="17"/>
+    </links>
+   </spd>
+   <matrix/>
+  </primaryModel>
+  <ConceptModel>
+   <cs last_elem_id="0" last_link_id="0">
+    <elemets/>
+    <links/>
+   </cs>
+   <spz last_id="1">
+    <elemets>
+     <AElement level="1" name="PZ_1" type="0" id="1" formalization="0" number="1" status="0" symbol="99"/>
+    </elemets>
+    <links/>
+   </spz>
+   <content/>
+  </ConceptModel>
+ </models>
+ <ModuleParams>
+  <Module name="PrimaryModelAuto">
+   <param decStr="z23;z24;z31;z32;z33;z34;z35;z37;"/>
+  </Module>
+ </ModuleParams>
+</project>

@@ -1,0 +1,27 @@
+# Stage 1.7 validation record
+
+Date: 2026-10-31
+Scope: static PE32 ABI recovery for all five supplied plugin DLLs; no Windows runtime.
+
+## Source DLL hashes accepted by the extractor
+
+- PM_auto.dll: `c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018`
+- PM_params.dll: `22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781`
+- PM_spec_WEB.dll: `ef0365f6fd3f69648ccf28c5eb564312f70faa9bbd892543a933ec4ae7fa6d68`
+- PM_matrix_web.dll: `55d25ef0f07a069d80226abae1583928be92cf023fb66ffddbdd32b4f1a66f22`
+- Model_Visualiser.dll: `1187c7a59ae2dbb8eb91bebbbe89850d9724a62ff186865733930f1488bce880`
+
+## Reproduction commands and results
+
+- `python tools/recover_plugin_module_abi.py /path/to/IS2_PMauto_beta --out analysis/plugins --asm-out analysis/disassembly/is_module_abi_stage17.asm` — PASS; all five pinned DLLs accepted and records regenerated.
+- `pytest -q` — `11 passed in 0.04s`.
+- C++ compile/run using `g++ -std=c++17 -Wall -Wextra -Werror -pedantic -I.`:
+PASS abi_layout_check
+PASS workwidget_contract_check
+PASS is_module_contract_check
+- Modified-copy SHA-256 rejection test — PASS; a one-byte altered `PM_auto.dll` was rejected before analysis.
+- JSON/TSV snapshot cross-check — PASS; five binaries, matching names, Qt shared-null IAT facts, factory member stores and descriptor float bits agree.
+
+## Limits
+
+No plugin was loaded by the original host. No Windows execution, debugger trace, heap ownership trace, Ghidra/IDA project or official SDK compatibility test was performed. Descriptor member semantics, descriptor deallocation, module wrapper destruction and bytes `IsModule+0x10..+0x1b` remain unresolved.

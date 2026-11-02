@@ -1,0 +1,135 @@
+{
+  "schema": "is2.pm_auto.structural_edit_commands.v1",
+  "evidence_level": "confirmed_static_with_context_branches_unresolved",
+  "binaries": {
+    "PM_auto.dll": {
+      "sha256": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+      "image_base": "0x10000000"
+    },
+    "MAIWmodels.dll": {
+      "sha256": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525",
+      "image_base": "0x10000000"
+    }
+  },
+  "commands": [
+    {
+      "slot": "newAlt_slot()",
+      "pm_auto_va": "0x1000BB60",
+      "core_api": "AFStructure::makeAlternative(AFElement*, int)",
+      "core_va": "0x1000B760",
+      "callsite": "0x1000BD1D",
+      "integer_argument": 2,
+      "confirmed": [
+        "Before the main conversion path, PM_auto obtains AContentStructure and the selected AFElement's content-link list; each listed link is removed from its list, unlinked with true, and destroyed through its virtual destructor.",
+        "The main diagram branch obtains AFStructure through AbstractModel::getDynamicStructure(0) and calls makeAlternative(selectedElement, 2).",
+        "The subsequent UI path obtains child count/child pointers and creates DiagramBlock wrappers of size 0x278 for the child elements.",
+        "MAIWmodels::makeAlternative rejects requested counts below 2, sets the target AFElement type/status/formalization fields, creates the requested child AFElements, links them compositionally and in order, and calls codeStructure()."
+      ],
+      "context_dependent_paths": [
+        "PM_auto branches on an opaque widget/context discriminator at owner+0x2c; an additional branch uses pasteNewAFElement and setters rather than the same direct makeAlternative call.",
+        "The exact source-level names and meanings of the discriminator values are not recovered."
+      ]
+    },
+    {
+      "slot": "newSeq_slot()",
+      "pm_auto_va": "0x1000C870",
+      "core_api": "AFStructure::makeSequanse(AFElement*, int)",
+      "core_va": "0x1000BC20",
+      "callsite": "0x1000CA25",
+      "integer_argument": 2,
+      "confirmed": [
+        "PM_auto removes the selected AFElement's content links before its principal sequence-conversion branch, using removeFromList, unlink(true), and virtual destruction.",
+        "The main diagram branch calls AbstractModel::getDynamicStructure(0), then makeSequanse(selectedElement, 2).",
+        "The UI path enumerates the created children and creates corresponding DiagramBlock wrappers of size 0x278.",
+        "MAIWmodels::makeSequanse requires a count of at least 2, sets the AFElement fields through setType(2), setStatus(1), setFormalization(2), creates the requested child elements and links, then calls codeStructure()."
+      ],
+      "context_dependent_paths": [
+        "Other diagram modes have additional branches, including pasteNewAFElement and explicit setFormalization/setType calls; these paths are not fully mapped to source-level modes."
+      ]
+    },
+    {
+      "slot": "newLoop_slot()",
+      "pm_auto_va": "0x1000C3A0",
+      "core_api": "AFStructure::makeIteration(AFElement*)",
+      "core_va": "0x1000BBA0",
+      "callsite": "0x1000C546",
+      "confirmed": [
+        "PM_auto removes associated content links before the main iteration-conversion path.",
+        "The main path obtains AFStructure with getDynamicStructure(0) and calls makeIteration(selectedElement).",
+        "MAIWmodels::makeIteration creates one child AFElement, adds the parent-child composition link and arrangement link, sets the target type to 3, formalization to 0 and status to 1, then calls codeStructure().",
+        "PM_auto retrieves the created child and constructs/updates its DiagramBlock representation."
+      ],
+      "context_dependent_paths": [
+        "The handler contains extra nested/diagram-mode paths that recurse through child blocks and helper 0x1000DB60; those branches are not all assigned semantic UI names."
+      ]
+    },
+    {
+      "slot": "toElementary_slot()",
+      "pm_auto_va": "0x10011470",
+      "core_api": "AFStructure::makeElementary(AFElement*)",
+      "core_va": "0x1000BB60",
+      "callsite": "0x10011721",
+      "confirmed": [
+        "PM_auto removes associated content links before converting the selected element.",
+        "The handler calls getDynamicStructure(0), then makeElementary(selectedElement).",
+        "The core method calls removeAFElementChildren(selectedElement), sets type/status/formalization arguments to 0, and calls codeStructure().",
+        "PM_auto then refreshes the diagram and its selected representation."
+      ]
+    },
+    {
+      "slot": "newElementAfter_slot()",
+      "pm_auto_va": "0x1000C160",
+      "core_api": "AFStructure::pasteNewAFElement(AFElement* parent, AFElement* anchor)",
+      "core_va": "0x1000C160",
+      "callsite": "0x1000C1BF",
+      "confirmed": [
+        "The handler requires the internal guard helper 0x1000D3C0 to return true and a current DiagramBlock to be present.",
+        "It obtains the selected AFElement and its parent, then invokes pasteNewAFElement with the parent and selected element as the insertion anchor.",
+        "The core method creates a new AFElement, adds a composition link to the parent, inserts the new element into the ordered arrangement around the supplied anchor, and calls codeStructure().",
+        "The UI inserts a corresponding DiagramBlock row after the selected block and refreshes the diagram."
+      ]
+    },
+    {
+      "slot": "newElementBefore_slot()",
+      "pm_auto_va": "0x1000C280",
+      "core_api": "AFStructure::pasteNewAFElement(AFElement* parent, AFElement* anchor)",
+      "core_va": "0x1000C160",
+      "callsite": "0x1000C2E8",
+      "confirmed": [
+        "The handler requires guard helper 0x1000D3C0 to return true and a current DiagramBlock.",
+        "It obtains the current element's previous sibling with getPrew() and its parent with getParent().",
+        "It passes parent plus previous sibling as the anchor to pasteNewAFElement; this inserts the new element immediately before the selected element (or at the start when no previous sibling exists).",
+        "The UI computes the insertion row and creates a corresponding DiagramBlock."
+      ]
+    },
+    {
+      "slot": "deleteElement_slot()",
+      "pm_auto_va": "0x1000A4E0",
+      "core_api": "AFStructure::removeAFElement(AFElement*)",
+      "core_va": "0x1000C230",
+      "call_chain": ["0x1000A4E0", "0x1000DB60", "0x1000DC44"],
+      "confirmed": [
+        "The UI handler verifies a selected element and applies child/parent-count conditions before invoking the removal helper.",
+        "Helper 0x1000DB60 receives the selected DiagramBlock, obtains its AFElement from +0x1D0, invokes an additional UI cleanup helper, removes the DiagramBlock pointer from the owner-side collection, and prepares a selection/update notification.",
+        "It obtains AFStructure through AbstractModel::getDynamicStructure(0) and calls removeAFElement(selectedElement).",
+        "The core removeAFElement path invokes _removeAFElementChildren, reconnects surrounding arrangement links where applicable, calls `unlink(true)` and `removeFromList()` for the element's binary links before virtual destruction, removes the element pointer from its containing child collection, and calls codeStructure()."
+      ],
+      "unresolved": [
+        "The user-facing confirmation/disable rules represented by the context and child-count branches are not fully recovered.",
+        "The exact object cleanup performed by helper 0x1000A360 is not yet semantically named."
+      ]
+    }
+  ],
+  "core_enum_arguments_observed": {
+    "AFStructure::makeAlternative": {"setType": 1, "setStatus": 1, "setFormalization": 0},
+    "AFStructure::makeSequanse": {"setType": 2, "setStatus": 1, "setFormalization": 2},
+    "AFStructure::makeIteration": {"setType": 3, "setStatus": 1, "setFormalization": 0},
+    "AFStructure::makeElementary": {"setType": 0, "setStatus": 0, "setFormalization": 0}
+  },
+  "limitations": [
+    "All findings are static observations from the exact supplied x86 binaries.",
+    "The numeric type mapping is cross-checked with the previously recovered AFElement type enum; status/formalization values are reported as setter arguments rather than assigned undocumented domain labels.",
+    "No original application runtime test or actual project mutation/save cycle was performed.",
+    "Some nested editor branches and helper responsibilities remain unresolved."
+  ]
+}

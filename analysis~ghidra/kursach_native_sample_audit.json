@@ -1,0 +1,51 @@
+{
+  "sample": "kursach_.is2",
+  "sha256": "096c67d83f6459e24c914b4818a5b3509e3991e7441389aba1a69586d0d650d4",
+  "size_bytes": 13634,
+  "source_claim": "user says saved directly by IS-2",
+  "primary_model": {
+    "spd_actions": 42,
+    "spd_links": 82,
+    "spd_link_type_counts": {
+      "2": 41,
+      "3": 41
+    },
+    "unique_action_ids": 42,
+    "actions_lastID": 84,
+    "max_action_id": 84,
+    "type2_edges": 41,
+    "type2_roots": [
+      1
+    ],
+    "type2_cycles": 0,
+    "type2_level_mismatches": 0,
+    "type3_parent_chains": 12,
+    "type3_broken_chains": 0,
+    "parameters": 10,
+    "objects": 2,
+    "module_params": {
+      "PrimaryModelAuto": "z31;z32;z33;z34;z35;"
+    }
+  },
+  "concept_model": {
+    "cs_direct_child_of_ConceptModel": true,
+    "cs_elemets_count": 0,
+    "cs_links_count": 0,
+    "spz_AElement_count": 1,
+    "content_children": 0,
+    "interpretation": "confirms external cs shape only; not a golden sample for SubjectCategory/SCBinaryLink"
+  },
+  "checks": {
+    "all_action_ids_unique": true,
+    "all_link_endpoints_resolve": true,
+    "type2_single_root_tree": true,
+    "type2_levels_consistent": true,
+    "all_type3_chains_valid": true,
+    "cs_shape_matches_previous_native_sample": true
+  },
+  "limitations": [
+    "No Windows runtime save/reopen was performed.",
+    "ConceptModel/cs elemets and links are empty in this sample.",
+    "The earlier FStructure interpretation is superseded: docs/47 and the complete 0x0040AC20 wrapper disassembly confirm FStructure is an intermediate DOM tag renamed to cs before append."
+  ]
+}

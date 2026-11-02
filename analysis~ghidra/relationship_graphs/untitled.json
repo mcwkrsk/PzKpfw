@@ -1,0 +1,169 @@
+{
+  "schema_version": 1,
+  "model": "IS-2 relationship endpoint graph",
+  "semantics": "Each relation is a record node; edges represent serialized endpoint slots and do not infer direction.",
+  "nodes": [
+    {
+      "key": "action:1",
+      "kind": "action",
+      "id": "1",
+      "label": "#1 · PD_1",
+      "detail": "AFElementtype=1 · level=1 · number=1",
+      "attributes": {
+        "id": "1",
+        "name": "PD_1",
+        "type": "1",
+        "formalization": "0",
+        "mark": "",
+        "symbol": "122",
+        "status": "1",
+        "level": "1",
+        "number": "1"
+      }
+    },
+    {
+      "key": "action:2",
+      "kind": "action",
+      "id": "2",
+      "label": "#2 · Razbor",
+      "detail": "AFElementtype=1 · level=2 · number=1",
+      "attributes": {
+        "id": "2",
+        "name": "Razbor",
+        "type": "1",
+        "formalization": "0",
+        "mark": "",
+        "symbol": "122",
+        "status": "1",
+        "level": "2",
+        "number": "1"
+      }
+    },
+    {
+      "key": "action:3",
+      "kind": "action",
+      "id": "3",
+      "label": "#3 · Sintez",
+      "detail": "AFElementtype=3 · level=2 · number=2",
+      "attributes": {
+        "id": "3",
+        "name": "Sintez",
+        "type": "3",
+        "formalization": "0",
+        "mark": "",
+        "symbol": "122",
+        "status": "1",
+        "level": "2",
+        "number": "2"
+      }
+    },
+    {
+      "key": "action:4",
+      "kind": "action",
+      "id": "4",
+      "label": "#4 · (без названия)",
+      "detail": "AFElementtype=0 · level=3 · number=1",
+      "attributes": {
+        "id": "4",
+        "name": "",
+        "type": "0",
+        "formalization": "0",
+        "mark": "",
+        "symbol": "122",
+        "status": "0",
+        "level": "3",
+        "number": "1"
+      }
+    },
+    {
+      "key": "action:5",
+      "kind": "action",
+      "id": "5",
+      "label": "#5 · (без названия)",
+      "detail": "AFElementtype=0 · level=3 · number=2",
+      "attributes": {
+        "id": "5",
+        "name": "",
+        "type": "0",
+        "formalization": "0",
+        "mark": "",
+        "symbol": "122",
+        "status": "0",
+        "level": "3",
+        "number": "2"
+      }
+    },
+    {
+      "key": "action:6",
+      "kind": "action",
+      "id": "6",
+      "label": "#6 · (без названия)",
+      "detail": "AFElementtype=0 · level=3 · number=4",
+      "attributes": {
+        "id": "6",
+        "name": "",
+        "type": "0",
+        "formalization": "0",
+        "mark": "",
+        "symbol": "122",
+        "status": "0",
+        "level": "3",
+        "number": "4"
+      }
+    },
+    {
+      "key": "action:7",
+      "kind": "action",
+      "id": "7",
+      "label": "#7 · (без названия)",
+      "detail": "AFElementtype=0 · level=3 · number=3",
+      "attributes": {
+        "id": "7",
+        "name": "",
+        "type": "0",
+        "formalization": "0",
+        "mark": "",
+        "symbol": "122",
+        "status": "0",
+        "level": "3",
+        "number": "3"
+      }
+    },
+    {
+      "key": "spz_element:1",
+      "kind": "spz_element",
+      "id": "1",
+      "label": "#1 · PZ_1",
+      "detail": "AIElement / spz AElementtype=0 · status=0 · level=1 · number=1",
+      "attributes": {
+        "id": "1",
+        "name": "PZ_1",
+        "type": "0",
+        "formalization": "0",
+        "symbol": "99",
+        "status": "0",
+        "level": "1",
+        "number": "1"
+      }
+    }
+  ],
+  "edges": [],
+  "dangling_references": [],
+  "opaque_records": [],
+  "duplicate_ids": [],
+  "summary": {
+    "node_count": 8,
+    "entity_node_count": 8,
+    "relation_node_count": 0,
+    "endpoint_count": 0,
+    "resolved_endpoint_count": 0,
+    "dangling_endpoint_count": 0,
+    "opaque_record_count": 0,
+    "duplicate_id_count": 0,
+    "nodes_by_kind": {
+      "action": 7,
+      "spz_element": 1
+    },
+    "relations_by_kind": {}
+  }
+}

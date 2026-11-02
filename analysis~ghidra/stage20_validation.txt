@@ -1,0 +1,47 @@
+Stage 1.10 — Qt MOC contracts validation
+Date: 2026-10-31
+
+Input distribution:
+  /mnt/data/is2_work/rar_extracted/IS2_PMauto_beta
+
+Parser command:
+  python tools/recover_qt_moc_contracts.py /path/to/IS2_PMauto_beta --out analysis/plugins
+
+Reproduced results:
+  PM_auto.dll:          QMetaObjects=10, methods=25, signals=5
+  PM_params.dll:        QMetaObjects=4,  methods=8,  signals=0
+  PM_spec_WEB.dll:      QMetaObjects=6,  methods=1,  signals=0
+  PM_matrix_web.dll:    QMetaObjects=4,  methods=0,  signals=0
+  Model_Visualiser.dll: QMetaObjects=4,  methods=10, signals=1
+  TOTAL:                QMetaObjects=28, methods=44, signals=6
+
+Source binary SHA-256:
+  PM_auto.dll          c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018
+  PM_params.dll        22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781
+  PM_spec_WEB.dll      ef0365f6fd3f69648ccf28c5eb564312f70faa9bbd892543a933ec4ae7fa6d68
+  PM_matrix_web.dll    55d25ef0f07a069d80226abae1583928be92cf023fb66ffddbdd32b4f1a66f22
+  Model_Visualiser.dll 1187c7a59ae2dbb8eb91bebbbe89850d9724a62ff186865733930f1488bce880
+
+Python regression tests:
+  pytest -q
+  Result: 21 passed
+
+Native C++ layout checks (all compiled and executed):
+  tests/native/abi_layout_check.cpp                   PASS
+  tests/native/is_module_contract_check.cpp           PASS
+  tests/native/is_module_vtable_contract_check.cpp    PASS
+  tests/native/legacy_is_module_abi_check.cpp          PASS
+  tests/native/workwidget_contract_check.cpp          PASS
+  Compiler: g++ -std=c++17 -Wall -Wextra -Werror -pedantic -I.
+
+New findings:
+  - QMetaObject records were found in both .rdata and .data.
+  - PM_params ObjectsEditWidget and Model_Visualiser Deca::QDecomposeTab were absent from the earlier string-only inventory.
+  - All five modules import and statically call QMetaObject::connectSlotsByName.
+  - Model_Visualiser's old-style connect signatures now correspond to a real MOC signal and a real MOC slot.
+
+Limitations:
+  - Static analysis only; no Qt/Windows runtime.
+  - Only selected static metacall handlers have been traced to implementation addresses.
+  - Full PM_auto QObject::connectImpl pairing is not yet mapped.
+  - Presence of auto-connect calls does not prove every slot resolves to a live UI object.

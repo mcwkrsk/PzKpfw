@@ -1,0 +1,276 @@
+{
+  "schema_version": 1,
+  "model": "IS-2 relationship endpoint graph",
+  "semantics": "Each relation is a record node; edges represent serialized endpoint slots and do not infer direction.",
+  "nodes": [
+    {
+      "key": "action:1",
+      "kind": "action",
+      "id": "1",
+      "label": "#1 · Synthetic action A",
+      "detail": "AFElementtype=1",
+      "attributes": {
+        "id": "1",
+        "name": "Synthetic action A",
+        "type": "1",
+        "formalization": "0",
+        "mark": "",
+        "status": "0"
+      }
+    },
+    {
+      "key": "action:2",
+      "kind": "action",
+      "id": "2",
+      "label": "#2 · Synthetic action B",
+      "detail": "AFElementtype=1",
+      "attributes": {
+        "id": "2",
+        "name": "Synthetic action B",
+        "type": "1",
+        "formalization": "0",
+        "mark": "",
+        "status": "0"
+      }
+    },
+    {
+      "key": "category:1",
+      "kind": "category",
+      "id": "1",
+      "label": "#1 · Synthetic category A",
+      "detail": "AIElement / SubjectCategoryclass=1 · group=-1 · number=-1 · status=0",
+      "attributes": {
+        "id": "1",
+        "name": "Synthetic category A",
+        "class": "1",
+        "group": "-1",
+        "number": "-1",
+        "status": "0",
+        "autoRange": "1",
+        "codingType": "1"
+      }
+    },
+    {
+      "key": "category:2",
+      "kind": "category",
+      "id": "2",
+      "label": "#2 · Synthetic category B",
+      "detail": "AIElement / SubjectCategoryclass=2 · group=-1 · number=-1 · status=0",
+      "attributes": {
+        "id": "2",
+        "name": "Synthetic category B",
+        "class": "2",
+        "group": "-1",
+        "number": "-1",
+        "status": "0",
+        "autoRange": "1",
+        "codingType": "1"
+      }
+    },
+    {
+      "key": "spz_element:1",
+      "kind": "spz_element",
+      "id": "1",
+      "label": "#1 · Synthetic spz A",
+      "detail": "AIElement / spz AElementtype=0 · status=0 · level=1 · number=1",
+      "attributes": {
+        "id": "1",
+        "name": "Synthetic spz A",
+        "type": "0",
+        "status": "0",
+        "formalization": "0",
+        "level": "1",
+        "number": "1",
+        "symbol": "99"
+      }
+    },
+    {
+      "key": "spz_element:2",
+      "kind": "spz_element",
+      "id": "2",
+      "label": "#2 · Synthetic spz B",
+      "detail": "AIElement / spz AElementtype=0 · status=0 · level=1 · number=2",
+      "attributes": {
+        "id": "2",
+        "name": "Synthetic spz B",
+        "type": "0",
+        "status": "0",
+        "formalization": "0",
+        "level": "1",
+        "number": "2",
+        "symbol": "99"
+      }
+    },
+    {
+      "key": "relation:scbinarylink:1:0",
+      "kind": "relation",
+      "relation_kind": "scbinarylink",
+      "label": "SCBinaryLink · #1 · type=2",
+      "detail": "ConceptModel/cs/link · id=1 · type=2 · range=1",
+      "attributes": {
+        "id": "1",
+        "name": "Synthetic SCBinaryLink",
+        "e1": "1",
+        "e2": "2",
+        "e3": "0",
+        "type": "2",
+        "range": "1"
+      },
+      "record_index": 0
+    },
+    {
+      "key": "relation:aie_binary_link:0",
+      "kind": "relation",
+      "relation_kind": "aie_binary_link",
+      "label": "AIEBinaryLink · #1 · Synthetic AIEBinaryLink",
+      "detail": "ConceptModel/spz/links/AElement · index=0 · id=0 · type=0",
+      "attributes": {
+        "id": "0",
+        "name": "Synthetic AIEBinaryLink",
+        "type": "0",
+        "status": "0",
+        "formalization": "0",
+        "level": "0",
+        "number": "0",
+        "symbol": "0",
+        "e1": "1",
+        "e2": "2",
+        "e3": "0"
+      },
+      "record_index": 0
+    },
+    {
+      "key": "relation:ae_content_link:0",
+      "kind": "relation",
+      "relation_kind": "ae_content_link",
+      "label": "AEContentLink · #1 · char=1",
+      "detail": "ConceptModel/content/AElement · index=0 · type=4 · char=1 · power=2",
+      "attributes": {
+        "id": "0",
+        "name": "",
+        "e1": "1",
+        "e2": "2",
+        "type": "4",
+        "char": "1",
+        "power": "2"
+      },
+      "record_index": 0
+    },
+    {
+      "key": "relation:ae_content_link:1",
+      "kind": "relation",
+      "relation_kind": "ae_content_link",
+      "label": "AEContentLink · #2 · char=2",
+      "detail": "ConceptModel/content/AElement · index=1 · type=4 · char=2 · power=3",
+      "attributes": {
+        "id": "0",
+        "name": "",
+        "e1": "2",
+        "e2": "1",
+        "type": "4",
+        "char": "2",
+        "power": "3"
+      },
+      "record_index": 1
+    }
+  ],
+  "edges": [
+    {
+      "key": "relation:scbinarylink:1:0:e1",
+      "relation_key": "relation:scbinarylink:1:0",
+      "slot": "e1",
+      "endpoint_id": "1",
+      "target_key": "category:1",
+      "target_domain": "category",
+      "valid": true
+    },
+    {
+      "key": "relation:scbinarylink:1:0:e2",
+      "relation_key": "relation:scbinarylink:1:0",
+      "slot": "e2",
+      "endpoint_id": "2",
+      "target_key": "category:2",
+      "target_domain": "category",
+      "valid": true
+    },
+    {
+      "key": "relation:aie_binary_link:0:e1",
+      "relation_key": "relation:aie_binary_link:0",
+      "slot": "e1",
+      "endpoint_id": "1",
+      "target_key": "spz_element:1",
+      "target_domain": "spz_element",
+      "valid": true
+    },
+    {
+      "key": "relation:aie_binary_link:0:e2",
+      "relation_key": "relation:aie_binary_link:0",
+      "slot": "e2",
+      "endpoint_id": "2",
+      "target_key": "spz_element:2",
+      "target_domain": "spz_element",
+      "valid": true
+    },
+    {
+      "key": "relation:ae_content_link:0:e1",
+      "relation_key": "relation:ae_content_link:0",
+      "slot": "e1",
+      "endpoint_id": "1",
+      "target_key": "action:1",
+      "target_domain": "action",
+      "valid": true
+    },
+    {
+      "key": "relation:ae_content_link:0:e2",
+      "relation_key": "relation:ae_content_link:0",
+      "slot": "e2",
+      "endpoint_id": "2",
+      "target_key": "category:2",
+      "target_domain": "category",
+      "valid": true
+    },
+    {
+      "key": "relation:ae_content_link:1:e1",
+      "relation_key": "relation:ae_content_link:1",
+      "slot": "e1",
+      "endpoint_id": "2",
+      "target_key": "action:2",
+      "target_domain": "action",
+      "valid": true
+    },
+    {
+      "key": "relation:ae_content_link:1:e2",
+      "relation_key": "relation:ae_content_link:1",
+      "slot": "e2",
+      "endpoint_id": "1",
+      "target_key": "category:1",
+      "target_domain": "category",
+      "valid": true
+    }
+  ],
+  "dangling_references": [],
+  "opaque_records": [],
+  "duplicate_ids": [],
+  "summary": {
+    "node_count": 10,
+    "entity_node_count": 6,
+    "relation_node_count": 4,
+    "endpoint_count": 8,
+    "resolved_endpoint_count": 8,
+    "dangling_endpoint_count": 0,
+    "opaque_record_count": 0,
+    "duplicate_id_count": 0,
+    "nodes_by_kind": {
+      "action": 2,
+      "category": 2,
+      "relation": 4,
+      "spz_element": 2
+    },
+    "relations_by_kind": {
+      "ae_content_link": 2,
+      "aie_binary_link": 1,
+      "scbinarylink": 1
+    }
+  },
+  "file": "samples/synthetic_relationships_0.7.3.is2"
+}

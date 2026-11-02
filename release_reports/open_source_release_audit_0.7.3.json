@@ -1,0 +1,30 @@
+{
+  "release": "PzKpfw Desktop Alpha 0.7.3",
+  "license": "MIT (original PzKpfw-authored code/tests/build scripts/docs; see LICENSE scope)",
+  "runtime_python_modules": 13,
+  "native_contract_headers": 8,
+  "test_source_files": 54,
+  "technical_markdown_documents": 75,
+  "public_source_archive_files": 568,
+  "build_scripts": [
+    "tools/build_from_source.sh",
+    "tools/build_from_source.ps1",
+    "tools/package_source_release.py"
+  ],
+  "ci_workflow": ".github/workflows/ci.yml",
+  "private_reference_directory_excluded": true,
+  "original_is2_exe_dll_excluded": true,
+  "private_screenshots_excluded": true,
+  "compiled_native_objects_excluded": true,
+  "third_party_runtime_dependencies": [],
+  "research_materials_separately_noticed": true,
+  "original_is2_runtime_acceptance": "NOT_RUN",
+  "notes": [
+    "All PzKpfw Python runtime modules are included as readable .py source; no closed PzKpfw runtime modules are shipped.",
+    "All tests, native contract sources and technical documents are included in the public source archive.",
+    "The source archive is the canonical editable package; the wheel is a convenience build.",
+    "The MIT license is scoped to original PzKpfw-authored code, tests, build scripts and docs.",
+    "Research snapshots and sample fixtures have separate notices and are not automatically covered by the MIT license grant.",
+    "The original IS-2 application has not been run; structural XML round-trip is not application-level certification."
+  ]
+}

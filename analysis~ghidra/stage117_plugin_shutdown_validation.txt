@@ -1,0 +1,15 @@
+Stage 1.17 plugin module shutdown boundary validation
+Date: 2026-11-01 (latest refresh)
+
+- SHA-pinned plugin module shutdown audit: 33/33 PASS.
+- Complete IS.exe .text scan: exactly four direct references to module registry global 0x004696B8, at 0x004010DB, 0x0040451A, 0x00418740 and 0x0041875F.
+- All direct GetProcAddress IAT call sites in IS.exe and four plugin DLLs resolve only: InitializeConditionVariable, SleepConditionVariableCS, WakeAllConditionVariable.
+- Python regression suite: 96 passed.
+- Native C++ ABI/layout checks: 8/8 compiled and executed.
+- Static-only; no original Windows runtime, Qt object-tree trace, heap trace or explicit DLL unload experiment performed.
+
+Reproduce:
+  python tools/audit_stage117_plugin_shutdown.py
+
+The exact host and five plugin DLL SHA-256 values are pinned by the audit script.
+The direct-address xref scan does not rule out indirect aliases or pointers copied to other locations.

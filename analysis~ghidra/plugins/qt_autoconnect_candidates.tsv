@@ -1,0 +1,21 @@
+binary	class	method_index	object_name	signal_suffix	slot_signature	utf16_name_found	string_VAs
+PM_auto.dll	DecompositionWidget	16	tbMoveTo	pressed	on_tbMoveTo_pressed()	1	0x10059290
+PM_auto.dll	CbWithBtn	0	pbDel	clicked	on_pbDel_clicked()	1	0x1005ca18
+PM_auto.dll	CbWithBtnContainer	0	pbAdd	clicked	on_pbAdd_clicked()	1	0x1005cacc
+PM_params.dll	ParamsWidget	0	tableView	clicked	on_tableView_clicked(QModelIndex index)	1	0x10017d8c;0x10018470
+PM_params.dll	ParamsWidget	1	tbDelParam	pressed	on_tbDelParam_pressed()	1	0x1001839c
+PM_params.dll	ParamsWidget	2	tbAddParam	clicked	on_tbAddParam_clicked()	1	0x1001833c
+PM_params.dll	ParamsWidget	3	tbObjects	clicked	on_tbObjects_clicked()	1	0x10018420
+PM_params.dll	ObjectsEditWidget	0	pbDel	pressed	on_pbDel_pressed()	1	0x10017d70
+PM_params.dll	ObjectsEditWidget	1	pbAdd	pressed	on_pbAdd_pressed()	1	0x10017e28
+PM_params.dll	ObjectsEditWidget	2	pbUp	pressed	on_pbUp_pressed()	1	0x10017d34
+PM_params.dll	ObjectsEditWidget	3	pbDown	pressed	on_pbDown_pressed()	1	0x10017d50
+PM_spec_WEB.dll	Am_spec_widget	0	sbZoom	valueChanged	on_sbZoom_valueChanged(int i)	1	0x1000d844
+Model_Visualiser.dll	Model_Visualiser	0	tabWidget	currentChanged	on_tabWidget_currentChanged(int index)	1	0x1000e1bc
+Model_Visualiser.dll	Model_Visualiser	1	pbShort	toggled	on_pbShort_toggled(bool checked)	1	0x1000e2a8
+Model_Visualiser.dll	Model_Visualiser	2	pbSave	pressed	on_pbSave_pressed()	1	0x1000e2c8
+Model_Visualiser.dll	Model_Visualiser	3	pbSaveAll	pressed	on_pbSaveAll_pressed()	1	0x1000e2e8
+Model_Visualiser.dll	Model_Visualiser	5	pbBack	pressed	on_pbBack_pressed()	1	0x1000e268
+Model_Visualiser.dll	Model_Visualiser	6	pbFront	pressed	on_pbFront_pressed()	1	0x1000e288
+Model_Visualiser.dll	Model_Visualiser	7	cb_Codes	stateChanged	on_cb_Codes_stateChanged(int state)	1	0x1000e30c
+Model_Visualiser.dll	Model_Visualiser	8	cb_Symbols	stateChanged	on_cb_Symbols_stateChanged(int state)	1	0x1000e330

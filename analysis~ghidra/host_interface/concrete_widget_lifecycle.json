@@ -1,0 +1,240 @@
+{
+  "audit": "stage117-concrete-workwidget-destruction-paths",
+  "schema_version": 1,
+  "static_only": true,
+  "status": "PASS",
+  "passed": 49,
+  "total": 49,
+  "host_sha256": "ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2",
+  "binary_sha256": {
+    "IS.exe": "ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2",
+    "Model_Visualiser.dll": "1187c7a59ae2dbb8eb91bebbbe89850d9724a62ff186865733930f1488bce880",
+    "PM_auto.dll": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+    "PM_matrix_web.dll": "55d25ef0f07a069d80226abae1583928be92cf023fb66ffddbdd32b4f1a66f22",
+    "PM_params.dll": "22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781",
+    "PM_spec_WEB.dll": "ef0365f6fd3f69648ccf28c5eb564312f70faa9bbd892543a933ec4ae7fa6d68"
+  },
+  "concrete_workwidget_deleting_destructors": {
+    "PM_auto.dll": {
+      "class": "PM_auto",
+      "decorated_type": ".?AVPM_auto@@",
+      "vftable_va": "0x10057860",
+      "complete_object_locator_va": "0x1005D564",
+      "object_offset": 0,
+      "primary_slot_count": 54,
+      "deleting_destructor_slot_index": 3,
+      "deleting_destructor_slot_offset": "0x0C",
+      "deleting_destructor_va": "0x100018E0",
+      "object_size_from_deleting_destructor": "0x174"
+    },
+    "PM_params.dll": {
+      "class": "ParamsWidget",
+      "decorated_type": ".?AVParamsWidget@@",
+      "vftable_va": "0x100184B0",
+      "complete_object_locator_va": "0x10019814",
+      "object_offset": 0,
+      "primary_slot_count": 52,
+      "deleting_destructor_slot_index": 3,
+      "deleting_destructor_slot_offset": "0x0C",
+      "deleting_destructor_va": "0x100042E0",
+      "object_size_from_deleting_destructor": "0x4C"
+    },
+    "PM_spec_WEB.dll": {
+      "class": "PM_spec_widget",
+      "decorated_type": ".?AVPM_spec_widget@@",
+      "vftable_va": "0x1000C7F0",
+      "complete_object_locator_va": "0x1000EA64",
+      "object_offset": 0,
+      "primary_slot_count": 52,
+      "deleting_destructor_slot_index": 3,
+      "deleting_destructor_slot_offset": "0x0C",
+      "deleting_destructor_va": "0x100021A0",
+      "object_size_from_deleting_destructor": "0x64"
+    },
+    "PM_matrix_web.dll": {
+      "class": "Pm_matrix_web",
+      "decorated_type": ".?AVPm_matrix_web@@",
+      "vftable_va": "0x1000869C",
+      "complete_object_locator_va": "0x1000980C",
+      "object_offset": 0,
+      "primary_slot_count": 54,
+      "deleting_destructor_slot_index": 3,
+      "deleting_destructor_slot_offset": "0x0C",
+      "deleting_destructor_va": "0x10001700",
+      "object_size_from_deleting_destructor": "0x60"
+    },
+    "Model_Visualiser.dll": {
+      "class": "Model_Visualiser",
+      "decorated_type": ".?AVModel_Visualiser@@",
+      "vftable_va": "0x1000E4B4",
+      "complete_object_locator_va": "0x1000F0F0",
+      "object_offset": 0,
+      "primary_slot_count": 52,
+      "deleting_destructor_slot_index": 3,
+      "deleting_destructor_slot_offset": "0x0C",
+      "deleting_destructor_va": "0x10007980",
+      "object_size_from_deleting_destructor": "0x64"
+    }
+  },
+  "host_deleteLater": {
+    "iat_va": "0x00419374",
+    "direct_iat_references": [
+      "402bdb:\t8b 3d 74 93 41 00    \tmov    edi,dword ptr ds:0x419374",
+      "40f380:\tff 15 74 93 41 00    \tcall   dword ptr ds:0x419374",
+      "410e51:\tff 15 74 93 41 00    \tcall   dword ptr ds:0x419374"
+    ],
+    "controlfrom_collection_cleanup": {
+      "owner_class": "ControlFrom (RTTI derives from WorkWidget; MOC super_class=WorkWidget)",
+      "moc_static_metacall_va": "0x004010F0",
+      "moc_method_count": 10,
+      "confirmed_ui_call_paths": [
+        {
+          "slot": "ControlFrom::on_pbSaveAs_clicked",
+          "moc_method_index": 3,
+          "slot_body_va": "0x00402530",
+          "calls_map_cleanup_method_at": "0x004026BA -> 0x00401770",
+          "map_cleanup_method_calls_helper_at": "0x00401A6D -> 0x00402B50"
+        },
+        {
+          "slot": "ControlFrom::on_pbNew_clicked",
+          "moc_method_index": 1,
+          "slot_body_va": "0x00402390",
+          "calls_secondary_map_path_at": "0x004024D4 -> 0x00402870",
+          "secondary_method_calls_map_cleanup_at": "0x0040291D -> 0x00401770",
+          "map_cleanup_method_calls_helper_at": "0x00401A6D -> 0x00402B50"
+        },
+        {
+          "slot": "ControlFrom::askForSaving-gated adapter path",
+          "adapter_va": "0x00401680",
+          "receiver_provenance": "the adapter dereferences its captured ControlFrom* and calls askForSaving at 0x00401B80 before forwarding the same pointer to 0x00402870"
+        },
+        {
+          "slot": "ControlFrom constructor",
+          "constructor_va": "0x0040C600",
+          "helper_call_va": "0x0040C873"
+        }
+      ],
+      "map_object_address": "ControlFrom+0xAC; QMapDataBase* field observed at +0xB0",
+      "map_value_type": "unresolved; helper selects alternating 32-bit cells as QObject* receivers",
+      "helper_va": "0x00402B50",
+      "deleteLater_iat_loaded_at": "0x00402BDB",
+      "indirect_call_va": "0x00402BF4",
+      "collection_member": "ControlFrom+0xB0",
+      "collection_initialization": "QMapDataBase::shared_null at 0x00419310",
+      "controlfrom_vftable_va": "0x00459220",
+      "controlfrom_rtti": ".?AVControlFrom@@ derives from WorkWidget",
+      "observed_iteration": "iterates the copied Qt map data; the helper's iterator advances through 32-bit cells and toggles selection, calling deleteLater on selected QObject* values. Exact map key/value type is unresolved",
+      "other_static_callers": [
+        "0x00401A6D",
+        "0x0040C873"
+      ],
+      "bounded_caller_type": {
+        "0x0040C873": "ControlFrom constructor passes its this pointer",
+        "0x00401A6D": "ControlFrom shared map-cleanup method 0x00401770, reached from the New and Save As MOC slots"
+      },
+      "destructor_path": "ControlFrom deleting destructor 0x0040CED0 calls container destructor helper 0x0040CB90 on +0xB0; it does not directly call 0x00402B50"
+    },
+    "feedbackform_virtual_wrapper": {
+      "wrapper_va": "0x0040F380",
+      "class_rtti": ".?AVFeedbackForm@@",
+      "vftable_va": "0x004595B4",
+      "slot_index": 30,
+      "receiver": "FeedbackForm this; wrapper forwards ECX to QObject::deleteLater"
+    },
+    "mainform_eventfilter": {
+      "entry_va": "0x00410D50",
+      "call_va": "0x00410E51",
+      "receiver": "MainForm this (ECX explicitly restored from ESI at 0x00410E4F)"
+    }
+  },
+  "plugin_deleteLater": {
+    "PM_auto.dll": {
+      "iat_va": "0x10022318",
+      "dispatcher_va": "0x1001B610",
+      "connection_setup_va": "0x1001B3C0",
+      "captured_pointer": "CbWithBtn* (passed as constructor ESI and stored in slot-object +0x0C)",
+      "preceding_layout_operation": "QLayout::removeWidget(captured CbWithBtn*) via IAT 0x100227F8",
+      "operation": "QObject::deleteLater(captured CbWithBtn*)"
+    },
+    "PM_params.dll": {
+      "iat_va": "0x1000A220",
+      "call_va": "0x100017F4",
+      "enclosing_destructor": "ObjectsEditWidget deleting destructor 0x100017B0",
+      "receiver": "QAbstractItemModel*: QAbstractItemView::model() returned from the view pointer at ObjectsEditWidget+0x3C",
+      "operation": "QObject::deleteLater(QAbstractItemModel*)"
+    },
+    "PM_spec_WEB.dll": {
+      "imports_qobject_deleteLater": false
+    },
+    "PM_matrix_web.dll": {
+      "imports_qobject_deleteLater": false
+    },
+    "Model_Visualiser.dll": {
+      "imports_qobject_deleteLater": false
+    }
+  },
+  "interpretation": {
+    "all_five_concrete_workwidget_types_expose_deleting_destructor": true,
+    "what_this_proves": "Each plugin's concrete primary WorkWidget vftable has slot index 3 at byte offset 0x0C pointing to a class-specific deleting-destructor implementation with a size-guarded operator-delete path.",
+    "what_this_does_not_prove": "This does not prove that the host close handler or Qt runtime actually invokes the deleting destructor for a top-level WorkWidget. The caller/owner path for those five top-level objects remains unresolved.",
+    "controlfrom_cleanup_scope": "The ControlFrom list cleanup is a distinct helper path; its collection item type is not proven to be one of the five top-level plugin WorkWidgets."
+  },
+  "checks": {
+    "PM_auto_primary_vtable_slot_3_is_expected_deleting_dtor": true,
+    "PM_auto_deleting_dtor_tests_delete_flag": true,
+    "PM_auto_deleting_dtor_uses_expected_object_size": true,
+    "PM_auto_deleting_dtor_runs_class_cleanup": true,
+    "PM_params_primary_vtable_slot_3_is_expected_deleting_dtor": true,
+    "PM_params_deleting_dtor_tests_delete_flag": true,
+    "PM_params_deleting_dtor_uses_expected_object_size": true,
+    "PM_params_deleting_dtor_runs_class_cleanup": true,
+    "PM_spec_WEB_primary_vtable_slot_3_is_expected_deleting_dtor": true,
+    "PM_spec_WEB_deleting_dtor_tests_delete_flag": true,
+    "PM_spec_WEB_deleting_dtor_uses_expected_object_size": true,
+    "PM_spec_WEB_deleting_dtor_runs_class_cleanup": true,
+    "PM_matrix_web_primary_vtable_slot_3_is_expected_deleting_dtor": true,
+    "PM_matrix_web_deleting_dtor_tests_delete_flag": true,
+    "PM_matrix_web_deleting_dtor_uses_expected_object_size": true,
+    "PM_matrix_web_deleting_dtor_runs_class_cleanup": true,
+    "Model_Visualiser_primary_vtable_slot_3_is_expected_deleting_dtor": true,
+    "Model_Visualiser_deleting_dtor_tests_delete_flag": true,
+    "Model_Visualiser_deleting_dtor_uses_expected_object_size": true,
+    "Model_Visualiser_deleting_dtor_runs_class_cleanup": true,
+    "host_all_three_qobject_deleteLater_iat_references_recognized": true,
+    "host_controlfrom_helper_loads_deleteLater_iat_at_402bdb": true,
+    "controlfrom_moc_class_inherits_workwidget_and_has_ten_methods": true,
+    "controlfrom_moc_static_metacall_is_4010f0": true,
+    "controlfrom_moc_index_1_is_pbnew_and_dispatches_402390": true,
+    "controlfrom_moc_index_3_is_pbsaveas_and_dispatches_402530": true,
+    "controlfrom_saveas_calls_shared_map_cleanup_method_401770": true,
+    "controlfrom_map_cleanup_method_uses_its_this_map_member": true,
+    "controlfrom_new_calls_secondary_cleanup_method_402870": true,
+    "controlfrom_secondary_method_forwards_to_shared_map_cleanup": true,
+    "controlfrom_askforsaving_adapter_passes_same_controlfrom_to_secondary_method": true,
+    "host_controlfrom_helper_calls_loaded_deleteLater_on_selected_list_entry": true,
+    "host_controlfrom_cleanup_advances_through_pointer_cells_and_alternates": true,
+    "controlfrom_ctor_initializes_plus_b0_with_qmap_shared_null": true,
+    "controlfrom_ctor_invokes_collection_cleanup": true,
+    "controlfrom_rtti_derives_from_workwidget": true,
+    "controlfrom_dtor_destroys_plus_b0_container": true,
+    "controlfrom_dtor_does_not_directly_call_deleteLater_helper": true,
+    "mainform_eventfilter_calls_deleteLater_on_this": true,
+    "feedbackform_vtable_slot_30_targets_deleteLater_wrapper": true,
+    "feedbackform_wrapper_forwards_this_to_deleteLater": true,
+    "pm_auto_slotobject_records_sender_and_captured_widget": true,
+    "pm_auto_container_passes_cbwithbtn_into_slotobject_capture": true,
+    "pm_auto_clicked_callback_removes_captured_widget_from_layout": true,
+    "pm_auto_clicked_callback_calls_deleteLater_on_captured_widget": true,
+    "pm_auto_container_ctor_creates_cbwithbtn_as_child": true,
+    "pm_params_objectsedit_dtor_fetches_view_model": true,
+    "pm_params_objectsedit_dtor_schedules_model_for_deleteLater": true,
+    "only_pm_auto_and_pm_params_plugins_import_qobject_deleteLater": true
+  },
+  "limitations": [
+    "Static SHA-pinned PE32 disassembly and RTTI/vtable recovery only; no Windows application execution or QObject destruction trace.",
+    "A deleting destructor in each concrete WorkWidget vtable proves destruction support, not who invokes it or whether it is invoked on close.",
+    "The top-level WorkWidget deleting-destructor caller/owner path remains unresolved despite all five vtable entries being identified.",
+    "The ControlFrom+0xB0 QMapDataBase-backed collection's exact key/value types remain unresolved; no claim is made that it stores top-level plugin WorkWidget pointers.",
+    "The Qt runtime binaries and exact Qt minor version are not in the supplied package, so deferred deletion and QObject parent destruction timing remain runtime questions."
+  ]
+}

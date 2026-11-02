@@ -1,0 +1,44 @@
+{
+  "status": "passed",
+  "evidence": "static_only",
+  "sha256": {
+    "PM_auto.dll": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+    "MAIWmodels.dll": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525"
+  },
+  "checks": {
+    "pm_auto_imports": [
+      "movieElementTo",
+      "getDynamicStructure",
+      "QStandardItem::takeChild",
+      "QStandardItem::removeRow",
+      "QStandardItem::insertRow",
+      "QTabWidget::setCurrentWidget"
+    ],
+    "core_exports": [
+      "movieElementTo RVA 0xC020",
+      "movieToElementary RVA 0xC140",
+      "addArragmentLink",
+      "addCompositionLink",
+      "codeStructure"
+    ],
+    "pm_drag_function": "0x100064F0",
+    "core_move_function": "0x1000C020",
+    "double_click_function": "0x10006EB0",
+    "selection_helper": "0x10015990",
+    "selection_signal_emitter": "0x10017A40",
+    "core_wrapper_function": "0x1000C140"
+  },
+  "interpretation": {
+    "drag": "same-owner target: move source AFElement before target by passing target previous sibling as predecessor; null target: move to end by passing last child; model mutation is skipped if source already last.",
+    "core": "detach old arrangement/composition links, reconnect old neighbors, add new parent composition link and predecessor/source/next arrangement links, then codeStructure().",
+    "double_click": "select one or two QTabWidget pages, resolve a DiagramBlock via coordinate lookup, mark its state byte, then emit FunctionalDiagram::selectionChanged(DiagramBlock*) via QMetaObject::activate."
+  },
+  "open_questions": [
+    "Does target AFElement always have the same parent as source AFElement? No explicit target-parent equality check was observed.",
+    "What concrete class is DiagramBlock+0x1D4?",
+    "What are the meanings of DiagramBlock+0x1C4, +0x1C8, +0x1D8, +0x1DC and +0x1E0?",
+    "What is the row/column orientation and source-level meaning of the two selected coordinates?",
+    "What is the full animation/color side effect in helper 0x10015990?",
+    "What do the post-move UI refresh helpers do internally?"
+  ]
+}

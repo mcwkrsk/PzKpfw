@@ -1,0 +1,17 @@
+include README.md LICENSE NOTICE THIRD_PARTY_NOTICES.md RESEARCH_MATERIALS_NOTICE.md
+include CHANGELOG.md CITATION.cff SBOM.json
+recursive-include docs *.md *.mmd *.cpp *.json *.txt
+recursive-include src *.py *.hpp *.h
+recursive-include tests *.py *.cpp *.hpp *.h *.is2 *.xml *.json *.txt
+recursive-include tools *.py *.sh *.ps1
+recursive-include samples *.is2 *.xml *.json *.txt
+recursive-include sdk *.hpp *.h *.md
+recursive-include analysis *.json *.md *.txt *.asm *.tsv *.csv *.cpp *.hpp
+prune reference-private
+prune dist
+prune .pytest_cache
+prune **/__pycache__
+exclude *.exe *.dll *.ocx *.rar *.7z *.zip *.pdf
+include VERSION.txt MANIFEST.in
+recursive-include .github *.yml *.yaml
+recursive-include release_reports *.md *.json *.txt

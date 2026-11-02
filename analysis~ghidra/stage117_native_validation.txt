@@ -1,0 +1,8 @@
+abi_layout_check PASS
+diagram_block_observed_check PASS
+is_module_contract_check PASS
+is_module_vtable_contract_check PASS
+legacy_is_module_abi_check PASS
+pm_auto_stage116_contract_check PASS
+pm_auto_typed_connections_contract_check PASS
+workwidget_contract_check PASS

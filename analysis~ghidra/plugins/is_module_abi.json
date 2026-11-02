@@ -1,0 +1,436 @@
+{
+  "static_only": true,
+  "binary_count": 5,
+  "binaries": [
+    {
+      "binary": "PM_auto.dll",
+      "sha256": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+      "concrete_rtti_type": ".?AVPM_auto_module@@",
+      "loadModule_va": "0x10002850",
+      "module_object_size": 28,
+      "is_module_vtable_va": "0x1005795c",
+      "factory_zeroes_full_module_block": false,
+      "factory_initialization": {
+        "writes_derived_vftable_at_0x00": true,
+        "loads_qmap_shared_null_from_iat": "0x10022330",
+        "stores_qmap_pointer_at_0x08": true,
+        "loads_qlist_shared_null_from_iat": "0x10022334",
+        "stores_qlist_pointer_at_0x0c": true,
+        "zeroes_all_0x1c_bytes": false,
+        "descriptor_pointer_0x04_written_by_host_later": true
+      },
+      "slots": [
+        {
+          "index": 0,
+          "byte_offset": 0,
+          "target_va": "0x10002c70",
+          "observed": "single-byte RET stub; not identified as deleting destructor"
+        },
+        {
+          "index": 1,
+          "byte_offset": 4,
+          "target_va": "0x100027d0",
+          "observed": "constructs plugin widget and appends raw pointer through module+0x0c QListData"
+        },
+        {
+          "index": 2,
+          "byte_offset": 8,
+          "target_va": "0x100027b0",
+          "observed": "allocates and returns a 12-byte descriptor-like record"
+        }
+      ],
+      "module_fields": {
+        "0x00": "vftable pointer",
+        "0x04": "descriptor record pointer; IS.exe stores slot[2] return value here",
+        "0x08": {
+          "type": "QMapDataBase* (32-bit pointer)",
+          "initial_value_source": "?shared_null@QMapDataBase@@2U1@B",
+          "iat_va": "0x10022330",
+          "dll": "Qt5Core.dll",
+          "usage": "no map operation yet established in module registration path"
+        },
+        "0x0c": {
+          "type": "QListData::Data* (32-bit pointer)",
+          "initial_value_source": "?shared_null@QListData@@2UData@1@B",
+          "iat_va": "0x10022334",
+          "dll": "Qt5Core.dll",
+          "usage": "widget pointer collection; create-widget slot appends through this+0x0c"
+        },
+        "0x10-0x1b": {
+          "description": "opaque; no field semantics assigned",
+          "zeroed_by_factory": false
+        }
+      },
+      "descriptor": {
+        "size_bytes": 12,
+        "field_0": {
+          "observed_type": "32-bit pointer to static NUL-terminated string",
+          "va": "0x10057968",
+          "text": "PrimaryModelAuto"
+        },
+        "field_4": {
+          "observed_type": "float32",
+          "bits": "0x3dcccccd",
+          "value": 0.10000000149011612
+        },
+        "field_8": {
+          "observed_type": "32-bit pointer to static NUL-terminated string",
+          "va": "0x10057968",
+          "text": "PrimaryModelAuto"
+        },
+        "semantic_labels": "unknown; field names intentionally not inferred"
+      },
+      "widget": {
+        "allocation_size_bytes": 372,
+        "constructor_va": "0x10001560",
+        "list_append_helper_va": "0x100095b0",
+        "list_receiver_expression": "lea    ecx,[esi+0xc]",
+        "pointer_ownership": "raw pointer append observed; ownership/deletion remains a separate lifecycle question"
+      }
+    },
+    {
+      "binary": "PM_params.dll",
+      "sha256": "22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781",
+      "concrete_rtti_type": ".?AVPM_params_module@@",
+      "loadModule_va": "0x10007390",
+      "module_object_size": 28,
+      "is_module_vtable_va": "0x10018d30",
+      "factory_zeroes_full_module_block": false,
+      "factory_initialization": {
+        "writes_derived_vftable_at_0x00": true,
+        "loads_qmap_shared_null_from_iat": "0x1000a1bc",
+        "stores_qmap_pointer_at_0x08": true,
+        "loads_qlist_shared_null_from_iat": "0x1000a150",
+        "stores_qlist_pointer_at_0x0c": true,
+        "zeroes_all_0x1c_bytes": false,
+        "descriptor_pointer_0x04_written_by_host_later": true
+      },
+      "slots": [
+        {
+          "index": 0,
+          "byte_offset": 0,
+          "target_va": "0x10007e10",
+          "observed": "single-byte RET stub; not identified as deleting destructor"
+        },
+        {
+          "index": 1,
+          "byte_offset": 4,
+          "target_va": "0x10007310",
+          "observed": "constructs plugin widget and appends raw pointer through module+0x0c QListData"
+        },
+        {
+          "index": 2,
+          "byte_offset": 8,
+          "target_va": "0x100072f0",
+          "observed": "allocates and returns a 12-byte descriptor-like record"
+        }
+      ],
+      "module_fields": {
+        "0x00": "vftable pointer",
+        "0x04": "descriptor record pointer; IS.exe stores slot[2] return value here",
+        "0x08": {
+          "type": "QMapDataBase* (32-bit pointer)",
+          "initial_value_source": "?shared_null@QMapDataBase@@2U1@B",
+          "iat_va": "0x1000a1bc",
+          "dll": "Qt5Core.dll",
+          "usage": "no map operation yet established in module registration path"
+        },
+        "0x0c": {
+          "type": "QListData::Data* (32-bit pointer)",
+          "initial_value_source": "?shared_null@QListData@@2UData@1@B",
+          "iat_va": "0x1000a150",
+          "dll": "Qt5Core.dll",
+          "usage": "widget pointer collection; create-widget slot appends through this+0x0c"
+        },
+        "0x10-0x1b": {
+          "description": "opaque; no field semantics assigned",
+          "zeroed_by_factory": false
+        }
+      },
+      "descriptor": {
+        "size_bytes": 12,
+        "field_0": {
+          "observed_type": "32-bit pointer to static NUL-terminated string",
+          "va": "0x10018d3c",
+          "text": "SPZAuto"
+        },
+        "field_4": {
+          "observed_type": "float32",
+          "bits": "0x3dcccccd",
+          "value": 0.10000000149011612
+        },
+        "field_8": {
+          "observed_type": "32-bit pointer to static NUL-terminated string",
+          "va": "0x10018d3c",
+          "text": "SPZAuto"
+        },
+        "semantic_labels": "unknown; field names intentionally not inferred"
+      },
+      "widget": {
+        "allocation_size_bytes": 76,
+        "constructor_va": "0x10003460",
+        "list_append_helper_va": "0x100070f0",
+        "list_receiver_expression": "lea    ecx,[esi+0xc]",
+        "pointer_ownership": "raw pointer append observed; ownership/deletion remains a separate lifecycle question"
+      }
+    },
+    {
+      "binary": "PM_spec_WEB.dll",
+      "sha256": "ef0365f6fd3f69648ccf28c5eb564312f70faa9bbd892543a933ec4ae7fa6d68",
+      "concrete_rtti_type": ".?AVPM_spec_Module@@",
+      "loadModule_va": "0x10006450",
+      "module_object_size": 28,
+      "is_module_vtable_va": "0x1000c8e4",
+      "factory_zeroes_full_module_block": false,
+      "factory_initialization": {
+        "writes_derived_vftable_at_0x00": true,
+        "loads_qmap_shared_null_from_iat": "0x1000c164",
+        "stores_qmap_pointer_at_0x08": true,
+        "loads_qlist_shared_null_from_iat": "0x1000c100",
+        "stores_qlist_pointer_at_0x0c": true,
+        "zeroes_all_0x1c_bytes": false,
+        "descriptor_pointer_0x04_written_by_host_later": true
+      },
+      "slots": [
+        {
+          "index": 0,
+          "byte_offset": 0,
+          "target_va": "0x10001040",
+          "observed": "single-byte RET stub; not identified as deleting destructor"
+        },
+        {
+          "index": 1,
+          "byte_offset": 4,
+          "target_va": "0x100062c0",
+          "observed": "constructs plugin widget and appends raw pointer through module+0x0c QListData"
+        },
+        {
+          "index": 2,
+          "byte_offset": 8,
+          "target_va": "0x100062a0",
+          "observed": "allocates and returns a 12-byte descriptor-like record"
+        }
+      ],
+      "module_fields": {
+        "0x00": "vftable pointer",
+        "0x04": "descriptor record pointer; IS.exe stores slot[2] return value here",
+        "0x08": {
+          "type": "QMapDataBase* (32-bit pointer)",
+          "initial_value_source": "?shared_null@QMapDataBase@@2U1@B",
+          "iat_va": "0x1000c164",
+          "dll": "Qt5Core.dll",
+          "usage": "no map operation yet established in module registration path"
+        },
+        "0x0c": {
+          "type": "QListData::Data* (32-bit pointer)",
+          "initial_value_source": "?shared_null@QListData@@2UData@1@B",
+          "iat_va": "0x1000c100",
+          "dll": "Qt5Core.dll",
+          "usage": "widget pointer collection; create-widget slot appends through this+0x0c"
+        },
+        "0x10-0x1b": {
+          "description": "opaque; no field semantics assigned",
+          "zeroed_by_factory": false
+        }
+      },
+      "descriptor": {
+        "size_bytes": 12,
+        "field_0": {
+          "observed_type": "32-bit pointer to static NUL-terminated string",
+          "va": "0x1000c8f0",
+          "text": "PM_spec_web"
+        },
+        "field_4": {
+          "observed_type": "float32",
+          "bits": "0x3dcccccd",
+          "value": 0.10000000149011612
+        },
+        "field_8": {
+          "observed_type": "32-bit pointer to static NUL-terminated string",
+          "va": "0x1000c8f0",
+          "text": "PM_spec_web"
+        },
+        "semantic_labels": "unknown; field names intentionally not inferred"
+      },
+      "widget": {
+        "allocation_size_bytes": 100,
+        "constructor_va": "0x10001b20",
+        "list_append_helper_va": "0x100023e0",
+        "list_receiver_expression": "lea    ecx,[esi+0xc]",
+        "pointer_ownership": "raw pointer append observed; ownership/deletion remains a separate lifecycle question"
+      }
+    },
+    {
+      "binary": "PM_matrix_web.dll",
+      "sha256": "55d25ef0f07a069d80226abae1583928be92cf023fb66ffddbdd32b4f1a66f22",
+      "concrete_rtti_type": ".?AVPM_matrix_Module@@",
+      "loadModule_va": "0x100028f0",
+      "module_object_size": 28,
+      "is_module_vtable_va": "0x10008798",
+      "factory_zeroes_full_module_block": true,
+      "factory_initialization": {
+        "writes_derived_vftable_at_0x00": true,
+        "loads_qmap_shared_null_from_iat": "0x10008150",
+        "stores_qmap_pointer_at_0x08": true,
+        "loads_qlist_shared_null_from_iat": "0x10008154",
+        "stores_qlist_pointer_at_0x0c": true,
+        "zeroes_all_0x1c_bytes": true,
+        "descriptor_pointer_0x04_written_by_host_later": true
+      },
+      "slots": [
+        {
+          "index": 0,
+          "byte_offset": 0,
+          "target_va": "0x10001020",
+          "observed": "single-byte RET stub; not identified as deleting destructor"
+        },
+        {
+          "index": 1,
+          "byte_offset": 4,
+          "target_va": "0x10002840",
+          "observed": "constructs plugin widget and appends raw pointer through module+0x0c QListData"
+        },
+        {
+          "index": 2,
+          "byte_offset": 8,
+          "target_va": "0x10002820",
+          "observed": "allocates and returns a 12-byte descriptor-like record"
+        }
+      ],
+      "module_fields": {
+        "0x00": "vftable pointer",
+        "0x04": "descriptor record pointer; IS.exe stores slot[2] return value here",
+        "0x08": {
+          "type": "QMapDataBase* (32-bit pointer)",
+          "initial_value_source": "?shared_null@QMapDataBase@@2U1@B",
+          "iat_va": "0x10008150",
+          "dll": "Qt5Core.dll",
+          "usage": "no map operation yet established in module registration path"
+        },
+        "0x0c": {
+          "type": "QListData::Data* (32-bit pointer)",
+          "initial_value_source": "?shared_null@QListData@@2UData@1@B",
+          "iat_va": "0x10008154",
+          "dll": "Qt5Core.dll",
+          "usage": "widget pointer collection; create-widget slot appends through this+0x0c"
+        },
+        "0x10-0x1b": {
+          "description": "opaque; no field semantics assigned",
+          "zeroed_by_factory": true
+        }
+      },
+      "descriptor": {
+        "size_bytes": 12,
+        "field_0": {
+          "observed_type": "32-bit pointer to static NUL-terminated string",
+          "va": "0x100087a4",
+          "text": "PM_matrix_web"
+        },
+        "field_4": {
+          "observed_type": "float32",
+          "bits": "0x3dcccccd",
+          "value": 0.10000000149011612
+        },
+        "field_8": {
+          "observed_type": "32-bit pointer to static NUL-terminated string",
+          "va": "0x100087a4",
+          "text": "PM_matrix_web"
+        },
+        "semantic_labels": "unknown; field names intentionally not inferred"
+      },
+      "widget": {
+        "allocation_size_bytes": 96,
+        "constructor_va": "0x10003890",
+        "list_append_helper_va": "0x10001a10",
+        "list_receiver_expression": "lea    ecx,[edi+0xc]",
+        "pointer_ownership": "raw pointer append observed; ownership/deletion remains a separate lifecycle question"
+      }
+    },
+    {
+      "binary": "Model_Visualiser.dll",
+      "sha256": "1187c7a59ae2dbb8eb91bebbbe89850d9724a62ff186865733930f1488bce880",
+      "concrete_rtti_type": ".?AVModelVisualizerModule@@",
+      "loadModule_va": "0x10009d20",
+      "module_object_size": 28,
+      "is_module_vtable_va": "0x1000e5a8",
+      "factory_zeroes_full_module_block": false,
+      "factory_initialization": {
+        "writes_derived_vftable_at_0x00": true,
+        "loads_qmap_shared_null_from_iat": "0x1000d0b4",
+        "stores_qmap_pointer_at_0x08": true,
+        "loads_qlist_shared_null_from_iat": "0x1000d0b0",
+        "stores_qlist_pointer_at_0x0c": true,
+        "zeroes_all_0x1c_bytes": false,
+        "descriptor_pointer_0x04_written_by_host_later": true
+      },
+      "slots": [
+        {
+          "index": 0,
+          "byte_offset": 0,
+          "target_va": "0x10001c50",
+          "observed": "single-byte RET stub; not identified as deleting destructor"
+        },
+        {
+          "index": 1,
+          "byte_offset": 4,
+          "target_va": "0x10009c60",
+          "observed": "constructs plugin widget and appends raw pointer through module+0x0c QListData"
+        },
+        {
+          "index": 2,
+          "byte_offset": 8,
+          "target_va": "0x100092b0",
+          "observed": "allocates and returns a 12-byte descriptor-like record"
+        }
+      ],
+      "module_fields": {
+        "0x00": "vftable pointer",
+        "0x04": "descriptor record pointer; IS.exe stores slot[2] return value here",
+        "0x08": {
+          "type": "QMapDataBase* (32-bit pointer)",
+          "initial_value_source": "?shared_null@QMapDataBase@@2U1@B",
+          "iat_va": "0x1000d0b4",
+          "dll": "Qt5Core.dll",
+          "usage": "no map operation yet established in module registration path"
+        },
+        "0x0c": {
+          "type": "QListData::Data* (32-bit pointer)",
+          "initial_value_source": "?shared_null@QListData@@2UData@1@B",
+          "iat_va": "0x1000d0b0",
+          "dll": "Qt5Core.dll",
+          "usage": "widget pointer collection; create-widget slot appends through this+0x0c"
+        },
+        "0x10-0x1b": {
+          "description": "opaque; no field semantics assigned",
+          "zeroed_by_factory": false
+        }
+      },
+      "descriptor": {
+        "size_bytes": 12,
+        "field_0": {
+          "observed_type": "32-bit pointer to static NUL-terminated string",
+          "va": "0x1000e5c8",
+          "text": "Test Module"
+        },
+        "field_4": {
+          "observed_type": "float32",
+          "bits": "0x3dcccccd",
+          "value": 0.10000000149011612
+        },
+        "field_8": {
+          "observed_type": "32-bit pointer to static NUL-terminated string",
+          "va": "0x1000e5b4",
+          "text": "Model Visualizer"
+        },
+        "semantic_labels": "unknown; field names intentionally not inferred"
+      },
+      "widget": {
+        "allocation_size_bytes": 100,
+        "constructor_va": "0x100092d0",
+        "list_append_helper_va": "0x10007f30",
+        "list_receiver_expression": "lea    ecx,[edi+0xc]",
+        "pointer_ownership": "raw pointer append observed; ownership/deletion remains a separate lifecycle question"
+      }
+    }
+  ]
+}

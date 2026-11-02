@@ -1,0 +1,19 @@
+{
+  "checks": {
+    "writer_entry": true,
+    "writer_calls_fstructure_wrapper": true,
+    "writer_serializes_element_records_to_fstructure_node": true,
+    "writer_serializes_links_to_fstructure_node": true,
+    "wrapper_entry": true,
+    "reader_entry": true,
+    "reader_looks_up_cs": true,
+    "reader_reads_counter_helper": true,
+    "caller_creates_conceptmodel_string": true,
+    "caller_passes_local_conceptmodel_node_to_reader": true,
+    "source_binary_hash_documented": true
+  },
+  "passed": 11,
+  "total": 11,
+  "status": "PASS",
+  "scope": "textual evidence audit over bundled disassembly; not a fresh binary disassembly or runtime test"
+}

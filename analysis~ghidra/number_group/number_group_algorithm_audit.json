@@ -1,0 +1,28 @@
+{
+  "audit": "subjectcategory-number-group-algorithm",
+  "binary_sha256": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525",
+  "source": "analysis/disassembly/codeStructure_number_group_and_helpers.asm",
+  "checks": {
+    "codingtype_zero_gate": true,
+    "reserved_tuple_gets_number_group_class": true,
+    "reserved_tuple_insert_helper": true,
+    "class5_deferred_list_branch": true,
+    "class4_parent_group_inheritance": true,
+    "general_group_minus_one_gate": true,
+    "general_codingtype_nonzero_gate": true,
+    "per_bucket_counter_increment": true,
+    "collision_probe_helper": true,
+    "candidate_increment_on_collision": true,
+    "number_setter": true,
+    "class5_parent_number_to_group": true,
+    "autorange_endpoint_index_zero": true,
+    "autorange_type_three": true,
+    "autorange_third_endpoint_null": true,
+    "autorange_range_setter": true,
+    "sccompare_used_for_ordering": true
+  },
+  "passed": 17,
+  "total": 17,
+  "status": "PASS",
+  "scope": "static disassembly evidence only; no runtime validation"
+}

@@ -1,0 +1,197 @@
+{
+  "schema": "is2.pm_auto.structural_edit_audit.v1",
+  "status": "passed",
+  "hashes": {
+    "PM_auto.dll": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+    "MAIWmodels.dll": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525"
+  },
+  "functions": {
+    "new_alternative": {
+      "start_va": "0x1000bb60",
+      "stop_va_exclusive": "0x1000c160",
+      "required_fingerprints": [
+        "0x100220ec",
+        "0x100220bc",
+        "0x10022068",
+        "0x2",
+        "0x100220cc"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "new_iteration": {
+      "start_va": "0x1000c3a0",
+      "stop_va_exclusive": "0x1000c870",
+      "required_fingerprints": [
+        "0x100220e8",
+        "0x100220b8",
+        "0x10022124",
+        "0x10022128"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "new_sequence": {
+      "start_va": "0x1000c870",
+      "stop_va_exclusive": "0x1000ce70",
+      "required_fingerprints": [
+        "0x100220f0",
+        "0x100220b8",
+        "0x10022124",
+        "0x10022128"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "insert_after": {
+      "start_va": "0x1000c160",
+      "stop_va_exclusive": "0x1000c280",
+      "required_fingerprints": [
+        "0x100220e0",
+        "0x10022118",
+        "0x100220b8",
+        "0x10022120"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "insert_before": {
+      "start_va": "0x1000c280",
+      "stop_va_exclusive": "0x1000c3a0",
+      "required_fingerprints": [
+        "0x100220e0",
+        "0x1002211c",
+        "0x10022118",
+        "0x100220b8"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "delete_selected": {
+      "start_va": "0x1000a4e0",
+      "stop_va_exclusive": "0x1000a59e",
+      "required_fingerprints": [
+        "0x1000db60",
+        "0x10022124",
+        "0x10015990",
+        "0x10014280"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "delete_core_path": {
+      "start_va": "0x1000db60",
+      "stop_va_exclusive": "0x1000dca0",
+      "required_fingerprints": [
+        "0x100220f4",
+        "0x100220b8",
+        "0x1000a360"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "to_elementary": {
+      "start_va": "0x10011470",
+      "stop_va_exclusive": "0x100117aa",
+      "required_fingerprints": [
+        "0x100220e4",
+        "0x100220bc",
+        "0x10022068",
+        "0x10014280"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    }
+  },
+  "core_implementations": {
+    "core_paste_new_element": {
+      "start_va": "0x1000c160",
+      "stop_va_exclusive": "0x1000c228",
+      "required_fingerprints": [
+        "0x1000aeb0",
+        "0x1000add0",
+        "0x1000b100",
+        "0x100096b0"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "core_remove_element": {
+      "start_va": "0x1000c230",
+      "stop_va_exclusive": "0x1000c3a0",
+      "required_fingerprints": [
+        "0x1000ab80",
+        "0x1000b100",
+        "0x10003320",
+        "0x100032f0"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "core_make_alternative": {
+      "start_va": "0x1000b760",
+      "stop_va_exclusive": "0x1000bb60",
+      "required_fingerprints": [
+        "0x1000aeb0",
+        "0x1000add0",
+        "0x1000b100",
+        "0x2"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "core_make_elementary": {
+      "start_va": "0x1000bb60",
+      "stop_va_exclusive": "0x1000bb98",
+      "required_fingerprints": [
+        "0x1000c3b0",
+        "0x10009eb0",
+        "0x10009d60",
+        "0x10009d40",
+        "0x1000b100"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "core_make_iteration": {
+      "start_va": "0x1000bba0",
+      "stop_va_exclusive": "0x1000bc14",
+      "required_fingerprints": [
+        "0x10002a60",
+        "0x1000aeb0",
+        "0x1000add0",
+        "0x1000b100"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    },
+    "core_make_sequence": {
+      "start_va": "0x1000bc20",
+      "stop_va_exclusive": "0x1000c015",
+      "required_fingerprints": [
+        "0x1000aeb0",
+        "0x1000add0",
+        "0x1000b100",
+        "0x2"
+      ],
+      "missing_fingerprints": [],
+      "status": "passed"
+    }
+  },
+  "required_core_imports": {
+    "?makeAlternative@AFStructure@@QAEXPAVAFElement@@H@Z": true,
+    "?makeElementary@AFStructure@@QAEXPAVAFElement@@@Z": true,
+    "?makeIteration@AFStructure@@QAEXPAVAFElement@@@Z": true,
+    "?makeSequanse@AFStructure@@QAEXPAVAFElement@@H@Z": true,
+    "?pasteNewAFElement@AFStructure@@QAEXPAVAFElement@@0@Z": true,
+    "?removeAFElement@AFStructure@@QAEXPAVAFElement@@@Z": true,
+    "?getDynamicStructure@AbstractModel@@QAEPAVAFStructure@@H@Z": true
+  },
+  "limitations": [
+    "Static disassembly only; no original Windows runtime execution.",
+    "No claim is made that the source-level function names are original symbols; slot names come from recovered Qt MOC metadata.",
+    "The meaning of UI context discriminator values at widget offset +0x2c is not fully decoded.",
+    "The semantic meaning of AFElement type/status/formalization enum values is not inferred beyond setter arguments and the separately recovered enum map.",
+    "The nested-diagram branches of newSeq/newAlt/newLoop contain additional UI/model paths that are not fully decompiled here."
+  ]
+}

@@ -1,0 +1,136 @@
+{
+  "release": "0.7.9",
+  "status": "PASS",
+  "report": {
+    "schema_version": 1,
+    "mode": "relationship_graph_diff",
+    "reference_summary": {
+      "node_count": 10,
+      "entity_node_count": 6,
+      "relation_node_count": 4,
+      "endpoint_count": 8,
+      "resolved_endpoint_count": 8,
+      "dangling_endpoint_count": 0,
+      "opaque_record_count": 0,
+      "duplicate_id_count": 0,
+      "nodes_by_kind": {
+        "action": 2,
+        "category": 2,
+        "relation": 4,
+        "spz_element": 2
+      },
+      "relations_by_kind": {
+        "ae_content_link": 2,
+        "aie_binary_link": 1,
+        "scbinarylink": 1
+      }
+    },
+    "current_summary": {
+      "node_count": 10,
+      "entity_node_count": 6,
+      "relation_node_count": 4,
+      "endpoint_count": 8,
+      "resolved_endpoint_count": 8,
+      "dangling_endpoint_count": 0,
+      "opaque_record_count": 0,
+      "duplicate_id_count": 0,
+      "nodes_by_kind": {
+        "action": 2,
+        "category": 2,
+        "relation": 4,
+        "spz_element": 2
+      },
+      "relations_by_kind": {
+        "ae_content_link": 2,
+        "aie_binary_link": 1,
+        "scbinarylink": 1
+      }
+    },
+    "summary": {
+      "added_nodes": 0,
+      "removed_nodes": 0,
+      "changed_nodes": 1,
+      "added_edges": 0,
+      "removed_edges": 0,
+      "rewired_edges": 1,
+      "dangling_reference_delta": 0,
+      "opaque_record_delta": 0
+    },
+    "added_nodes": [],
+    "removed_nodes": [],
+    "changed_nodes": [
+      {
+        "key": "relation:ae_content_link:0",
+        "before": {
+          "key": "relation:ae_content_link:0",
+          "kind": "relation",
+          "relation_kind": "ae_content_link",
+          "label": "AEContentLink · #1 · char=1",
+          "detail": "ConceptModel/content/AElement · index=0 · type=4 · char=1 · power=2",
+          "attributes": {
+            "id": "0",
+            "name": "",
+            "e1": "1",
+            "e2": "2",
+            "type": "4",
+            "char": "1",
+            "power": "2"
+          },
+          "record_index": 0
+        },
+        "after": {
+          "key": "relation:ae_content_link:0",
+          "kind": "relation",
+          "relation_kind": "ae_content_link",
+          "label": "AEContentLink · #1 · char=1",
+          "detail": "ConceptModel/content/AElement · index=0 · type=4 · char=1 · power=2",
+          "attributes": {
+            "id": "0",
+            "name": "",
+            "e1": "2",
+            "e2": "2",
+            "type": "4",
+            "char": "1",
+            "power": "2"
+          },
+          "record_index": 0
+        }
+      }
+    ],
+    "added_edges": [],
+    "removed_edges": [],
+    "rewired_edges": [
+      {
+        "key": "relation:ae_content_link:0:e1",
+        "before": {
+          "key": "relation:ae_content_link:0:e1",
+          "relation_key": "relation:ae_content_link:0",
+          "slot": "e1",
+          "endpoint_id": "1",
+          "target_key": "action:1",
+          "target_domain": "action",
+          "valid": true
+        },
+        "after": {
+          "key": "relation:ae_content_link:0:e1",
+          "relation_key": "relation:ae_content_link:0",
+          "slot": "e1",
+          "endpoint_id": "2",
+          "target_key": "action:2",
+          "target_domain": "action",
+          "valid": true
+        }
+      }
+    ],
+    "new_dangling_references": [],
+    "new_opaque_records": [],
+    "warnings": [
+      "Часть AIEBinaryLink/AEContentLink сопоставляется по индексу записи: вставка или удаление перед записью может выглядеть как изменение нескольких связей."
+    ],
+    "semantics": "Edges are serialized endpoint slots; direction beyond the recovered slot mapping is not inferred.",
+    "reference": "/tmp/pzkpfw-0.7.9-cli/graph_reference.is2",
+    "current": "/tmp/pzkpfw-0.7.9-cli/graph_current.is2"
+  },
+  "installed_wheel_cli": "PASS",
+  "output_file_created": true
+}

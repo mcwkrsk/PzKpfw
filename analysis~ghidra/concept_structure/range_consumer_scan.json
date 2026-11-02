@@ -1,0 +1,80 @@
+{
+  "scan": "scbinarylink-range-import-consumers",
+  "scope": "IS.exe plus five supplied plugin DLLs",
+  "symbols_checked": [
+    "?getRange@AIEBinaryLink@@QAEHXZ",
+    "?setRange@AIEBinaryLink@@QAEXH@Z"
+  ],
+  "tool": "GNU objdump -p output; search for exact decorated symbol names",
+  "results": {
+    "IS.exe": {
+      "sha256": "ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2",
+      "expected_sha256": "ed526d51da184685dab5ddd89eae0e486b37001ed5781e623cb25f9166410dc2",
+      "sha_matches": true,
+      "named_range_symbol_occurrences_in_objdump": {
+        "?getRange@AIEBinaryLink@@QAEHXZ": 0,
+        "?setRange@AIEBinaryLink@@QAEXH@Z": 0
+      },
+      "no_named_range_symbol_occurrences": true
+    },
+    "PM_auto.dll": {
+      "sha256": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+      "expected_sha256": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+      "sha_matches": true,
+      "named_range_symbol_occurrences_in_objdump": {
+        "?getRange@AIEBinaryLink@@QAEHXZ": 0,
+        "?setRange@AIEBinaryLink@@QAEXH@Z": 0
+      },
+      "no_named_range_symbol_occurrences": true
+    },
+    "PM_params.dll": {
+      "sha256": "22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781",
+      "expected_sha256": "22c867d11fcc724b79fbff420f514d7adccd7a8eb7565e9b4b43e60b267ea781",
+      "sha_matches": true,
+      "named_range_symbol_occurrences_in_objdump": {
+        "?getRange@AIEBinaryLink@@QAEHXZ": 0,
+        "?setRange@AIEBinaryLink@@QAEXH@Z": 0
+      },
+      "no_named_range_symbol_occurrences": true
+    },
+    "PM_matrix_web.dll": {
+      "sha256": "55d25ef0f07a069d80226abae1583928be92cf023fb66ffddbdd32b4f1a66f22",
+      "expected_sha256": "55d25ef0f07a069d80226abae1583928be92cf023fb66ffddbdd32b4f1a66f22",
+      "sha_matches": true,
+      "named_range_symbol_occurrences_in_objdump": {
+        "?getRange@AIEBinaryLink@@QAEHXZ": 0,
+        "?setRange@AIEBinaryLink@@QAEXH@Z": 0
+      },
+      "no_named_range_symbol_occurrences": true
+    },
+    "PM_spec_WEB.dll": {
+      "sha256": "ef0365f6fd3f69648ccf28c5eb564312f70faa9bbd892543a933ec4ae7fa6d68",
+      "expected_sha256": "ef0365f6fd3f69648ccf28c5eb564312f70faa9bbd892543a933ec4ae7fa6d68",
+      "sha_matches": true,
+      "named_range_symbol_occurrences_in_objdump": {
+        "?getRange@AIEBinaryLink@@QAEHXZ": 0,
+        "?setRange@AIEBinaryLink@@QAEXH@Z": 0
+      },
+      "no_named_range_symbol_occurrences": true
+    },
+    "Model_Visualiser.dll": {
+      "sha256": "1187c7a59ae2dbb8eb91bebbbe89850d9724a62ff186865733930f1488bce880",
+      "expected_sha256": "1187c7a59ae2dbb8eb91bebbbe89850d9724a62ff186865733930f1488bce880",
+      "sha_matches": true,
+      "named_range_symbol_occurrences_in_objdump": {
+        "?getRange@AIEBinaryLink@@QAEHXZ": 0,
+        "?setRange@AIEBinaryLink@@QAEXH@Z": 0
+      },
+      "no_named_range_symbol_occurrences": true
+    }
+  },
+  "passed": 6,
+  "total": 6,
+  "limitations": [
+    "bounded string-presence scan of objdump -p output, not a full import-thunk disassembler",
+    "does not rule out dynamic symbol resolution",
+    "does not rule out ordinal imports",
+    "does not inspect binaries outside the supplied host and five plugin DLLs"
+  ],
+  "status": "PASS"
+}

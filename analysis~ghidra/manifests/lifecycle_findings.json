@@ -1,0 +1,104 @@
+{
+  "target": {
+    "file": "MAIWmodels.dll",
+    "image_base": "0x10000000",
+    "architecture": "PE32/i386",
+    "sha256": "80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525"
+  },
+  "ownership": [
+    {
+      "class": "AFStructure",
+      "wrapper_destructor_rva": "0x0a750",
+      "private_destructor_rva": "0x0a800",
+      "collection_pointees_destroyed_by": "public wrapper destructor",
+      "buffers_and_private_tree_released_by": "private destructor",
+      "wrapper_tree_offset": "0x04",
+      "private_pointer_offset": "0x0c",
+      "confidence": "confirmed by direct destructor and constructor instructions"
+    },
+    {
+      "class": "AIStructure",
+      "wrapper_destructor_rva": "0x0d8e0",
+      "private_destructor_rva": "0x0d970",
+      "collection_pointees_destroyed_by": "public wrapper destructor",
+      "buffers_and_private_tree_released_by": "private destructor",
+      "private_pointer_offset": "0x04",
+      "confidence": "confirmed by direct destructor and constructor instructions"
+    },
+    {
+      "class": "AbstractModel",
+      "wrapper_destructor_rva": "0x015f0",
+      "private_destructor_rva": "0x016c0",
+      "first_two_collections": "virtual deleting destructor per pointee",
+      "third_collection": "raw operator delete per pointee; concrete type unresolved",
+      "private_destructor": "releases vector backing buffers only",
+      "private_pointer_offset": "0x04",
+      "confidence": "direct destructor instructions; third pointee contract unresolved"
+    }
+  ],
+  "mutation": [
+    {
+      "method": "AIStructure::deleteAIEBinnaryLink",
+      "rva": "0x0ddf0",
+      "effect": "erase pointer from link vector and invoke virtual deleting destructor",
+      "confidence": "confirmed"
+    },
+    {
+      "method": "AIStructure::deleteAIElement",
+      "rva": "0x0de60",
+      "effect": "erase pointer from element vector; no pointee destructor call in method",
+      "confidence": "confirmed; detached-object lifetime unresolved"
+    },
+    {
+      "method": "AIStructure::deleteAIElementById",
+      "rva": "0x0dec0",
+      "effect": "find by ID and erase pointer; no pointee destructor call in method",
+      "confidence": "confirmed; detached-object lifetime unresolved"
+    }
+  ],
+  "copy_semantics": [
+    {
+      "class": "AIStructure",
+      "copy_ctor_rva": "0x01360",
+      "effect": "copies private pointer at public-object +0x04",
+      "risk": "shared PIMPL / possible double destruction if wrappers independently own lifetime",
+      "confidence": "static; runtime not reproduced"
+    },
+    {
+      "class": "AbstractModel",
+      "copy_ctor_rva": "0x01430",
+      "effect": "copies private pointer at public-object +0x04",
+      "risk": "shared PIMPL / possible double destruction if wrappers independently own lifetime",
+      "confidence": "static; runtime not reproduced"
+    },
+    {
+      "class": "AFStructure",
+      "copy_ctor_rva": "0x01320",
+      "effect": "clones wrapper tree handle at +0x04, aliases private pointer at +0x0c",
+      "risk": "shared private state; auxiliary wrapper tree is separate",
+      "confidence": "static; runtime not reproduced"
+    }
+  ],
+  "private_layout_updates": {
+    "AFElementPrivate.alternatives": "24-byte records whose first member is an MSVC std::wstring-shaped value",
+    "AFElementPrivate.children_cache": {
+      "items_buffer_offset": "0x04",
+      "item_count_offset": "0x08",
+      "reference_count_offset": "0x10",
+      "sidecar_offset": "0x00",
+      "state_or_payload_offset": "0x0c"
+    },
+    "tree_handles": [
+      "AFStructure public wrapper +0x04 (separate tree)",
+      "AFStructurePrivate +0x1c",
+      "AIStructurePrivate +0x04"
+    ]
+  },
+  "validation": {
+    "pytest": "3 passed",
+    "native_abi_header": "g++ compile and executable passed",
+    "rtti_recovery": "57 TypeDescriptors, 54 COLs, 54 vftable candidates",
+    "runtime_validation": false,
+    "ghidra_or_ida_decompilation": false
+  }
+}

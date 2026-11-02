@@ -1,0 +1,63 @@
+binary	class	class_va	section	super	method_index	kind	access	signature	metacall_va
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	0	signal	public	stateChanged(DiagramBlock* arg0)	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	1	slot	private	FdChangeState_slot(DiagramBlock* d)	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	2	slot	private	tabChanged_slot(int arg0)	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	3	slot	private	treeViewDoubleClick(QModelIndex arg0)	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	4	slot	private	listViewDoubleClick(QModelIndex arg0)	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	5	slot	public	newLoop_slot()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	6	slot	public	newSeq_slot()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	7	slot	public	newAlt_slot()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	8	slot	public	toElementary_slot()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	9	slot	public	newElementBefore_slot()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	10	slot	public	newElementAfter_slot()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	11	slot	public	deleteElement_slot()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	12	slot	public	changeProps_slot()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	13	slot	public	decomposeToNewList_slot()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	14	slot	public	delList_slot()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	15	slot	public	showPropsWidget_slot()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	16	slot	public	on_tbMoveTo_pressed()	0x10002e90
+PM_auto.dll	DecompositionWidget	0x10057cb8	.rdata	WorkWidget	17	slot	public	moveToElementary(DiagramBlock* scr, DiagramBlock* dst)	0x10002e90
+PM_auto.dll	FunctionalDiagram	0x1005bc90	.rdata	BaseDiagram	0	signal	public	selectionChanged(DiagramBlock* selection)	0x100177a0
+PM_auto.dll	FunctionalDiagram	0x1005bc90	.rdata	BaseDiagram	1	signal	public	itemDoubleClick(DiagramBlock* arg0)	0x100177a0
+PM_auto.dll	FunctionalDiagram	0x1005bc90	.rdata	BaseDiagram	2	signal	public	itemDraged(DiagramBlock* item, DiagramBlock* destination)	0x100177a0
+PM_auto.dll	FunctionalDiagram	0x1005bc90	.rdata	BaseDiagram	3	signal	public	closed()	0x100177a0
+PM_auto.dll	WorkWidget	0x1006f000	.data		-	-	-	-	0x10002c70
+PM_auto.dll	MenuWidget	0x1006f018	.data		-	-	-	-	0x10002c70
+PM_auto.dll	BaseDiagram	0x1006f034	.data		0	slot	public	repainSlot()	0x1001c590
+PM_auto.dll	AFEAltProps	0x1006f04c	.data		-	-	-	-	0x10002c70
+PM_auto.dll	AFEProps	0x1006f064	.data		-	-	-	-	0x10002c70
+PM_auto.dll	ArgumentsWidget	0x1006f07c	.data		-	-	-	-	0x10002c70
+PM_auto.dll	CbWithBtn	0x1006f094	.data		0	slot	public	on_pbDel_clicked()	0x1001c900
+PM_auto.dll	CbWithBtnContainer	0x1006f0ac	.data		0	slot	public	on_pbAdd_clicked()	0x1001c920
+PM_params.dll	ParamsWidget	0x10017550	.rdata	WorkWidget	0	slot	public	on_tableView_clicked(QModelIndex index)	0x100011e0
+PM_params.dll	ParamsWidget	0x10017550	.rdata	WorkWidget	1	slot	public	on_tbDelParam_pressed()	0x100011e0
+PM_params.dll	ParamsWidget	0x10017550	.rdata	WorkWidget	2	slot	public	on_tbAddParam_clicked()	0x100011e0
+PM_params.dll	ParamsWidget	0x10017550	.rdata	WorkWidget	3	slot	public	on_tbObjects_clicked()	0x100011e0
+PM_params.dll	ObjectsEditWidget	0x10023000	.data		0	slot	public	on_pbDel_pressed()	0x10001190
+PM_params.dll	ObjectsEditWidget	0x10023000	.data		1	slot	public	on_pbAdd_pressed()	0x10001190
+PM_params.dll	ObjectsEditWidget	0x10023000	.data		2	slot	public	on_pbUp_pressed()	0x10001190
+PM_params.dll	ObjectsEditWidget	0x10023000	.data		3	slot	public	on_pbDown_pressed()	0x10001190
+PM_params.dll	WorkWidget	0x10023018	.data		-	-	-	-	0x10007e10
+PM_params.dll	MenuWidget	0x10023030	.data		-	-	-	-	0x10007e10
+PM_spec_WEB.dll	PM_spec_widget	0x1000c740	.rdata	Am_spec_widget	-	-	-	-	0x10001040
+PM_spec_WEB.dll	Am_spec_widget	0x1000cf70	.rdata	WorkWidget	0	slot	public	on_sbZoom_valueChanged(int i)	0x100065d0
+PM_spec_WEB.dll	FormAndPanel	0x10016000	.data		-	-	-	-	0x10001040
+PM_spec_WEB.dll	AFsettings	0x10016018	.data		-	-	-	-	0x10001040
+PM_spec_WEB.dll	WorkWidget	0x10016030	.data		-	-	-	-	0x10001040
+PM_spec_WEB.dll	MenuWidget	0x10016048	.data		-	-	-	-	0x10001040
+PM_matrix_web.dll	Pm_matrix_web	0x10008610	.rdata	Am_matrix_web	-	-	-	-	0x10001020
+PM_matrix_web.dll	Am_matrix_web	0x10008b6c	.rdata	WorkWidget	-	-	-	-	0x10001020
+PM_matrix_web.dll	WorkWidget	0x1000f000	.data		-	-	-	-	0x10001020
+PM_matrix_web.dll	MenuWidget	0x1000f018	.data		-	-	-	-	0x10001020
+Model_Visualiser.dll	Model_Visualiser	0x1000d910	.rdata	WorkWidget	0	slot	public	on_tabWidget_currentChanged(int index)	0x100074a0
+Model_Visualiser.dll	Model_Visualiser	0x1000d910	.rdata	WorkWidget	1	slot	public	on_pbShort_toggled(bool checked)	0x100074a0
+Model_Visualiser.dll	Model_Visualiser	0x1000d910	.rdata	WorkWidget	2	slot	public	on_pbSave_pressed()	0x100074a0
+Model_Visualiser.dll	Model_Visualiser	0x1000d910	.rdata	WorkWidget	3	slot	public	on_pbSaveAll_pressed()	0x100074a0
+Model_Visualiser.dll	Model_Visualiser	0x1000d910	.rdata	WorkWidget	4	slot	public	change_tab_clot(QString arg0)	0x100074a0
+Model_Visualiser.dll	Model_Visualiser	0x1000d910	.rdata	WorkWidget	5	slot	public	on_pbBack_pressed()	0x100074a0
+Model_Visualiser.dll	Model_Visualiser	0x1000d910	.rdata	WorkWidget	6	slot	public	on_pbFront_pressed()	0x100074a0
+Model_Visualiser.dll	Model_Visualiser	0x1000d910	.rdata	WorkWidget	7	slot	public	on_cb_Codes_stateChanged(int state)	0x100074a0
+Model_Visualiser.dll	Model_Visualiser	0x1000d910	.rdata	WorkWidget	8	slot	public	on_cb_Symbols_stateChanged(int state)	0x100074a0
+Model_Visualiser.dll	Deca::QDecomposeTab	0x10015018	.data		0	signal	public	difficuldActionClicked(QString arg0)	0x100073e0
+Model_Visualiser.dll	WorkWidget	0x10015038	.data		-	-	-	-	0x10001c50
+Model_Visualiser.dll	MenuWidget	0x10015050	.data		-	-	-	-	0x10001c50

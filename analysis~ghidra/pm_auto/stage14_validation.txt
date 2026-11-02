@@ -1,0 +1,30 @@
+Stage 1.14 validation — 2026-10-31
+
+Binaries:
+  PM_auto.dll SHA-256: c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018
+  MAIWmodels.dll SHA-256: 80ccc6678bdf057152f473369a56eb3b76a1ce643edca2832345f7b53e09c525
+
+Static audit:
+  tools/audit_pm_auto_content_handlers.py: PASSED
+  Functions fingerprinted: 5/5
+  Required MAIWmodels imports: 4/4
+  Audited VAs: 0x10005890, 0x100059C0, 0x10005F00, 0x10006BF0, 0x10006DC0
+
+Python:
+  pytest -q: 35 passed
+
+Native ABI/layout:
+  abi_layout_check.cpp: compile/run passed
+  diagram_block_observed_check.cpp: compile/run passed
+  is_module_contract_check.cpp: compile/run passed
+  is_module_vtable_contract_check.cpp: compile/run passed
+  legacy_is_module_abi_check.cpp: compile/run passed
+  pm_auto_typed_connections_contract_check.cpp: compile/run passed
+  workwidget_contract_check.cpp: compile/run passed
+  Compiler flags: -std=c++17 -Wall -Wextra -Werror -pedantic
+
+Limitations:
+  Static analysis only; no Windows runtime execution.
+  Marker semantics ('+', '.', '*') and addContentLink boolean semantics are unknown.
+  UI labels for the content-link controls are not identified.
+  Helper semantics at 0x10009970 and 0x10009730 remain under investigation.

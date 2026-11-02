@@ -1,0 +1,73 @@
+{
+  "release": "PzKpfw Desktop Alpha 0.7.6",
+  "release_date": "2026-11-02",
+  "python_tests": {
+    "collected": 286,
+    "passed": 286,
+    "failed": 0,
+    "status": "PASS"
+  },
+  "supplied_project_roundtrip": {
+    "passed": 5,
+    "total": 5,
+    "status": "PASS"
+  },
+  "compatibility_corpus": {
+    "passed": 6,
+    "total": 6,
+    "includes_synthetic_relationship_fixture": true,
+    "status": "PASS"
+  },
+  "native_cpp_abi_layout_checks": {
+    "passed": 8,
+    "total": 8,
+    "status": "PASS"
+  },
+  "link_repair": {
+    "status": "PASS",
+    "supported_domains": [
+      "SCBinaryLink typed endpoints",
+      "AIEBinaryLink typed endpoints",
+      "AEContentLink action/category endpoints",
+      "PrimaryModel param/@o object reference"
+    ],
+    "policies": [
+      "explicit target selection only",
+      "no heuristic ID guessing",
+      "ambiguous or duplicate target IDs excluded",
+      "nullable slots only may be cleared",
+      "repair works on a cloned document",
+      "unknown XML attributes and children preserved",
+      "CLI dry-run by default",
+      "CLI writes only to a distinct output path after validation"
+    ],
+    "cli_commands": [
+      "link-integrity",
+      "repair-links"
+    ],
+    "gui_dialog": "PASS",
+    "undo_redo": "PASS"
+  },
+  "gui_smoke": {
+    "status": "PASS",
+    "covered": [
+      "repair dialog opens",
+      "typed target selection",
+      "repair commit",
+      "Undo restores broken endpoint",
+      "Redo reapplies repair",
+      "existing graph and editor smoke coverage"
+    ]
+  },
+  "wheel": {
+    "filename": "pzkpfw-0.7.6-py3-none-any.whl",
+    "sha256": "111c7efce9a9be934ee9004a477378d55debd29cd09952af120e712e3d702395",
+    "build": "PASS",
+    "clean_environment_install": "PASS",
+    "clean_environment_version": "0.7.6",
+    "cli_and_gui_import": "PASS",
+    "cli_validate_link_integrity_repair_preview": "PASS"
+  },
+  "original_is2_windows_runtime_acceptance": "NOT_TESTED",
+  "note": "Structural XML checks are not a substitute for a Windows load-save-reopen test with the original IS.exe."
+}

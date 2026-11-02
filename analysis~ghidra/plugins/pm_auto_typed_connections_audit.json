@@ -1,0 +1,58 @@
+{
+  "binary": "PM_auto.dll",
+  "path": "/mnt/data/work_stage117/re_inputs/modules/PM_auto.dll",
+  "sha256": "c3cbde9cb83a7c10774a0faa4541622005856d09b79ce94dec3d8bd90d083018",
+  "architecture": "PE32 x86 (static analysis)",
+  "connect_impl_iat": "0x10022368",
+  "connect_impl_direct_callsite_count": 17,
+  "connect_impl_call_sites": [
+    "0x10001550",
+    "0x10003f25",
+    "0x10003f8f",
+    "0x10003ff5",
+    "0x10004060",
+    "0x100040c0",
+    "0x1000413c",
+    "0x100041b4",
+    "0x10004264",
+    "0x10004314",
+    "0x100043c4",
+    "0x10004474",
+    "0x10004524",
+    "0x100045d4",
+    "0x10004670",
+    "0x1001aefa",
+    "0x1001afa4"
+  ],
+  "required_import_symbols_verified": [
+    "connectImpl@QObject",
+    "clicked@QAbstractButton",
+    "pressed@QAbstractButton",
+    "currentIndexChanged@QComboBox",
+    "dataChanged@QAbstractItemModel",
+    "textChanged@QTextEdit",
+    "setFormalization@AFElement",
+    "setCurrentWidget@QTabWidget"
+  ],
+  "callback_targets_verified": [
+    "0x100064f0",
+    "0x1000dad0",
+    "0x10006bf0",
+    "0x10006dc0",
+    "0x100063b0",
+    "0x10005f00",
+    "0x10005890",
+    "0x100059c0",
+    "0x10005b10",
+    "0x10006eb0",
+    "0x10002750",
+    "0x100017e0"
+  ],
+  "static_only": true,
+  "runtime_signal_delivery_tested": false,
+  "notes": [
+    "Callsite count is the number of static call instructions to the imported QObject::connectImpl IAT entry, not the number of live connections at runtime.",
+    "Several logical signal/slot connections reuse the same wrapper callsite; constructor callsites may invoke those wrappers repeatedly.",
+    "Callback target addresses are raw machine-code targets. No source-level names are invented for anonymous helper functions."
+  ]
+}

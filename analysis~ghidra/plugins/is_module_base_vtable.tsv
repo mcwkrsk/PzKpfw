@@ -1,0 +1,6 @@
+binary	base_vtable_va	slot0_va	slot1_va	slot2_va	slot2_import
+PM_auto.dll	0x10057654	0x10002c70	0x10002c70	0x1001db60	_purecall
+PM_params.dll	0x10018d20	0x10007e10	0x10007e10	0x10008edc	_purecall
+PM_spec_WEB.dll	0x1000c7bc	0x10001040	0x10001040	0x10009a98	_purecall
+PM_matrix_web.dll	0x1000868c	0x10001020	0x10001020	0x10006a88	_purecall
+Model_Visualiser.dll	0x1000e4a4	0x10001c50	0x10001c50	0x1000b17e	_purecall
