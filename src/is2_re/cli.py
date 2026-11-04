@@ -17,6 +17,12 @@ from .backups import (BackupError, create_project_backup, list_project_backups,
 from .diff import (ProjectDiffError, compare_project_files, apply_selected_restores, expand_related_restore_bundle)
 from .merge import ProjectMergeError, merge_documents
 from .graph_diff import compare_relationship_graphs
+from .exports import write_export
+from .decomposition import convert_action, insert_sibling
+from .specifications import add_primary_link, remove_primary_link, set_primary_link_power, primary_links
+from .feature_audit import feature_audit
+from .coursework import (create_course_project, renumber_structure, course_checklist,
+                         build_course_scene, scene_svg, set_alternative_labels)
 
 
 def _pairs(values: list[str]) -> dict[str, str]:
@@ -35,12 +41,81 @@ def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Inspect, validate, edit and round-trip IS-2 XML projects.")
     sub = parser.add_subparsers(dest="command", required=True)
 
+    p = sub.add_parser("export", help="export a read-only HTML overview, SVG diagram, or CSV relation table")
+    p.add_argument("input", type=Path)
+    p.add_argument("output", type=Path)
+    p.add_argument("--kind", choices=("report", "diagram", "relations", "matrix", "primary-matrix", "specifications"), required=True)
+    p.add_argument("--overwrite", action="store_true")
+
     p = sub.add_parser("summary", help="print semantic project summary")
     p.add_argument("input", type=Path)
 
     p = sub.add_parser("validate", help="validate project structure and graph invariants")
     p.add_argument("input", type=Path)
     p.add_argument("--json", action="store_true")
+
+    p = sub.add_parser("feature-audit", help="inventory supported, experimental, and unknown IS-2 capabilities for a project")
+    p.add_argument("input", type=Path)
+    p.add_argument("--output", type=Path)
+
+    p = sub.add_parser("course-new", help="create editable .is2 coursework scaffold with coded root")
+    p.add_argument("output", type=Path)
+    p.add_argument("--title", required=True)
+    p.add_argument("--root", required=True)
+    p.add_argument("--author", default="")
+    p.add_argument("--symbol", default="z")
+
+    p = sub.add_parser("course-renumber", help="explicit PzKpfw codeStructure approximation; writes a separate .is2")
+    p.add_argument("input", type=Path)
+    p.add_argument("output", type=Path)
+    p.add_argument("--symbol", default="z")
+
+    p = sub.add_parser("course-check", help="coursework completeness checklist, not a grade")
+    p.add_argument("input", type=Path)
+    p.add_argument("--output", type=Path)
+
+    p = sub.add_parser("course-svg", help="export screenshot-style coursework hierarchy as standalone SVG")
+    p.add_argument("input", type=Path)
+    p.add_argument("output", type=Path)
+    p.add_argument("--focus", help="action ID for a local sheet")
+    p.add_argument("--depth", type=int, help="optional subtree depth; default is full hierarchy")
+    p.add_argument("--overwrite", action="store_true")
+
+    p = sub.add_parser("course-alternatives", help="edit two native <alts> labels on an alternative")
+    p.add_argument("input", type=Path)
+    p.add_argument("output", type=Path)
+    p.add_argument("action_id")
+    p.add_argument("--first", required=True)
+    p.add_argument("--second", required=True)
+
+    p = sub.add_parser("primary-links", help="list the action/parameter matrix rows without altering XML")
+    p.add_argument("input", type=Path)
+
+    p = sub.add_parser("convert-action", help="conservatively convert selected action to elementary/alternative/sequence/iteration")
+    p.add_argument("input", type=Path)
+    p.add_argument("output", type=Path)
+    p.add_argument("action_id")
+    p.add_argument("--to", choices=("elementary", "alternative", "sequence", "iteration"), required=True)
+    p.add_argument("--replace-children", action="store_true")
+    p.add_argument("--drop-content", action="store_true")
+    p.add_argument("--child-name", action="append", default=[])
+
+    p = sub.add_parser("insert-sibling", help="insert a new action before/after an existing child in the native sibling chain")
+    p.add_argument("input", type=Path)
+    p.add_argument("output", type=Path)
+    p.add_argument("anchor_id")
+    p.add_argument("--position", choices=("before", "after"), required=True)
+    p.add_argument("--name", required=True)
+
+    for cmd in ("add-primary-link", "remove-primary-link", "set-primary-link-power"):
+        p = sub.add_parser(cmd, help="safely edit one native-shaped primaryModel/matrix action/parameter link")
+        p.add_argument("input", type=Path)
+        p.add_argument("output", type=Path)
+        p.add_argument("--action", required=True)
+        p.add_argument("--parameter", required=True)
+        p.add_argument("--marker", required=True, choices=("*", "+", "."))
+        if cmd != "remove-primary-link":
+            p.add_argument("--power", type=int, default=1)
 
     p = sub.add_parser("inspect-conceptmodel", help="inspect AElement, spz links and content records")
     p.add_argument("input", type=Path)
@@ -359,6 +434,56 @@ def main(argv: list[str] | None = None) -> int:
                               "validation_issue_count": report["validation_issue_count_after"],
                               "report": str(args.report) if args.report else None}, ensure_ascii=False, indent=2))
             return 0
+        if args.command == "course-new":
+            if args.output.exists():
+                raise ValueError('destination exists: source-safe command will not overwrite')
+            doc = create_course_project(args.title, args.root, author=args.author, symbol=args.symbol)
+            doc.save(args.output)
+            print(json.dumps({'output': str(args.output), 'actions': len(doc.actions), 'valid': not doc.validate()}, ensure_ascii=False))
+            return 0
+        if args.command == "course-renumber":
+            if args.input.resolve() == args.output.resolve() or args.output.exists():
+                raise ValueError('use a separate, non-existing destination .is2')
+            doc=ProjectDocument.load(args.input)
+            result=renumber_structure(doc,symbol=args.symbol)
+            doc.save(args.output)
+            print(json.dumps({'output': str(args.output), **result}, ensure_ascii=False, indent=2))
+            return 0
+        if args.command == "course-check":
+            doc=ProjectDocument.load(args.input)
+            result=course_checklist(doc)
+            value=json.dumps(result,ensure_ascii=False,indent=2)+'\n'
+            if args.output:
+                if args.output.resolve()==args.input.resolve():
+                    raise ValueError('report must not overwrite input .is2')
+                if args.output.exists():
+                    raise ValueError('report destination exists')
+                args.output.write_text(value,encoding='utf-8')
+            print(value,end='')
+            return 0 if not result['errors'] else 2
+        if args.command == "course-svg":
+            if args.output.resolve()==args.input.resolve() or (args.output.exists() and not args.overwrite):
+                raise ValueError('SVG output must not overwrite source; existing output requires --overwrite')
+            if args.depth is not None and args.depth < 0:
+                raise ValueError('--depth must be nonnegative')
+            doc=ProjectDocument.load(args.input)
+            graphic=scene_svg(build_course_scene(doc, args.focus, max_depth=args.depth))
+            args.output.write_text(graphic,encoding='utf-8')
+            print(json.dumps({'output':str(args.output),'source':str(args.input),'format':'SVG'},ensure_ascii=False))
+            return 0
+        if args.command == "course-alternatives":
+            if args.input.resolve()==args.output.resolve() or args.output.exists():
+                raise ValueError('use a separate, non-existing destination .is2')
+            doc=ProjectDocument.load(args.input)
+            set_alternative_labels(doc,args.action_id,[args.first,args.second])
+            doc.save(args.output)
+            print(json.dumps({'output':str(args.output),'action_id':args.action_id},ensure_ascii=False))
+            return 0
+        if args.command == "export":
+            doc = ProjectDocument.load(args.input)
+            write_export(doc, args.output, args.kind, source_path=args.input, overwrite=args.overwrite)
+            print(json.dumps({"output": str(args.output), "kind": args.kind, "original_is2_equivalence": "NOT_TESTED"}, ensure_ascii=False))
+            return 0
         if args.command == "summary":
             print(json.dumps(load_project(args.input).summary(), ensure_ascii=False, indent=2))
             return 0
@@ -386,6 +511,22 @@ def main(argv: list[str] | None = None) -> int:
                 "native_envelope", "structural_validation", "writer_semantic_roundtrip",
                 "writer_idempotent_roundtrip", "writer_reopened_validation"
             )) else 2
+        if args.command == "feature-audit":
+            doc = ProjectDocument.load(args.input)
+            report = feature_audit(doc)
+            report["file"] = str(args.input)
+            serialized = json.dumps(report, ensure_ascii=False, indent=2) + "\n"
+            if args.output:
+                args.output.parent.mkdir(parents=True, exist_ok=True)
+                args.output.write_text(serialized, encoding="utf-8")
+            print(serialized, end="")
+            return 0 if not report["validation_issues"] else 2
+        if args.command == "primary-links":
+            doc = ProjectDocument.load(args.input)
+            links, warnings = primary_links(doc)
+            print(json.dumps({"links": [dict(action=a, parameter=p, marker=m, power=v)
+                                      for a, p, m, v in links], "warnings": warnings}, ensure_ascii=False, indent=2))
+            return 0
         if args.command == "graph":
             doc = ProjectDocument.load(args.input)
             full = build_relationship_graph(doc)
@@ -545,6 +686,9 @@ def main(argv: list[str] | None = None) -> int:
                               "json_export": str(args.output) if args.output else None}, ensure_ascii=False, indent=2))
             return 0
         doc = ProjectDocument.load(args.input)
+        if args.command in {"convert-action", "insert-sibling", "add-primary-link", "remove-primary-link", "set-primary-link-power"}:
+            if args.input.resolve() == args.output.resolve():
+                raise ValueError('Refusing to replace input project; save to a separate output .is2')
         if args.command == "roundtrip":
             issues = doc.roundtrip_to(args.output)
             print(json.dumps({"output": str(args.output), "semantic_roundtrip": "PASS", "validation_issues": issues}, ensure_ascii=False, indent=2))
@@ -555,6 +699,21 @@ def main(argv: list[str] | None = None) -> int:
                 symbol=args.symbol, level=args.level, number=args.number,
                 parent_id=args.parent_id, alternatives=args.alternative)
             result = {"created_action_id": ident}
+        elif args.command == "convert-action":
+            result = convert_action(doc, args.action_id, args.to,
+                                    replace_children=args.replace_children, drop_content=args.drop_content,
+                                    child_names=args.child_name if args.child_name else None)
+        elif args.command == "insert-sibling":
+            result = insert_sibling(doc, args.anchor_id, after=(args.position == "after"), name=args.name)
+        elif args.command == "add-primary-link":
+            add_primary_link(doc, args.action, args.parameter, args.marker, power=args.power)
+            result = {"matrix_link_added": [args.action, args.parameter, args.marker], "power": args.power}
+        elif args.command == "remove-primary-link":
+            remove_primary_link(doc, args.action, args.parameter, args.marker)
+            result = {"matrix_link_removed": [args.action, args.parameter, args.marker]}
+        elif args.command == "set-primary-link-power":
+            new_power = set_primary_link_power(doc, args.action, args.parameter, args.marker, args.power)
+            result = {"matrix_link_updated": [args.action, args.parameter, args.marker], "power": new_power}
         elif args.command == "set-action":
             changes = _pairs(args.changes)
             doc.update_action(args.action_id, **{k: (None if v == "" else v) for k, v in changes.items()})

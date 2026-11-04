@@ -280,6 +280,22 @@ class ProjectDocument:
             raise ProjectFormatError(f"parent {parent}: composition/arrangement child sets differ")
         return ordered
 
+    def reorder_children(self, parent_id: str | int, ordered_ids: Iterable[str | int]) -> None:
+        """Rewire the observed type-3 sibling chain without replacing link records.
+
+        The set of children must be unchanged. All checks run before mutation;
+        unknown attributes and children of the existing links are retained.
+        """
+        parent = str(parent_id)
+        self.action(parent)
+        current = self.sibling_order(parent)
+        desired = [str(item) for item in ordered_ids]
+        if len(desired) != len(current) or len(set(desired)) != len(desired) or set(desired) != set(current):
+            raise ValueError("new order must contain exactly the existing children once")
+        records = {n.get("afe2"): n for n in self._links_of_type("3") if n.get("afe1") == parent}
+        for index, child in enumerate(desired):
+            records[child].set("afe3", desired[index + 1] if index + 1 < len(desired) else "0")
+
     def validate(self, *, deep: bool = True) -> list[str]:
         issues: list[str] = []
         actions = self.actions
@@ -345,6 +361,26 @@ class ProjectDocument:
                 issues.append(
                     f"parameter {node.get('id', '?')} references missing object id {object_ref} via @o"
                 )
+
+        matrix = self.root.find("models/primaryModel/matrix")
+        if matrix is not None:
+            pids = set(parameter_ids)
+            for index, node in enumerate(matrix):
+                if not isinstance(node.tag, str):
+                    continue
+                if node.tag != "AElement" or node.get("type") != "4":
+                    issues.append(f"primaryModel/matrix[{index}] unsupported record; preserved")
+                    continue
+                if node.get("e1") not in idset:
+                    issues.append(f"primaryModel/matrix[{index}] references missing action {node.get('e1')}")
+                if node.get("e2") not in pids:
+                    issues.append(f"primaryModel/matrix[{index}] references missing parameter {node.get('e2')}")
+                try:
+                    char, power = int(node.get("char", "")), int(node.get("power", ""))
+                    if not -128 <= char <= 127 or not -(2**31) <= power < 2**31:
+                        raise ValueError()
+                except ValueError:
+                    issues.append(f"primaryModel/matrix[{index}] invalid char/power")
 
         # Keep the high-water counters, but ensure they are not lower than any current numeric ID.
         for container, key, nodes in (
@@ -512,6 +548,14 @@ class ProjectDocument:
                 f"action subtree is referenced by {len(dependent_content)} ConceptModel/content links; pass cascade_content=True"
             )
 
+        matrix = self.root.find("models/primaryModel/matrix")
+        if matrix is not None:
+            records = [n for n in matrix if isinstance(n.tag, str)]
+            if any(n.tag != "AElement" or n.get("e1") is None or n.get("e2") is None for n in records):
+                raise ValueError("primaryModel/matrix contains opaque records; deletion is blocked")
+            if any(n.get("e1") in subtree_set for n in records):
+                raise ValueError("action is referenced in primaryModel/matrix; remove its parameter links first")
+
         # Preflight every incoming sibling-chain splice too.
         for current in subtree:
             incoming_parent = next(
@@ -613,6 +657,13 @@ class ProjectDocument:
             raise ValueError(
                 "ConceptModel/content is non-empty; parameter deletion is blocked until cross-model content-link endpoints are resolved"
             )
+        matrix = self.root.find("models/primaryModel/matrix")
+        if matrix is not None:
+            records = [n for n in matrix if isinstance(n.tag, str)]
+            if any(n.tag != "AElement" or n.get("e1") is None or n.get("e2") is None for n in records):
+                raise ValueError("primaryModel/matrix contains opaque records; deletion is blocked")
+            if any(n.get("e2") == str(parameter_id) for n in records):
+                raise ValueError("parameter is referenced in primaryModel/matrix; remove its action links first")
         self._delete_record(self.params_node, "param", str(parameter_id))
 
     def add_object(self, name: str, *, attributes: Mapping[str, str | int] | None = None) -> str:

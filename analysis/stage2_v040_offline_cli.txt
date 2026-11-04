@@ -1,7 +1,0 @@
-VALID: /mnt/data/IS2_RE_Stage2_MVP_2026-11-01/continuation/samples/kursach_user_supplied_42_actions.is2 (42 actions, 82 links)
-{
-  "created_spz_element_id": "2",
-  "output": "/tmp/tmp.aescxTBbzE/added.is2",
-  "validation": "PASS"
-}
-VALID: /tmp/tmp.aescxTBbzE/added.is2 (42 actions, 82 links)

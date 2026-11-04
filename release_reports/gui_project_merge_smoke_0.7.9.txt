@@ -1,2 +1,0 @@
-PASS: GUI three-way merge conflict resolution and side-by-side relationship graph comparison
-GUI compare, selective restore, dependency/writer preflight and grouped Undo/Redo smoke: PASS (see gui_project_diff_smoke_0.7.9.txt)

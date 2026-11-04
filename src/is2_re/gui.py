@@ -28,6 +28,12 @@ from .backups import create_project_backup, list_project_backups, restore_projec
 from .diff import (compare_documents, apply_selected_restores, expand_related_restore_bundle, ProjectDiffError)
 from .merge import merge_documents, ProjectMergeError
 from .graph_diff import compare_relationship_graphs
+from .exports import write_export, TYPE_LABELS
+from .specifications import project_forms, form_html, FORM_NAMES, add_primary_link, remove_primary_link, set_primary_link_power
+from .decomposition import convert_action, insert_sibling
+from .coursework import create_course_project
+from .course_gui import CourseworkPanel
+from .ui_theme import apply_theme, BACKGROUND, SURFACE, INK, MUTED, BORDER, PRIMARY
 
 
 class RecordDialog(tk.Toplevel):
@@ -104,7 +110,9 @@ class Is2Studio(tk.Tk):
         super().__init__()
         self.title("PzKpfw — редактор проектов .is2")
         self.geometry("1320x820")
-        self.minsize(1000, 650)
+        self.minsize(1050, 650)
+        self._install_app_icon()
+        apply_theme(self)
         self.doc: ProjectDocument | None = None
         self.path: Path | None = None
         self.dirty = False
@@ -128,14 +136,53 @@ class Is2Studio(tk.Tk):
         self.protocol("WM_DELETE_WINDOW", self._quit)
         self._set_title()
 
+    def _install_app_icon(self) -> None:
+        """Set the PzKpfw application icon; tolerate platform-specific Tk issues."""
+        assets = Path(__file__).resolve().parent / "assets"
+        try:
+            # Tk's PNG icon is used on Linux and other platforms.
+            self._app_icon_image = tk.PhotoImage(file=str(assets / "pzkpfw.png"))
+            self.iconphoto(True, self._app_icon_image)
+        except (OSError, tk.TclError):
+            self._app_icon_image = None
+        if sys.platform == "win32":
+            try:
+                # .ico preserves multiple resolutions in Windows titlebars/taskbar.
+                self.iconbitmap(str(assets / "pzkpfw.ico"))
+            except (OSError, tk.TclError):
+                pass
+
+    def export_document(self, kind):
+        if self.doc is None:
+            messagebox.showinfo("Экспорт", "Сначала откройте проект.", parent=self)
+            return
+        config = {"report": (".html", "HTML"), "diagram": (".svg", "SVG"), "relations": (".csv", "CSV"), "matrix": (".csv", "CSV"), "primary-matrix": (".csv", "CSV"), "specifications": (".html", "HTML")}
+        extension, label = config[kind]
+        destination = filedialog.asksaveasfilename(parent=self, defaultextension=extension,
+                                                    filetypes=[(label, "*" + extension)])
+        if not destination:
+            return
+        try:
+            write_export(self.doc, destination, kind, source_path=self.path, overwrite=True)
+        except (OSError, ValueError, ProjectFormatError) as exc:
+            messagebox.showerror("Ошибка экспорта", str(exc), parent=self)
+            return
+        messagebox.showinfo("Экспорт", "Файл создан. Это справочный экспорт PzKpfw; соответствие формам ИС-2 не проверено.", parent=self)
+
     def _build_menu(self):
         menu = tk.Menu(self)
         file_menu = tk.Menu(menu, tearoff=False)
         file_menu.add_command(label="Новый проект…", accelerator="Ctrl+N", command=self.new_project)
+        file_menu.add_command(label="Новый проект с главным действием…", command=self.new_coursework)
         file_menu.add_command(label="Открыть…", accelerator="Ctrl+O", command=self.open_file)
         file_menu.add_command(label="Сохранить", accelerator="Ctrl+S", command=self.save)
         file_menu.add_command(label="Сохранить как…", command=self.save_as)
         file_menu.add_command(label="Резервные копии…", command=self.show_backups)
+        file_menu.add_separator()
+        file_menu.add_command(label="Экспорт обзора в HTML…", command=lambda: self.export_document("report"))
+        file_menu.add_command(label="Экспорт схемы в SVG…", command=lambda: self.export_document("diagram"))
+        file_menu.add_command(label="Экспорт таблицы связей в CSV…", command=lambda: self.export_document("relations"))
+        file_menu.add_command(label="Экспорт матрицы состава в CSV…", command=lambda: self.export_document("matrix"))
         file_menu.add_separator()
         file_menu.add_command(label="Выход", command=self._quit)
         menu.add_cascade(label="Файл", menu=file_menu)
@@ -168,58 +215,148 @@ class Is2Studio(tk.Tk):
         self.bind_all("<Control-Shift-Z>", self._redo_shortcut)
 
     def _build_layout(self):
-        toolbar = ttk.Frame(self, padding=(8, 6))
-        toolbar.pack(fill="x")
-        ttk.Button(toolbar, text="Новый", command=self.new_project).pack(side="left")
-        ttk.Button(toolbar, text="Открыть", command=self.open_file).pack(side="left", padx=(5, 0))
-        ttk.Button(toolbar, text="Сохранить", command=self.save).pack(side="left", padx=5)
-        self.undo_button = ttk.Button(toolbar, text="↶ Отменить", command=self.undo, state="disabled")
-        self.undo_button.pack(side="left", padx=(8, 2))
-        self.redo_button = ttk.Button(toolbar, text="↷ Повторить", command=self.redo, state="disabled")
-        self.redo_button.pack(side="left", padx=2)
-        ttk.Button(toolbar, text="История…", command=self.show_history).pack(side="left", padx=(4, 0))
-        ttk.Button(toolbar, text="Проверить", command=self.validate_project).pack(side="left", padx=(5, 0))
-        self.file_label = ttk.Label(toolbar, text="Файл не открыт")
-        self.file_label.pack(side="right")
+        """User-facing editing workflow: structure, data, output, then advanced tools.
+
+        The native project editor (formerly a standalone coursework tab) is the
+        *primary* workspace.  Non-coursework tools are still available under
+        'Дополнительно', without duplicating the main workflow.
+        """
+        # Brand artwork is a separate asset from the Windows/taskbar gear icon.
+        # Keep the PhotoImage referenced for the whole Tk window lifetime.
+        header = ttk.Frame(self, padding=(15, 8), style='Brand.TFrame')
+        header.pack(fill='x')
+        self._brand_logo = None
+        try:
+            logo_path = Path(__file__).resolve().parent / 'assets' / 'pzkpfw_logo_header.png'
+            self._brand_logo = tk.PhotoImage(file=str(logo_path))
+        except (OSError, tk.TclError):
+            pass
+        if self._brand_logo is not None:
+            ttk.Label(header, image=self._brand_logo, style='Brand.TLabel').pack(side='left', padx=(0, 12))
+        title_area = ttk.Frame(header, style='Brand.TFrame')
+        title_area.pack(side='left')
+        ttk.Label(title_area, text='PzKpfw', font=('TkDefaultFont', 19, 'bold'),
+                  style='Brand.Title.TLabel').pack(anchor='w')
+        ttk.Label(title_area, text='Редактор моделей и файлов ИС-2',
+                  style='Brand.Muted.TLabel').pack(anchor='w')
+        self.file_label = ttk.Label(header, text='Файл не открыт', style='Brand.Muted.TLabel')
+        self.file_label.pack(side='right', padx=8)
+
+        toolbar = ttk.Frame(self, padding=(14, 2, 14, 9))
+        toolbar.pack(fill='x')
+        ttk.Button(toolbar, text='Новый проект', command=self.new_coursework,
+                   style='Primary.TButton').pack(side='left')
+        ttk.Button(toolbar, text='Открыть .is2', command=self.open_file).pack(side='left', padx=(7, 0))
+        ttk.Button(toolbar, text='Сохранить', command=self.save).pack(side='left', padx=(7, 0))
+        ttk.Separator(toolbar, orient='vertical').pack(side='left', fill='y', padx=12)
+        self.undo_button = ttk.Button(toolbar, text='↶ Отменить', command=self.undo, state='disabled')
+        self.undo_button.pack(side='left', padx=(0, 4))
+        self.redo_button = ttk.Button(toolbar, text='↷ Повторить', command=self.redo, state='disabled')
+        self.redo_button.pack(side='left')
+        ttk.Button(toolbar, text='Проверить проект', command=self.validate_project).pack(side='left', padx=(14, 0))
+        ttk.Button(toolbar, text='Экспорт…', command=self._show_export_menu).pack(side='left', padx=(7, 0))
+
         self.notebook = ttk.Notebook(self)
-        self.notebook.pack(fill="both", expand=True, padx=8, pady=(0, 8))
+        self.notebook.pack(fill='both', expand=True, padx=12, pady=(0, 8))
+        self.course_page = ttk.Frame(self.notebook)    # kept as compatibility alias
         self.action_page = ttk.Frame(self.notebook)
-        self.diagram_page = ttk.Frame(self.notebook)
         self.param_page = ttk.Frame(self.notebook)
         self.object_page = ttk.Frame(self.notebook)
-        self.concept_page = ttk.Frame(self.notebook)
-        self.link_page = ttk.Frame(self.notebook)
-        self.other_page = ttk.Frame(self.notebook)
-        self.graph_page = ttk.Frame(self.notebook)
-        self.xml_page = ttk.Frame(self.notebook)
-        self.metadata_page = ttk.Frame(self.notebook)
-        self.notebook.add(self.metadata_page, text="Паспорт проекта")
-        self.notebook.add(self.action_page, text="Декомпозиция")
-        self.notebook.add(self.diagram_page, text="Схема spd")
-        self.notebook.add(self.param_page, text="Параметры")
-        self.notebook.add(self.object_page, text="Объекты")
-        self.notebook.add(self.concept_page, text="Категории (cs)")
-        self.notebook.add(self.link_page, text="Связи (cs)")
-        self.notebook.add(self.other_page, text="spz / content")
-        self.notebook.add(self.graph_page, text="Граф связей")
-        self.notebook.add(self.xml_page, text="XML")
+        self.forms_page = ttk.Frame(self.notebook)
+        self.matrix_page = ttk.Frame(self.notebook)
+        self.service_page = ttk.Frame(self.notebook)
+        for frame, name in (
+            (self.course_page, 'Формирование СПД'),
+            (self.action_page, 'Декомпозиция'),
+            (self.param_page, 'Параметры'),
+            (self.object_page, 'Объекты'),
+            (self.forms_page, 'Спецификации'),
+            (self.matrix_page, 'Матричная диаграмма'),
+            (self.service_page, 'Дополнительно'),
+        ):
+            self.notebook.add(frame, text=name)
+        self.advanced_tabs = ttk.Notebook(self.service_page)
+        self.advanced_tabs.pack(fill='both', expand=True, padx=5, pady=5)
+        self.metadata_page = ttk.Frame(self.advanced_tabs)
+        self.diagram_page = ttk.Frame(self.advanced_tabs)
+        self.concept_page = ttk.Frame(self.advanced_tabs)
+        self.link_page = ttk.Frame(self.advanced_tabs)
+        self.other_page = ttk.Frame(self.advanced_tabs)
+        self.graph_page = ttk.Frame(self.advanced_tabs)
+        self.xml_page = ttk.Frame(self.advanced_tabs)
+        for frame, name in (
+            (self.metadata_page, 'Паспорт'), (self.diagram_page, 'Техническая схема'),
+            (self.concept_page, 'Категории (cs)'), (self.link_page, 'Связи (cs)'),
+            (self.other_page, 'spz / content'), (self.graph_page, 'Граф связей'),
+            (self.xml_page, 'XML'),
+        ):
+            self.advanced_tabs.add(frame, text=name)
+        self.course_panel = CourseworkPanel(self.course_page, self)
+        self.course_panel.pack(fill='both', expand=True)
         self._build_metadata_page()
         self._build_action_page()
+        self._build_forms_page()
+        self._build_matrix_page()
         self._build_diagram_page()
-        self._build_record_page(self.param_page, "Параметры", self._refresh_params, self.add_parameter, self.edit_parameter, self.delete_parameter)
-        self._build_record_page(self.object_page, "Объекты", self._refresh_objects, self.add_object, self.edit_object, self.delete_object)
+        self._build_record_page(self.param_page, 'Параметры', self._refresh_params, self.add_parameter, self.edit_parameter, self.delete_parameter)
+        self._build_record_page(self.object_page, 'Объекты', self._refresh_objects, self.add_object, self.edit_object, self.delete_object)
         self._build_category_page()
         self._build_link_page()
         self._build_other_page()
         self._build_graph_page()
-        self.xml_text = tk.Text(self.xml_page, wrap="none", font=("Consolas", 10), state="disabled")
-        self.xml_text.pack(fill="both", expand=True)
-        self.status = tk.StringVar(value="Готово")
-        ttk.Label(self, textvariable=self.status, relief="sunken", anchor="w", padding=(8, 4)).pack(fill="x", side="bottom")
+        self.xml_text = tk.Text(self.xml_page, wrap='none', font=('Consolas', 10),
+                                state='disabled', bg=SURFACE, fg=INK)
+        self.xml_text.pack(fill='both', expand=True)
+        self.status = tk.StringVar(value='Готово · откройте .is2 или создайте проект')
+        status_bar = ttk.Frame(self, padding=(12, 6))
+        status_bar.pack(fill='x', side='bottom')
+        ttk.Label(status_bar, textvariable=self.status, style='Muted.TLabel').pack(side='left')
+        ttk.Label(status_bar, text='Ctrl+S · сохранить    Ctrl+Z · отменить    F1 · помощь',
+                  style='Muted.TLabel').pack(side='right')
+        self.bind_all('<F1>', lambda _event: self._show_shortcuts())
+
+    def _show_shortcuts(self):
+        messagebox.showinfo('Работа в PzKpfw',
+            'Формирование СПД — схема, создание и изменение действий, свойства справа.\n'
+            'Декомпозиция — табличное дерево тех же действий.\n'
+            'Параметры и Объекты — редактирование данных модели.\n'
+            'Спецификации — формы A, B, D, D1, D2.\n'
+            'Матричная диаграмма — связи действий с параметрами; двойной щелчок по ячейке — редактирование.\n'
+            'Дополнительно — паспорт, графы, XML, исследовательские средства.\n\n'
+            'Ctrl+N — новый пустой проект, Ctrl+O — открыть, Ctrl+S — сохранить.\n'
+            'Ctrl+Z / Ctrl+Y — история правок. В СПД: F2 — имя, Ctrl+Enter — применить свойства.',
+            parent=self)
+
+    def _show_export_menu(self):
+        """Keep rarely used exports off the permanent primary toolbar."""
+        menu = tk.Menu(self, tearoff=False)
+        for label, command in (
+            ('Комплект проекта (схемы, формы, проверка)…', self.course_panel._export_all),
+            ('Схема СПД в SVG…', self.course_panel._export_svg),
+            ('Спецификации в HTML…', lambda: self.export_document('specifications')),
+            ('Матрица в CSV…', lambda: self.export_document('primary-matrix')),
+            ('Отчёт в HTML…', lambda: self.export_document('report')),
+        ):
+            menu.add_command(label=label, command=command)
+        try:
+            x, y = self.winfo_pointerxy()
+            menu.tk_popup(x, y)
+        finally:
+            menu.grab_release()
+
+    def _show_page(self, page):
+        """Navigate advanced pages without exposing seven extra top-level tabs."""
+        if page in (self.metadata_page, self.diagram_page, self.concept_page,
+                    self.link_page, self.other_page, self.graph_page, self.xml_page):
+            self.notebook.select(self.service_page)
+            self.advanced_tabs.select(page)
+        else:
+            self.notebook.select(page)
 
     def _set_enabled(self, enabled: bool):
+        self.course_panel.set_editing_enabled(enabled)
         state = "normal" if enabled else "disabled"
-        for page in (self.metadata_page, self.action_page, self.diagram_page, self.param_page, self.object_page, self.concept_page, self.link_page, self.other_page, self.graph_page, self.xml_page):
+        for page in (self.metadata_page, self.action_page, self.forms_page, self.diagram_page, self.param_page, self.object_page, self.concept_page, self.link_page, self.other_page, self.graph_page, self.xml_page):
             try:
                 for child in page.winfo_children():
                     if isinstance(child, ttk.Frame):
@@ -238,11 +375,214 @@ class Is2Studio(tk.Tk):
         self.metadata_text.pack(fill="both", expand=True, padx=6, pady=(0, 6))
         ttk.Label(self.metadata_page, text="Неизвестные атрибуты project/user сохраняются.", padding=6).pack(anchor="w")
 
+    def _build_forms_page(self):
+        bar = ttk.Frame(self.forms_page, padding=6)
+        bar.pack(fill="x")
+        self.form_selection = tk.StringVar(value=FORM_NAMES["A"])
+        self.form_combo = ttk.Combobox(bar, textvariable=self.form_selection, values=tuple(v for k,v in FORM_NAMES.items() if k != "M"), state="readonly", width=39)
+        self.form_combo.pack(side="left")
+        self.form_combo.bind("<<ComboboxSelected>>", lambda event: self._refresh_form())
+        for form_key in ('A', 'B', 'D', 'D1', 'D2'):
+            ttk.Button(bar, text='Форма ' + form_key,
+                       command=lambda key=form_key: self._select_spec_form(key)).pack(side='left', padx=(6, 0))
+        ttk.Button(bar, text="Обновить", command=self._refresh_form).pack(side="left", padx=4)
+        ttk.Button(bar, text="Печатать все формы…", command=lambda: self.export_document('specifications')).pack(side="left", padx=4)
+        ttk.Label(self.forms_page, text="Реконструкция по XML и исследованию ИС-2; соответствие оригиналу не проверено.", padding=(6, 3)).pack(anchor="w")
+        container=ttk.Frame(self.forms_page, padding=6)
+        container.pack(fill="both", expand=True)
+        self.forms_tree=ttk.Treeview(container, show="headings")
+        y=ttk.Scrollbar(container, orient="vertical", command=self.forms_tree.yview)
+        x=ttk.Scrollbar(container, orient="horizontal", command=self.forms_tree.xview)
+        self.forms_tree.configure(yscrollcommand=y.set,xscrollcommand=x.set)
+        self.forms_tree.grid(row=0,column=0,sticky="nsew"); y.grid(row=0,column=1,sticky="ns"); x.grid(row=1,column=0,sticky="ew")
+        container.columnconfigure(0,weight=1); container.rowconfigure(0,weight=1)
+        self.form_status=tk.StringVar(value="Откройте проект и нажмите «Обновить».")
+        ttk.Label(self.forms_page,textvariable=self.form_status,wraplength=1150,padding=6).pack(anchor="w")
+
+    def _build_matrix_page(self):
+        bar = ttk.Frame(self.matrix_page, padding=(8, 10))
+        bar.pack(fill='x')
+        ttk.Label(bar, text='Действия × параметры', font=('TkDefaultFont', 12, 'bold')).pack(side='left', padx=(0, 15))
+        ttk.Button(bar, text='+ Связь…', command=lambda: self.edit_primary_link(False)).pack(side='left', padx=(0, 4))
+        ttk.Button(bar, text='− Связь…', command=lambda: self.edit_primary_link(True)).pack(side='left', padx=(0, 4))
+        ttk.Button(bar, text='Кратность…', command=self.edit_primary_link_power).pack(side='left', padx=(0, 4))
+        ttk.Button(bar, text='CSV…', command=lambda: self.export_document('primary-matrix')).pack(side='left', padx=(0, 4))
+        ttk.Button(bar, text='Обновить', command=self._refresh_matrix).pack(side='left')
+        ttk.Label(self.matrix_page, text='Дважды нажмите на пересечение строки действия и столбца параметра, чтобы добавить или изменить связь.',
+                  padding=(12, 0), style='Muted.TLabel').pack(anchor='w')
+        box = ttk.Frame(self.matrix_page, padding=9)
+        box.pack(fill='both', expand=True)
+        self.matrix_tree = ttk.Treeview(box, show='headings', selectmode='browse')
+        yy=ttk.Scrollbar(box, orient='vertical', command=self.matrix_tree.yview)
+        xx=ttk.Scrollbar(box, orient='horizontal', command=self.matrix_tree.xview)
+        self.matrix_tree.configure(yscrollcommand=yy.set, xscrollcommand=xx.set)
+        self.matrix_tree.grid(row=0, column=0, sticky='nsew')
+        yy.grid(row=0, column=1, sticky='ns'); xx.grid(row=1, column=0, sticky='ew')
+        box.columnconfigure(0, weight=1); box.rowconfigure(0, weight=1)
+        self.matrix_tree.bind('<Double-1>', self._edit_matrix_cell)
+        self.matrix_status = tk.StringVar(value='Создайте или откройте проект.')
+        ttk.Label(self.matrix_page, textvariable=self.matrix_status,
+                  style='Muted.TLabel', padding=(12, 7)).pack(anchor='w')
+        self._matrix_action_ids: list[str] = []
+        self._matrix_parameter_ids: list[str] = []
+
+    def _refresh_matrix(self):
+        if self.doc is None:
+            return
+        try:
+            from .gui_models import action_tree_rows
+            from .specifications import _sort_number
+            forms, warnings = project_forms(self.doc)
+            headers, rows = forms['M']
+            self._matrix_action_ids = [r.action_id for r in action_tree_rows(self.doc)]
+            parameters = sorted(self.doc.params_node.findall('param'),
+                                key=lambda n: (_sort_number(n.get('group')),
+                                               _sort_number(n.get('number')),
+                                               _sort_number(n.get('id'))))
+            self._matrix_parameter_ids = [p.get('id', '') for p in parameters]
+            if len(headers) > 300:
+                self.matrix_status.set('Матрица очень широкая: используйте CSV-экспорт.')
+                return
+            cols = [f'm{i}' for i in range(len(headers))]
+            self.matrix_tree.delete(*self.matrix_tree.get_children())
+            self.matrix_tree.configure(columns=cols)
+            for i, (key, caption) in enumerate(zip(cols, headers)):
+                self.matrix_tree.heading(key, text=caption)
+                self.matrix_tree.column(key, width=76 if i == 0 else 128 if i == 1 else 94,
+                                        minwidth=58, stretch=False, anchor='center')
+            for index, row in enumerate(rows):
+                self.matrix_tree.insert('', 'end', iid=f'matrix{index}', values=row)
+            self.matrix_status.set(f'{len(rows)} действий · {len(parameters)} параметров ·'
+                                   ' * функция, + аргумент, . по умолчанию. '
+                                   'Структурные символы реконструированы и требуют сверки с ИС-2.')
+        except (ValueError, ProjectFormatError, KeyError) as exc:
+            messagebox.showerror('Матричная диаграмма', str(exc), parent=self)
+
+    def _edit_matrix_cell(self, event):
+        if self.doc is None:
+            return
+        row = self.matrix_tree.identify_row(event.y)
+        col = self.matrix_tree.identify_column(event.x)
+        if not row or not col or int(col[1:]) < 3:
+            return
+        try:
+            idx = int(row.removeprefix('matrix'))
+            pidx = int(col[1:]) - 3
+            aid = self._matrix_action_ids[idx]
+            pid = self._matrix_parameter_ids[pidx]
+            code = self.doc.action(aid)
+            if code.get('type') != '0':
+                messagebox.showinfo('Матричная диаграмма', 'Функции и аргументы можно назначать только элементарным действиям.', parent=self)
+                return
+            from .specifications import primary_links
+            existing = [(mark, power) for a, p, mark, power in primary_links(self.doc)[0]
+                        if a == aid and p == pid]
+            if len(existing) > 1:
+                messagebox.showinfo('Матричная диаграмма', 'В ячейке несколько записей. Используйте команды «Связь» и «Кратность».', parent=self)
+                return
+            old_mark, old_power = existing[0] if existing else ('+', '1')
+            if old_mark not in ('*', '+', '.'):
+                messagebox.showwarning('Матричная диаграмма', 'Роль не распознана — правка заблокирована.', parent=self)
+                return
+            dialog = RecordDialog(self, 'Связь действия и параметра', [
+                ('marker', 'Роль связи', old_mark, ('*', '+', '.')),
+                ('power', 'Кратность', old_power, None),
+                ('operation', 'Действие', 'Изменить' if existing else 'Добавить',
+                 ('Изменить', 'Удалить') if existing else ('Добавить',)),
+            ])
+            self.wait_window(dialog)
+            if dialog.result is None:
+                return
+            values = dialog.result
+            # Run the edit against an isolated clone: never partially rewrite an XML document.
+            trial = self.doc.clone()
+            if existing:
+                if values['operation'] == 'Удалить' or values['marker'] != old_mark:
+                    remove_primary_link(trial, aid, pid, old_mark)
+            if values['operation'] != 'Удалить':
+                if existing and values['marker'] == old_mark:
+                    set_primary_link_power(trial, aid, pid, old_mark, values['power'])
+                else:
+                    add_primary_link(trial, aid, pid, values['marker'], power=values['power'])
+            self.doc = trial
+            self._mark_dirty('Изменена ячейка матричной диаграммы')
+            self.refresh_all()
+        except (ValueError, KeyError, IndexError, ProjectFormatError) as exc:
+            messagebox.showerror('Матрица', str(exc), parent=self)
+
+    def _select_spec_form(self, key):
+        self.form_selection.set(FORM_NAMES[key])
+        self._refresh_form()
+
+    def edit_primary_link(self, remove):
+        if self.doc is None: return
+        fields=[("action", "ID элементарного действия", "", None),
+                ("parameter", "ID параметра", "", None),
+                ("marker", "Роль: * функция, + аргумент, . по умолчанию", "+", ("*", "+", "."))]
+        if not remove:
+            fields.append(("power", "Кратность (записывается как @power)", "1", None))
+        dialog=RecordDialog(self,"Удалить связь" if remove else "Добавить связь",fields)
+        self.wait_window(dialog)
+        if dialog.result is None: return
+        data=dialog.result
+        try:
+            if remove:
+                remove_primary_link(self.doc,data["action"],data["parameter"],data["marker"])
+            else:
+                add_primary_link(self.doc,data["action"],data["parameter"],data["marker"],power=data["power"])
+            self._mark_dirty("Удалена связь действия и параметра" if remove else "Добавлена связь действия и параметра")
+            self.refresh_all()
+            self._refresh_form()
+        except (ValueError, KeyError, ProjectFormatError) as exc:
+            messagebox.showerror("Связь действия и параметра",str(exc),parent=self)
+
+    def edit_primary_link_power(self):
+        if self.doc is None: return
+        fields = [("action", "ID действия", "", None),
+                  ("parameter", "ID параметра", "", None),
+                  ("marker", "Роль", "+", ("*", "+", ".")),
+                  ("power", "Новая кратность @power", "1", None)]
+        dialog = RecordDialog(self, "Изменение кратности связи", fields)
+        self.wait_window(dialog)
+        if dialog.result is None: return
+        try:
+            d = dialog.result
+            set_primary_link_power(self.doc, d["action"], d["parameter"], d["marker"], d["power"])
+            self._mark_dirty("Изменена кратность связи действия и параметра")
+            self.refresh_all()
+        except (ValueError, KeyError, ProjectFormatError) as exc:
+            messagebox.showerror("Кратность связи", str(exc), parent=self)
+
+    def _refresh_form(self):
+        if self.doc is None:
+            return
+        try:
+            forms,warnings=project_forms(self.doc)
+            key=next((k for k,v in FORM_NAMES.items() if v==self.form_selection.get()),"A")
+            headers,rows=forms[key]
+            if len(headers)>300:
+                self.form_status.set("Слишком много столбцов для просмотра. Используйте HTML-экспорт.")
+                return
+            self.forms_tree.delete(*self.forms_tree.get_children())
+            cols=[f"c{i}" for i in range(len(headers))]
+            self.forms_tree.configure(columns=cols)
+            for name,title in zip(cols,headers):
+                self.forms_tree.heading(name,text=title)
+                self.forms_tree.column(name,width=180 if len(headers)<12 else 100,minwidth=50,stretch=False)
+            for row in rows:
+                self.forms_tree.insert("", "end", values=row)
+            self.form_status.set(f"Строк: {len(rows)}. " + " ".join(warnings))
+        except (ValueError, ProjectFormatError, KeyError) as exc:
+            messagebox.showerror("Формы",str(exc),parent=self)
+
     def _build_action_page(self):
         bar = ttk.Frame(self.action_page, padding=6)
         bar.pack(fill="x")
-        for text, command in (("Новый корень", self.add_root_action), ("Добавить дочерний", self.add_child_action), ("Изменить", self.edit_action), ("Удалить", self.delete_action), ("Обновить", self._refresh_actions)):
+        for text, command in (("Новый корень", self.add_root_action), ("Добавить дочерний", self.add_child_action), ("↑", lambda: self.move_action(-1)), ("↓", lambda: self.move_action(1)), ("Изменить", self.edit_action), ("Удалить", self.delete_action), ("Обновить", self._refresh_actions)):
             ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 5))
+        ttk.Button(bar, text="Преобразовать…", command=self.convert_selected_action).pack(side="left", padx=(0, 5))
+        ttk.Button(bar, text="Вставить до…", command=lambda: self.insert_selected_action(False)).pack(side="left", padx=(0, 5))
+        ttk.Button(bar, text="Вставить после…", command=lambda: self.insert_selected_action(True)).pack(side="left", padx=(0, 5))
         split = ttk.Panedwindow(self.action_page, orient="horizontal")
         split.pack(fill="both", expand=True, padx=6, pady=(0, 6))
         left = ttk.Frame(split)
@@ -264,6 +604,32 @@ class Is2Studio(tk.Tk):
         ttk.Label(right, text="Выбранное действие", font=("TkDefaultFont", 11, "bold")).pack(anchor="w")
         self.action_details = tk.Text(right, wrap="word", height=20, state="disabled")
         self.action_details.pack(fill="both", expand=True, pady=(8, 0))
+
+    def move_action(self, direction):
+        if self.doc is None:
+            return
+        ident = self._selected_id(self.action_tree)
+        if not ident:
+            messagebox.showinfo("Порядок действий", "Выберите дочернее действие.", parent=self)
+            return
+        parents = [n.get("afe1") for n in self.doc.links if n.get("type") == "2" and n.get("afe2") == ident]
+        if len(parents) != 1:
+            messagebox.showinfo("Порядок действий", "Выберите действие с одним родителем; корневые действия не переставляются.", parent=self)
+            return
+        try:
+            order = self.doc.sibling_order(parents[0])
+            index = order.index(ident)
+            target = index + direction
+            if not 0 <= target < len(order):
+                return
+            order[index], order[target] = order[target], order[index]
+            self.doc.reorder_children(parents[0], order)
+            self._mark_dirty(f"Изменён порядок действия {ident}")
+            self.refresh_all()
+            self.action_tree.selection_set(ident)
+            self.action_tree.see(ident)
+        except (ValueError, ProjectFormatError) as exc:
+            messagebox.showerror("Порядок действий", str(exc), parent=self)
 
     def _build_diagram_page(self):
         bar = ttk.Frame(self.diagram_page, padding=6)
@@ -365,11 +731,15 @@ class Is2Studio(tk.Tk):
         else:
             columns = ("id", "name", "attributes")
         tree["columns"] = columns
+        captions = {"id": "ID", "name": "Наименование", "group": "Группа",
+                    "codingType": "Тип кодирования", "number": "Номер", "sign": "Обозначение",
+                    "object": "Объект", "attributes": "Атрибуты XML"}
         for column in columns:
-            tree.heading(column, text=column)
-            tree.column(column, width=140 if column != "attributes" else 500, anchor="w")
+            tree.heading(column, text=captions.get(column, column))
+            tree.column(column, width=(270 if column == "name" else 130) if column != "attributes" else 500, anchor="w")
         if title == "Параметры":
             self.param_tree = tree
+            ttk.Button(bar, text="Доп. XML…", command=self.edit_parameter_advanced).pack(side="left", padx=(6, 0))
             ttk.Button(bar, text="Назначить объект…", command=self.assign_parameter_object).pack(side="left", padx=(6, 0))
             ttk.Button(bar, text="Снять объект", command=self.clear_parameter_object).pack(side="left", padx=(4, 0))
             tree.bind("<<TreeviewSelect>>", self._on_tree_selection_changed, add="+")
@@ -730,10 +1100,19 @@ class Is2Studio(tk.Tk):
             return False
 
     def _on_notebook_tab_changed(self, _event=None):
+        if self.notebook.select() == str(self.forms_page):
+            self._refresh_form()
+        if self.notebook.select() == str(self.matrix_page):
+            self._refresh_matrix()
         if self.doc is not None and self.path is not None:
             self._save_graph_view_state()
 
     def _on_tree_selection_changed(self, _event=None):
+        """Keep the table and the visual editor focused on the same action."""
+        if self.doc is not None:
+            selected = self._selected_id(self.action_tree)
+            if selected and self.course_panel.selected_id != selected:
+                self.course_panel.select_action(selected)
         if self.doc is not None and self.path is not None:
             self._save_graph_view_state()
 
@@ -1015,23 +1394,23 @@ class Is2Studio(tk.Tk):
         if kind == "action" and self.action_tree.exists(ident):
             self.notebook.select(self.action_page); self.action_tree.selection_set(ident); self.action_tree.see(ident)
         elif kind == "category" and self.category_tree.exists(ident):
-            self.notebook.select(self.concept_page); self.category_tree.selection_set(ident); self.category_tree.see(ident)
+            self._show_page(self.concept_page); self.category_tree.selection_set(ident); self.category_tree.see(ident)
         elif kind == "spz_element" and self.spz_tree.exists(ident):
-            self.notebook.select(self.other_page); self.spz_tree.selection_set(ident); self.spz_tree.see(ident)
+            self._show_page(self.other_page); self.spz_tree.selection_set(ident); self.spz_tree.see(ident)
         elif kind == "parameter" and self.param_tree.exists(ident):
-            self.notebook.select(self.param_page); self.param_tree.selection_set(ident); self.param_tree.see(ident)
+            self._show_page(self.param_page); self.param_tree.selection_set(ident); self.param_tree.see(ident)
         elif kind == "object" and self.object_tree.exists(ident):
-            self.notebook.select(self.object_page); self.object_tree.selection_set(ident); self.object_tree.see(ident)
+            self._show_page(self.object_page); self.object_tree.selection_set(ident); self.object_tree.see(ident)
         elif kind == "relation":
             relation_kind = node.get("relation_kind"); index = int(node.get("record_index", -1))
             if relation_kind == "scbinarylink":
                 link_id = str(node.get("attributes", {}).get("id", ""))
                 if self.link_tree.exists(link_id):
-                    self.notebook.select(self.link_page); self.link_tree.selection_set(link_id); self.link_tree.see(link_id)
+                    self._show_page(self.link_page); self.link_tree.selection_set(link_id); self.link_tree.see(link_id)
             elif relation_kind == "aie_binary_link" and self.spz_links_tree.exists(str(index)):
-                self.notebook.select(self.other_page); self.dynamic_tabs.select(self.spz_links_page); self.spz_links_tree.selection_set(str(index)); self.spz_links_tree.see(str(index))
+                self._show_page(self.other_page); self.dynamic_tabs.select(self.spz_links_page); self.spz_links_tree.selection_set(str(index)); self.spz_links_tree.see(str(index))
             elif relation_kind == "ae_content_link" and self.content_tree.exists(str(index)):
-                self.notebook.select(self.other_page); self.dynamic_tabs.select(self.content_page); self.content_tree.selection_set(str(index)); self.content_tree.see(str(index))
+                self._show_page(self.other_page); self.dynamic_tabs.select(self.content_page); self.content_tree.selection_set(str(index)); self.content_tree.see(str(index))
 
     def _graph_zoom_step(self, factor):
         self.graph_zoom = min(2.5, max(0.5, self.graph_zoom * factor))
@@ -2434,6 +2813,35 @@ class Is2Studio(tk.Tk):
     def _ask_discard(self) -> bool:
         return not self.dirty or messagebox.askyesno("Несохранённые изменения", "Сохранить изменения перед продолжением?", parent=self)
 
+    def new_coursework(self):
+        """Create a coursework-ready XML scaffold with one coded root action."""
+        if self.dirty and not self._save_prompt():
+            return
+        dialog = RecordDialog(self, "Новый проект с главным действием", [
+            ("name", "Название проекта", "Новый проект", None),
+            ("root", "Главное действие", "Проектировочный расчёт", None),
+            ("author", "Автор", "", None),
+            ("symbol", "Код действий (один символ)", "z", None),
+        ])
+        self.wait_window(dialog)
+        if dialog.result is None:
+            return
+        try:
+            d = dialog.result
+            self.doc = create_course_project(d["name"], d["root"], author=d["author"], symbol=d["symbol"])
+            self.path = None
+            self.graph_positions.clear(); self.graph_selected_key = None; self.graph_zoom = 1.0
+            self.course_panel.focus_id = None; self.course_panel.selected_id = '1'; self.course_panel.depth_limit = 2
+            self._reset_history(saved=False)
+            self.refresh_all()
+            self._set_enabled(True)
+            self.notebook.select(self.course_page)
+            self.after_idle(self.course_panel._fit_scene)
+            self._set_title()
+            self.status.set("Проект создан. Добавляйте действия, параметры и сохраняйте .is2 через Ctrl+S")
+        except Exception as exc:
+            messagebox.showerror("Новый проект", str(exc), parent=self)
+
     def new_project(self):
         if self.dirty and not self._save_prompt():
             return
@@ -2480,6 +2888,8 @@ class Is2Studio(tk.Tk):
             self.refresh_all()
             self._restore_editor_state()
             self._set_enabled(True)
+            if self.notebook.select() == str(self.course_page):
+                self.after_idle(self.course_panel._fit_scene)
             issues = doc.validate()
             status_text = f"Открыт: {self.path.name} — {len(doc.actions)} действий, {len(doc.concept_structure.categories)} категорий; замечаний: {len(issues)}"
             if view_warning:
@@ -2686,6 +3096,8 @@ class Is2Studio(tk.Tk):
             return
         self._refresh_metadata()
         self._refresh_actions()
+        self.course_panel.refresh()
+        self._refresh_matrix()
         self._refresh_diagram()
         self._refresh_params()
         self._refresh_objects()
@@ -2747,7 +3159,7 @@ class Is2Studio(tk.Tk):
             parent = row.parent_id if row.parent_id in nodes else ""
             n = nodes[row.action_id]
             self.action_tree.insert(parent, "end", iid=row.action_id, text=row.label,
-                                    values=(n.get("type", ""), n.get("level", "")))
+                                    values=(TYPE_LABELS.get(n.get("type", ""), n.get("type", "")), n.get("level", "")))
         for item in self.action_tree.get_children(""):
             self.action_tree.item(item, open=True)
 
@@ -2895,13 +3307,44 @@ class Is2Studio(tk.Tk):
         if self.doc is None: return
         ident, node = self._selected_attrs(self.param_tree, self.doc.params_node, "param")
         if node is None: return
+        object_options = tuple(["нет"] + [n.get("id", "") for n in self.doc.objects_node])
+        current_object = node.get("o", "") if node.get("o", "") in object_options else "нет"
+        dialog = RecordDialog(self, f"Параметр {ident}", [
+            ("name", "Наименование", node.get("name", ""), None),
+            ("group", "Группа", node.get("group", "0"), None),
+            ("number", "Номер", node.get("number", "1"), None),
+            ("codingType", "Тип кодирования (XML)", node.get("codingType", "1"), None),
+            ("sign", "Обозначение", node.get("sign", ""), None),
+            ("o", "Объект (ID)", current_object, object_options),
+        ])
+        self.wait_window(dialog)
+        if dialog.result is None: return
+        data = dialog.result
+        if not data["number"].isdigit() or not data["group"].isdigit():
+            messagebox.showerror("Параметр", "Группа и номер должны быть целыми неотрицательными числами", parent=self)
+            return
+        try:
+            changes = {key: value for key, value in data.items() if key != "o"}
+            self.doc.update_parameter(ident, **changes)
+            self.doc.set_parameter_object(ident, None if data["o"] == "нет" else data["o"])
+            self._mark_dirty(f"Изменён параметр {ident}")
+            self.refresh_all()
+            self.param_tree.selection_set(ident)
+        except Exception as exc: messagebox.showerror("Параметр", str(exc), parent=self)
+
+    def edit_parameter_advanced(self):
+        """Keep editing of unknown native attributes available without changing them by default."""
+        if self.doc is None: return
+        ident, node = self._selected_attrs(self.param_tree, self.doc.params_node, "param")
+        if node is None: return
         attrs = dict(node.attrib); attrs.pop("id", None)
-        changed = self._edit_json_record(f"Параметр {ident}", attrs)
+        changed = self._edit_json_record(f"Дополнительные XML-атрибуты параметра {ident}", attrs)
         if changed is None: return
         try:
             self.doc.update_parameter(ident, **{k: (v if v != "" else None) for k,v in changed.items() if k != "id"})
             for k in set(attrs) - set(changed): self.doc.update_parameter(ident, **{k: None})
-            self._mark_dirty(f"Изменён параметр {ident}"); self.refresh_all()
+            self._mark_dirty(f"Изменены XML-атрибуты параметра {ident}"); self.refresh_all()
+            self.param_tree.selection_set(ident)
         except Exception as exc: messagebox.showerror("Параметр", str(exc), parent=self)
 
     def assign_parameter_object(self):
@@ -3031,6 +3474,48 @@ class Is2Studio(tk.Tk):
         except Exception as exc:
             messagebox.showerror("Объект", str(exc), parent=self)
 
+    def convert_selected_action(self):
+        if self.doc is None: return
+        ident = self._selected_id(self.action_tree)
+        if not ident:
+            messagebox.showinfo("Действия", "Выберите действие в дереве.", parent=self)
+            return
+        fields = [("kind", "Новый тип", "sequence", ("elementary", "alternative", "sequence", "iteration")),
+                  ("replace", "Удалить прежних потомков?", "Нет", ("Нет", "Да")),
+                  ("content", "Удалить связи ConceptModel/content?", "Нет", ("Нет", "Да"))]
+        dialog = RecordDialog(self, "Преобразование действия " + ident, fields)
+        self.wait_window(dialog)
+        if dialog.result is None: return
+        d = dialog.result
+        destructive = d['replace'] == 'Да' or d['content'] == 'Да'
+        if destructive and not messagebox.askyesno("Подтверждение удаления",
+                "Потомки и/или межмодельные связи могут быть необратимо удалены из сохранённого файла. Продолжить?",
+                parent=self):
+            return
+        try:
+            convert_action(self.doc, ident, d['kind'],
+                           replace_children=d['replace'] == 'Да', drop_content=d['content'] == 'Да')
+            self._mark_dirty("Преобразовано действие " + ident)
+            self.refresh_all()
+        except (ValueError, KeyError, ProjectFormatError) as exc:
+            messagebox.showerror("Преобразование действия", str(exc), parent=self)
+
+    def insert_selected_action(self, after):
+        if self.doc is None: return
+        ident = self._selected_id(self.action_tree)
+        if not ident:
+            messagebox.showinfo("Действия", "Выберите дочернее действие в дереве.", parent=self)
+            return
+        dialog = RecordDialog(self, "Вставка действия", [("name", "Название нового действия", "Новое действие", None)])
+        self.wait_window(dialog)
+        if dialog.result is None: return
+        try:
+            insert_sibling(self.doc, ident, after=after, name=dialog.result['name'])
+            self._mark_dirty("Добавлено соседнее действие")
+            self.refresh_all()
+        except (ValueError, KeyError, ProjectFormatError) as exc:
+            messagebox.showerror("Вставка действия", str(exc), parent=self)
+
     def add_root_action(self): self._action_add(parent_id=None)
     def add_child_action(self):
         if self.doc is None: return
@@ -3056,8 +3541,10 @@ class Is2Studio(tk.Tk):
         ident = self._selected_id(self.action_tree)
         if not ident: return messagebox.showinfo("Действие", "Выберите действие.", parent=self)
         node = self.doc.action(ident)
-        keys = ("name", "type", "formalization", "mark", "symbol", "status", "level", "number")
-        fields = [(k, k, node.get(k, ""), ("0","1","2","3") if k == "type" else None) for k in keys]
+        # Structural type changes must go through the conversion command,
+        # otherwise a raw @type update would not create/remove the native links.
+        keys = ("name", "formalization", "mark", "symbol", "status", "level", "number")
+        fields = [(k, k, node.get(k, ""), None) for k in keys]
         dialog = RecordDialog(self, f"Действие {ident}", fields); self.wait_window(dialog)
         if dialog.result is None: return
         try:
@@ -3318,7 +3805,32 @@ class Is2Studio(tk.Tk):
         messagebox.showinfo("AutoRange",f"Обновлено связей: {count}\nКатегорий: {len(changed)}",parent=self)
 
     def _about(self):
-        messagebox.showinfo("О PzKpfw","PzKpfw — независимый редактор проектов .is2.\n\nПоддерживаются primaryModel/spd, параметры, объекты, ConceptModel/cs, AElement, AIEBinaryLink и AEContentLink с Undo/Redo. Вкладка «Граф связей» показывает endpoint-слоты как ассоциации с отдельной записью связи и не предполагает неизвестную направленность. Перед сохранением XML повторно открывается и проверяется на семантическое равенство и стабильность сериализации. История редактора остаётся в памяти и не добавляет полей в .is2. Совместимость с оригинальной Windows ИС-2 требует отдельного runtime-теста.",parent=self)
+        """Show the product logo independently from the taskbar application icon."""
+        window = tk.Toplevel(self)
+        window.title('О PzKpfw')
+        window.resizable(False, False)
+        window.transient(self)
+        window.iconphoto(True, self._app_icon_image) if self._app_icon_image is not None else None
+        body = ttk.Frame(window, padding=22)
+        body.pack(fill='both', expand=True)
+        try:
+            path = Path(__file__).resolve().parent / 'assets' / 'pzkpfw_logo_about.png'
+            window._brand_logo = tk.PhotoImage(file=str(path))
+            ttk.Label(body, image=window._brand_logo).pack(pady=(0, 12))
+        except (OSError, tk.TclError):
+            pass
+        ttk.Label(body, text='PzKpfw', font=('TkDefaultFont', 18, 'bold')).pack()
+        ttk.Label(body, text='Редактор проектов .is2', style='Muted.TLabel').pack(pady=(0, 12))
+        explanation = ('Независимый редактор моделей ИС-2: СПД, декомпозиция, '
+                       'параметры, объекты, спецификации и матричные формы.\n\n'
+                       'Сохранение и проверка XML, резервные копии и история правок. '
+                       'Совместимость с исходной Windows-программой ИС-2 '
+                       'ещё не подтверждена для всех проектов.')
+        ttk.Label(body, text=explanation, wraplength=410, justify='center').pack()
+        ttk.Button(body, text='Закрыть', command=window.destroy).pack(pady=(16, 0))
+        window.bind('<Escape>', lambda _event: window.destroy())
+        window.grab_set()
+        window.focus_set()
 
     def _quit(self):
         if self.dirty and not self._save_prompt():
