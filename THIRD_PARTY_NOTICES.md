@@ -1,32 +1,14 @@
-# Third-party notices and dependency inventory
+# Third-party components
 
-## Runtime
+The source application uses Python's standard library, including Tkinter and
+Tcl/Tk supplied by the Python or operating-system distributor. These runtimes
+are not bundled in the source archive.
 
-PzKpfw has no third-party Python runtime dependencies. It uses the Python
-standard library, including `tkinter`/Tcl-Tk for the desktop UI. Python and
-Tk/Tcl are separately distributed by the relevant platform vendors and are
-not bundled in this source archive.
+The optional Windows executable build downloads and uses PyInstaller and its
+transitive dependencies. A built executable includes runtime components; check
+the actual build's dependency versions, licenses and distribution obligations
+before publishing it.
 
-## Build and test tools
-
-- setuptools (build backend; `setuptools>=61`): MIT license.
-- pytest (`test` optional extra; `pytest>=8`): MIT license.
-
-These tools are development/build dependencies and are not required as
-runtime libraries once PzKpfw is installed. Install them from their official
-package distributions and review their current license notices.
-
-## Original IS-2 and other software
-
-No original IS-2 executable, DLL, Qt runtime, MSVC runtime, plugin binary,
-Chromium/WebEngine component, or commercial third-party library is shipped
-here. The reconstructed headers in `sdk/` are independent ABI contract
-summaries and are not the original vendor SDK.
-
-This inventory is a source-release snapshot, not legal advice. A production
-binary installer must maintain a separate, version-specific SBOM and license
-review for every bundled runtime component.
-
-- Tcl/Tk (platform GUI runtime used by Python's `tkinter`): supplied by the
-  operating system or Python distributor, not bundled here. Review the Tcl/Tk
-  license and notices for the exact version provided by your platform.
+No original IS-2 binaries or proprietary runtime are included in this snapshot.
+Confirm rights to any included project assets and third-party materials before
+wider distribution.

@@ -10,7 +10,7 @@ from xml.sax.saxutils import escape, quoteattr
 from .gui_models import action_tree_rows, action_diagram_layout
 from .specifications import form_html
 
-TYPE_LABELS = {'0': 'Элементарное', '1': 'Альтернатива', '2': 'Последовательность', '3': 'Итерация'}
+TYPE_LABELS = {'0': 'Элементарное', '1': 'Альтернатива', '2': 'Последовательность', '3': 'Цикл'}
 
 
 def _esc(value):

@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import json
 import tkinter as tk
-from tkinter import ttk, filedialog, messagebox
+from tkinter import ttk, filedialog, messagebox, font as tkfont
 from pathlib import Path
 
 from .coursework import (
@@ -17,11 +17,40 @@ from .gui_models import action_tree_rows
 from .specifications import action_code, parameter_code, primary_links, add_primary_link, remove_primary_link, FORM_NAMES
 from .exports import export_report
 from .specifications import form_html
+from .grid_tree import GridTreeview
 from .ui_theme import BACKGROUND, SURFACE, INK, MUTED, BORDER, PRIMARY, PALE_BLUE, TEAL
 
 KIND_TEXT = {'0': 'Элементарное', '1': 'Альтернатива', '2': 'Последовательность', '3': 'Цикл'}
 FORMAL_LABELS = {'0': 'Аналитическая', '2': 'Алгоритмическая'}
 STATUS_LABELS = {'0': 'Элементарное', '1': 'Промежуточное'}
+
+
+def _fit_text_lines(value, measure, max_width, max_lines):
+    """Word-wrap and ellipsize using the actual font metrics in pixels."""
+    if max_width <= 0 or max_lines <= 0:
+        return []
+    remaining = (value or '(без названия)').strip() or '(без названия)'
+    lines = []
+    while remaining and len(lines) < max_lines:
+        count = 0
+        for i in range(1, len(remaining) + 1):
+            if measure(remaining[:i]) > max_width:
+                break
+            count = i
+        if not count:
+            break
+        if count < len(remaining):
+            space = remaining.rfind(' ', 0, count + 1)
+            if space > 0:
+                count = space
+        line, remaining = remaining[:count].rstrip(), remaining[count:].lstrip()
+        lines.append(line)
+    if remaining and lines:
+        last = lines[-1].rstrip(' .')
+        while last and measure(last + '…') > max_width:
+            last = last[:-1]
+        lines[-1] = last + '…' if measure(last + '…') <= max_width else ''
+    return lines
 
 
 class CourseworkPanel(ttk.Frame):
@@ -49,8 +78,7 @@ class CourseworkPanel(ttk.Frame):
         # to the application header rather than a special 'coursework' workspace.
         top = ttk.Frame(self, padding=(11, 8, 11, 0))
         top.pack(fill='x')
-        ttk.Label(top, text='Формирование СПД', font=('TkDefaultFont', 13, 'bold'),
-                  foreground=INK).pack(side='left')
+        ttk.Label(top, text='Формирование СПД', font=('TkDefaultFont', 13, 'bold')).pack(side='left')
         ttk.Label(top, text='Выберите действие на схеме или слева; свойства редактируются справа',
                   style='Muted.TLabel').pack(side='left', padx=(17, 0))
 
@@ -60,7 +88,6 @@ class CourseworkPanel(ttk.Frame):
             ('+ Корневое', self._add_root, False), ('+ Дочернее', self._add_child, True),
             ('Вставить до', lambda: self._insert(False), False),
             ('Вставить после', lambda: self._insert(True), False),
-            ('Тип / конструкция…', self._convert, False),
             ('Условия ветвей…', self._alternative_labels, False),
             ('↑', lambda: self._move(-1), False), ('↓', lambda: self._move(1), False),
             ('Удалить', self._delete, False),
@@ -72,6 +99,17 @@ class CourseworkPanel(ttk.Frame):
         code_button = ttk.Button(structure, text='Перенумеровать z…', command=self._renumber)
         code_button.pack(side='right')
         self._edit_buttons.append(code_button)
+
+        # The creation dialog already offers the new action's type. Keep
+        # conversion of an existing action available in a compact menu.
+        construction = ttk.Menubutton(structure, text='Изменить конструкцию ▾')
+        choices = tk.Menu(construction, tearoff=False)
+        for label, kind in (('Последовательность', 'sequence'), ('Альтернатива', 'alternative'),
+                            ('Цикл', 'iteration'), ('Элементарное', 'elementary')):
+            choices.add_command(label=label, command=lambda k=kind: self._convert(k))
+        construction.configure(menu=choices)
+        construction.pack(side='left', padx=(0, 5))
+        self._edit_buttons.append(construction)
 
         views = ttk.Frame(self, padding=(11, 4, 11, 8))
         views.pack(fill='x')
@@ -95,7 +133,7 @@ class CourseworkPanel(ttk.Frame):
         panes.add(right, weight=3)
 
         ttk.Label(left, text='ДЕРЕВО ДЕЙСТВИЙ', font=('TkDefaultFont', 10, 'bold'),
-                  foreground=INK, padding=(4, 4)).pack(anchor='w')
+                  padding=(4, 4)).pack(anchor='w')
         search_bar = ttk.Frame(left)
         search_bar.pack(fill='x', pady=(5, 6))
         self.search_entry = ttk.Entry(search_bar, textvariable=self.search_var)
@@ -107,11 +145,18 @@ class CourseworkPanel(ttk.Frame):
                   style='Muted.TLabel').pack(anchor='w', pady=(0, 5))
         treebox = ttk.Frame(left)
         treebox.pack(fill='both', expand=True)
-        self.tree = ttk.Treeview(treebox, show='tree', selectmode='browse')
+        self.tree = GridTreeview(treebox, show='tree', selectmode='browse')
+        self._tree_requested_width = 240
         ty = ttk.Scrollbar(treebox, orient='vertical', command=self.tree.yview)
-        self.tree.configure(yscrollcommand=ty.set)
-        self.tree.pack(side='left', fill='both', expand=True)
-        ty.pack(side='right', fill='y')
+        tx = ttk.Scrollbar(treebox, orient='horizontal', command=self.tree.xview)
+        self.tree.configure(yscrollcommand=ty.set, xscrollcommand=tx.set)
+        self.tree.column('#0', width=self._tree_requested_width, stretch=False)
+        self.tree.grid(row=0, column=0, sticky='nsew')
+        ty.grid(row=0, column=1, sticky='ns')
+        tx.grid(row=1, column=0, sticky='ew')
+        treebox.columnconfigure(0, weight=1)
+        treebox.rowconfigure(0, weight=1)
+        self.tree.bind('<Configure>', self._update_tree_column_width)
         self.tree.bind('<<TreeviewSelect>>', self._tree_select)
         self.tree.bind('<Double-1>', lambda _event: self._focus_scene())
         self.tree.bind('<F2>', lambda _event: self._focus_name())
@@ -121,12 +166,14 @@ class CourseworkPanel(ttk.Frame):
 
         self.canvas = tk.Canvas(center, bg='#f9fbfe', highlightthickness=0,
                                 bd=0, cursor='arrow')
+        self.canvas._theme_course_canvas = True
         sx = ttk.Scrollbar(center, orient='horizontal', command=self.canvas.xview)
         sy = ttk.Scrollbar(center, orient='vertical', command=self.canvas.yview)
         self.canvas.configure(xscrollcommand=sx.set, yscrollcommand=sy.set)
         self.canvas.grid(row=0, column=0, sticky='nsew')
         sy.grid(row=0, column=1, sticky='ns'); sx.grid(row=1, column=0, sticky='ew')
         center.columnconfigure(0, weight=1); center.rowconfigure(0, weight=1)
+        self.canvas.bind('<Configure>', self._on_canvas_resize)
         self.canvas.bind('<Button-1>', self._canvas_select)
         self.canvas.bind('<Double-1>', self._canvas_open)
         self.canvas.bind('<Button-3>', self._canvas_context_menu)
@@ -142,6 +189,7 @@ class CourseworkPanel(ttk.Frame):
         # Scrollable inspector: on 650–720 px screens the function/argument
         # controls remain available, unlike the previous fixed-height sidebar.
         side_canvas = tk.Canvas(right, highlightthickness=0, background=BACKGROUND, bd=0)
+        side_canvas._theme_background = True
         side_scroll = ttk.Scrollbar(right, orient='vertical', command=side_canvas.yview)
         side_canvas.configure(yscrollcommand=side_scroll.set)
         side_canvas.pack(side='left', fill='both', expand=True)
@@ -189,7 +237,7 @@ class CourseworkPanel(ttk.Frame):
         row.pack(fill='x')
         ttk.Button(row, text='+ Функция (*)', command=lambda: self._add_parameter_link('*')).pack(side='left')
         ttk.Button(row, text='+ Аргумент (+)', command=lambda: self._add_parameter_link('+')).pack(side='left', padx=4)
-        self.link_tree = ttk.Treeview(inspector, columns=('role', 'name'), show='headings',
+        self.link_tree = GridTreeview(inspector, columns=('role', 'name'), show='headings',
                                       height=5, selectmode='browse')
         self.link_tree.heading('role', text='Роль'); self.link_tree.heading('name', text='Параметр')
         self.link_tree.column('role', width=58, stretch=False)
@@ -254,6 +302,11 @@ class CourseworkPanel(ttk.Frame):
         self.canvas.xview_moveto(0)
         self.canvas.yview_moveto(0)
 
+    def _update_tree_column_width(self, _event=None):
+        width = max(self._tree_requested_width, self.tree.winfo_width() - 4)
+        if int(self.tree.column('#0', 'width')) != width:
+            self.tree.column('#0', width=width)
+
     def _refresh_tree(self):
         if not hasattr(self, 'tree') or self.doc is None:
             return
@@ -271,13 +324,17 @@ class CourseworkPanel(ttk.Frame):
                         visible.add(current)
                         current = parents.get(current, '')
         self.tree.delete(*self.tree.get_children())
+        font = tkfont.nametofont('TkDefaultFont')
+        self._tree_requested_width = 240
         for row in rows:
             if row.action_id not in visible:
                 continue
             parent = row.parent_id if row.parent_id in visible else ''
             node = nodes[row.action_id]
-            self.tree.insert(parent, 'end', iid=row.action_id,
-                             text=f'{action_code(node)}  {node.get("name", "")[:78]}')
+            caption = f'{action_code(node)}  {node.get("name", "")}'
+            self._tree_requested_width = max(self._tree_requested_width, font.measure(caption) + 25 * (row.depth + 1) + 24)
+            self.tree.insert(parent, 'end', iid=row.action_id, text=caption)
+        self._update_tree_column_width()
         for top in self.tree.get_children(''):
             self.tree.item(top, open=True)
         if self.selected_id and self.tree.exists(self.selected_id):
@@ -300,54 +357,98 @@ class CourseworkPanel(ttk.Frame):
         self._draw()
         self._show_properties()
 
+    def _on_canvas_resize(self, _event=None):
+        self._draw()
+
     def _draw(self):
         canvas = self.canvas
         canvas.delete('all')
+        dark = self.app.theme_name.get() == 'dark'
+        canvas.configure(background='#1b1b29' if dark else '#ffffff')
         if self.doc is None:
+            canvas.create_text(28, 32, anchor='nw', text='// РАБОЧАЯ ОБЛАСТЬ',
+                               fill='#aaaabd' if dark else '#65697d', font=('TkDefaultFont', 10))
+            canvas.create_text(28, 70, anchor='nw', text='Создайте или откройте проект',
+                               fill='#f3f3f8' if dark else '#242536', font=('TkDefaultFont', 14, 'bold'))
+            canvas.create_text(28, 104, anchor='nw', text='Здесь появится схема вашей модели.',
+                               fill='#aaaabd' if dark else '#65697d', font=('TkDefaultFont', 10))
             return
         scene = build_course_scene(self.doc, self.focus_id, max_depth=self.depth_limit)
         self._scene = scene
         s = self.zoom
         w = scene.node_width * s; h = scene.node_height * s
-        if self.depth_limit is not None:
-            for x in range(0, scene.width + scene.column_width, scene.column_width):
-                canvas.create_line(x*s, 0, x*s, scene.height*s, fill='#e4eaf2')
-            for y in range(0, scene.height + scene.row_height, scene.row_height):
-                canvas.create_line(0, y*s, scene.width*s, y*s, fill='#e4eaf2')
+        # Cover both the scene and the entire viewport, in every view mode.
+        grid_width = max(scene.width * s, canvas.winfo_width())
+        grid_height = max(scene.height * s, canvas.winfo_height())
+        step_x = max(24.0, scene.column_width * s, grid_width / 1200)
+        step_y = max(24.0, scene.row_height * s, grid_height / 1200)
+        grid_color = '#303041' if dark else '#e4eaf2'
+        for i in range(int(grid_width / step_x) + 2):
+            x_grid = i * step_x
+            canvas.create_line(x_grid, 0, x_grid, grid_height, fill=grid_color, tags=('grid',))
+        for i in range(int(grid_height / step_y) + 2):
+            y_grid = i * step_y
+            canvas.create_line(0, y_grid, grid_width, y_grid, fill=grid_color, tags=('grid',))
+        # Tiny text cannot be read and Tk does not clip text to rectangles.
+        # Hide it at overview scales; selecting a block still shows full text.
+        show_labels = s >= 0.55
+        if show_labels:
+            title_font = tkfont.Font(root=canvas, family='Arial', size=-max(6, round(13*s)))
+            code_font = tkfont.Font(root=canvas, family='Arial', size=-max(6, round(11*s)), weight='bold')
+            small_font = tkfont.Font(root=canvas, family='Arial', size=-max(6, round(10*s)))
+            self._scene_fonts = (title_font, code_font, small_font)
         by_id = {n.ident: n for n in scene.nodes}
         for edge in scene.edges:
             p, c = by_id[edge.source], by_id[edge.target]
             x1, y1 = (p.x + scene.node_width/2)*s, (p.y + scene.node_height)*s
             x2, y2 = (c.x + scene.node_width/2)*s, c.y*s
             my = (y1 + y2)/2
-            canvas.create_line(x1,y1,x1,my,x2,my,x2,y2, fill='#8ba0b8', width=max(1,1.5*s))
+            canvas.create_line(x1,y1,x1,my,x2,my,x2,y2, fill='#737d9a' if dark else '#8ba0b8', width=max(1,1.5*s))
         for parent in scene.nodes:
             kids = sorted((by_id[e.target] for e in scene.edges if e.source==parent.ident), key=lambda node:node.x)
             if len(kids) > 1 and parent.kind == '2':
                 for a,b in zip(kids,kids[1:]):
                     canvas.create_line((a.x+scene.node_width)*s, (a.y+scene.node_height/2)*s,
-                                       b.x*s,(b.y+scene.node_height/2)*s,fill='#4874ad',arrow='last')
+                                       b.x*s,(b.y+scene.node_height/2)*s,fill='#70cfcb' if dark else '#4874ad',arrow='last')
         for node in scene.nodes:
             x,y = node.x*s,node.y*s
             tags=('course-node', 'course-action:'+node.ident)
             is_selected = node.ident == self.selected_id
-            color = PRIMARY if is_selected else ('#207a75' if node.kind == '1' else '#526c88')
-            fill = PALE_BLUE if is_selected else SURFACE
-            canvas.create_rectangle(x+2*s,y+3*s,x+w+2*s,y+h+3*s,fill='#e8edf5',outline='',tags=tags)
+            color = PRIMARY if is_selected else (('#70cfcb' if dark else '#207a75') if node.kind == '1' else ('#72758d' if dark else '#526c88'))
+            fill = ('#30365f' if is_selected else '#282836') if dark else (PALE_BLUE if is_selected else SURFACE)
+            ink = '#f3f3f8' if dark else INK
+            canvas.create_rectangle(x+2*s,y+3*s,x+w+2*s,y+h+3*s,fill='#12121d' if dark else '#e8edf5',outline='',tags=tags)
             canvas.create_rectangle(x,y,x+w,y+h,fill=fill,outline=color,
                                     width=2.5 if is_selected else 1.4,tags=tags)
-            for idx,line in enumerate(_wrapped_lines(node.title)):
-                canvas.create_text(x+w/2,y+(18+idx*15)*s,text=line,fill=INK,
-                                   width=w-12, font=('Arial',max(7,round(10*s))), tags=tags)
-            if node.kind == '1':
-                canvas.create_line(x,y+h-13*s,x+w,y+h-13*s,fill=color,tags=tags)
-                canvas.create_text(x+10*s,y+h-6*s,text='1',font=('Arial',max(7,round(8*s))),tags=tags)
-                canvas.create_text(x+w-10*s,y+h-6*s,text='2',font=('Arial',max(7,round(8*s))),tags=tags)
-            canvas.create_text(x+w-5*s,y+h-5*s,anchor='se',text=node.code,
-                               font=('Arial',max(7,round(10*s)),'bold'),tags=tags)
-        canvas.configure(scrollregion=(0,0,scene.width*s,scene.height*s))
+            is_alternative = node.kind == '1'
+            # The two branch cells share a dedicated bottom band. The action
+            # code stays in the main part of the block, above that band.
+            band_height = (max(13*s, small_font.metrics('linespace') + 2*max(1, 2*s))
+                           if show_labels else 13*s) if is_alternative else 0
+            band_top = y + h - band_height
+            if is_alternative:
+                canvas.create_line(x, band_top, x+w, band_top, fill=color, tags=tags)
+                canvas.create_line(x+w/2, band_top, x+w/2, y+h, fill=color, tags=tags)
+            if show_labels:
+                pad = max(2, 5*s)
+                code_bottom = band_top - max(1, 2*s) if is_alternative else y+h-pad
+                available = max(0, code_bottom - code_font.metrics('linespace') - (y + pad))
+                line_height = title_font.metrics('linespace')
+                lines = _fit_text_lines(node.title, title_font.measure, max(0, w - 2*pad), int(available // line_height))
+                for idx, line in enumerate(lines):
+                    canvas.create_text(x+w/2, y+pad+idx*line_height, anchor='n', text=line,
+                                       fill=ink, font=title_font, tags=tags)
+                code = _fit_text_lines(node.code, code_font.measure, max(0, w - 2*pad), 1)
+                if code and code[0]:
+                    canvas.create_text(x+w-pad, code_bottom, anchor='se', text=code[0],
+                                       fill=ink, font=code_font, tags=tags)
+                if is_alternative:
+                    for number, center in (('1', x+w/4), ('2', x+3*w/4)):
+                        canvas.create_text(center, band_top+band_height/2, anchor='center',
+                                           text=number, fill=ink, font=small_font, tags=tags)
+        canvas.configure(scrollregion=(0, 0, grid_width, grid_height))
         title = 'Весь проект' if self.focus_id is None else action_code(self.doc.action(self.focus_id))
-        self.mode_label.configure(text=f'{title} · {"глубина 2" if self.depth_limit == 2 else "вся структура"} · {round(s*100)}%')
+        self.mode_label.configure(text=f'{title} · {"глубина 2" if self.depth_limit == 2 else "вся структура"} · {round(s*100)}%' + (' · увеличьте масштаб для подписей' if not show_labels else ''))
 
     def _tree_select(self, _event=None):
         selected = self.tree.selection()
@@ -472,8 +573,8 @@ class CourseworkPanel(ttk.Frame):
     def _insert(self, after: bool):
         self._sync(); self.app.insert_selected_action(after)
 
-    def _convert(self):
-        self._sync(); self.app.convert_selected_action()
+    def _convert(self, kind=None):
+        self._sync(); self.app.convert_selected_action(kind)
 
     def _delete(self):
         self._sync(); self.app.delete_action()

@@ -1,16 +1,11 @@
-PzKpfw Desktop Alpha 0.7.8
+PzKpfw is an independent experimental editor for IS-2 project files. It is not
+an official distribution of IS-2. Original project materials identify
+Gavrilov A.G. as the author of IS-2; the preferred attribution should be
+confirmed with the author.
 
-PzKpfw is an independent, open-source editor and XML toolkit for project files
-used by the IS-2 application. It is not the original IS-2 application and is
-not an official release of its author or publisher.
+The LICENSE file inherited from the GitHub repository contains GNU GPL v3.
+The copyright and licensing status of each component and visual asset should
+be verified by the project authors before public distribution.
 
-Original IS-2 attribution: the supplied project materials identify Gavrilov
-A.G. (Гаврилов А.Г.) as the author of IS-2. The exact preferred public
-attribution form should be confirmed with the author before wider publication.
-
-No original IS-2 EXE, DLL, plugin binary, or commercial runtime is included in
-this source distribution. The MIT license in LICENSE applies only to original
-PzKpfw-authored components within the scope described there.
-
-See RESEARCH_MATERIALS_NOTICE.md and THIRD_PARTY_NOTICES.md for important
-scope and redistribution notes.
+No original IS-2 executable, DLL, plugin or commercial runtime is included in
+this source snapshot. See THIRD_PARTY_NOTICES.md.

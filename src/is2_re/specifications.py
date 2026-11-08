@@ -7,7 +7,7 @@ import html
 from collections import defaultdict
 from .gui_models import action_tree_rows
 
-ACTION_TYPES={'0':'Элементарное','1':'Альтернатива','2':'Последовательность','3':'Итерация'}
+ACTION_TYPES={'0':'Элементарное','1':'Альтернатива','2':'Последовательность','3':'Цикл'}
 STATUS={'0':'Э','1':'П'}
 FORMAL={'0':'Ан.','2':'Алг.'}
 ROLES={'*':'Функция','+':'Аргумент','.':'Аргумент по умолчанию'}
@@ -86,7 +86,7 @@ def project_forms(doc):
             warnings.append(f'Порядок потомков действия {pid} не восстановлен: {exc}')
             continue
         kind=parent.get('type')
-        name={'2':'Последовательность','1':'Альтернатива','3':'Итерация'}.get(kind,'Другое')
+        name={'2':'Последовательность','1':'Альтернатива','3':'Цикл'}.get(kind,'Другое')
         if kind == '2':
             # Reference screenshot: parent z11, (z21,z22), (z22,z23), (z23,z24).
             pairs = list(zip(children, children[1:])) if len(children)>1 else [(c,None) for c in children]

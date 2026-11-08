@@ -163,12 +163,27 @@ def build_course_scene(doc: ProjectDocument, focus: str | None = None, *, max_de
         positions[ident] = (x, depth * 150 + 44, depth)
         return x
 
+    # Track the whole reachable component independently of the visual depth
+    # limit. Descendants intentionally hidden beyond max_depth must never be
+    # mistaken for disconnected roots and drawn in the top row.
+    covered = set()
+    def cover_component(root):
+        pending = [root]
+        while pending:
+            ident = pending.pop()
+            if ident in covered or ident not in nodes_by_id:
+                continue
+            covered.add(ident)
+            pending.extend(children.get(ident, ()))
+
     for root in roots:
         allocate(root, 0, frozenset())
+        cover_component(root)
     if focus is None:
         for ident in nodes_by_id:
-            if ident not in emitted:
+            if ident not in covered:
                 allocate(ident, 0, frozenset())
+                cover_component(ident)
     rendered = tuple(
         CourseNode(ident, action_code(n), n.get('name', ''), n.get('type', '0'), *positions[ident])
         for ident, n in nodes_by_id.items() if ident in positions
@@ -215,10 +230,14 @@ def scene_svg(scene: CourseScene, *, selected: str | None = None, title: str = '
         outline = '#15803d' if node.ident == selected else '#1f2937'
         lines.append(f'<g><rect x="{node.x:.1f}" y="{node.y:.1f}" width="{w}" height="{h}" fill="white" stroke="{outline}" stroke-width="{2 if node.ident == selected else 1.5}"/>')
         if node.kind == '1':
-            lines.append(f'<path d="M{node.x:.1f},{node.y+h-13:.1f} h{w}" stroke="{outline}"/><text x="{node.x+9:.1f}" y="{node.y+h-3:.1f}" font-size="10">1</text><text x="{node.x+w-18:.1f}" y="{node.y+h-3:.1f}" font-size="10">2</text>')
-        for index, line in enumerate(_wrapped_lines(node.title)):
+            band_top = node.y+h-16
+            lines.append(f'<path d="M{node.x:.1f},{band_top:.1f} h{w} M{node.x+w/2:.1f},{band_top:.1f} v16" stroke="{outline}"/>')
+            lines.append(f'<text x="{node.x+w/4:.1f}" y="{node.y+h-4:.1f}" font-family="Arial,sans-serif" font-size="10" text-anchor="middle">1</text>')
+            lines.append(f'<text x="{node.x+3*w/4:.1f}" y="{node.y+h-4:.1f}" font-family="Arial,sans-serif" font-size="10" text-anchor="middle">2</text>')
+        for index, line in enumerate(_wrapped_lines(node.title, max_lines=2 if node.kind == '1' else 3)):
             lines.append(f'<text x="{node.x+w/2:.1f}" y="{node.y+20+index*15:.1f}" font-family="Arial,sans-serif" font-size="11" text-anchor="middle">{escape(line)}</text>')
-        lines.append(f'<text x="{node.x+w-6:.1f}" y="{node.y+h-4:.1f}" text-anchor="end" font-family="Arial,sans-serif" font-size="11" font-weight="bold">{escape(node.code)}</text>')
+        code_y = node.y+h-19 if node.kind == '1' else node.y+h-4
+        lines.append(f'<text x="{node.x+w-6:.1f}" y="{code_y:.1f}" text-anchor="end" font-family="Arial,sans-serif" font-size="11" font-weight="bold">{escape(node.code)}</text>')
         lines.append('</g>')
     lines.append('</svg>')
     return '\n'.join(lines)
