@@ -27,7 +27,7 @@ py -3 pzkpfw_standalone_entry.py
 
 На Linux/macOS при установленном Tkinter и графической среде:
 
-```sh
+```bash
 PYTHONPATH=src python3 pzkpfw_standalone_entry.py
 ```
 
