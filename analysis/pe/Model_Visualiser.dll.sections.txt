@@ -1,0 +1,17 @@
+
+/mnt/data/is2_work/rar_extracted/IS2_PMauto_beta/modules/Model_Visualiser.dll:     file format pei-i386
+
+Sections:
+Idx Name          Size      VMA       LMA       File off  Algn
+  0 .text         0000b0d4  10001000  10001000  00000400  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, CODE
+  1 .rdata        00007902  1000d000  1000d000  0000b600  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  2 .data         00000400  10015000  10015000  00013000  2**2
+                  CONTENTS, ALLOC, LOAD, DATA
+  3 .gfids        00000044  10016000  10016000  00013400  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  4 .rsrc         000001e0  10017000  10017000  00013600  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
+  5 .reloc        00001594  10018000  10018000  00013800  2**2
+                  CONTENTS, ALLOC, LOAD, READONLY, DATA
