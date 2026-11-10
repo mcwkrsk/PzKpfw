@@ -26,23 +26,44 @@ def _preferences_path() -> Path:
     base = os.environ.get('APPDATA') if os.name == 'nt' else os.environ.get('XDG_CONFIG_HOME')
     return (Path(base) if base else Path.home() / ('.config' if os.name != 'nt' else 'AppData/Roaming')) / 'PzKpfw' / 'appearance.json'
 
-def load_theme() -> str:
+def _load_preferences() -> dict:
     try:
-        value = json.loads(_preferences_path().read_text(encoding='utf-8')).get('theme')
-        return value if value in PALETTES else 'dark'
-    except (OSError, ValueError, AttributeError):
-        return 'dark'
+        value = json.loads(_preferences_path().read_text(encoding='utf-8'))
+        return value if isinstance(value, dict) else {}
+    except (OSError, ValueError):
+        return {}
+
+
+def _save_preference(key: str, value) -> bool:
+    try:
+        path = _preferences_path()
+        data = _load_preferences()
+        data[key] = value
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data, ensure_ascii=False), encoding='utf-8')
+        return True
+    except OSError:
+        return False
+
+
+def load_theme() -> str:
+    value = _load_preferences().get('theme')
+    return value if value in PALETTES else 'dark'
+
 
 def save_theme(name: str) -> bool:
     if name not in PALETTES:
         raise ValueError('Unknown theme')
-    try:
-        path = _preferences_path()
-        path.parent.mkdir(parents=True, exist_ok=True)
-        path.write_text(json.dumps({'theme': name}, ensure_ascii=False), encoding='utf-8')
-        return True
-    except OSError:
-        return False
+    return _save_preference('theme', name)
+
+
+def load_tooltips() -> bool:
+    value = _load_preferences().get('button_tooltips', True)
+    return value if isinstance(value, bool) else True
+
+
+def save_tooltips(enabled: bool) -> bool:
+    return _save_preference('button_tooltips', bool(enabled))
 
 def apply_theme(root: tk.Tk, name: str = 'dark') -> None:
     p = PALETTES[name]

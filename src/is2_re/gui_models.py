@@ -28,7 +28,7 @@ def action_tree_rows(document: ProjectDocument) -> list[ActionTreeRow]:
     for parent in dict.fromkeys(link.get("afe1", "") for link in document.links if link.get("type") == "2"):
         try:
             children[parent] = document.sibling_order(parent)
-        except Exception:
+        except (ValueError, KeyError):
             # Preserve reachability and source order in the display for corrupt files.
             children[parent] = [
                 link.get("afe2", "") for link in document.links
@@ -55,7 +55,7 @@ def action_tree_rows(document: ProjectDocument) -> list[ActionTreeRow]:
     return rows
 
 
-def action_diagram_layout(document: ProjectDocument, *, x_gap: int = 260, y_gap: int = 110):
+def action_diagram_layout(document: ProjectDocument, *, x_gap: int = 330, y_gap: int = 140):
     """Return tree rows, node coordinates and the two observed edge classes.
 
     Coordinates preserve the recovered type-2 hierarchy and type-3 sibling

@@ -14,7 +14,19 @@ class GridTreeview(ttk.Treeview):
         for event in ('<Configure>', '<Map>', '<MouseWheel>', '<ButtonRelease-1>', '<KeyRelease>',
                       '<<TreeviewOpen>>', '<<TreeviewClose>>', '<<TreeviewSelect>>'):
             self.bind(event, self._schedule_grid, add='+')
+        self.bind('<Destroy>', self._cancel_grid_on_destroy, add='+')
         self._schedule_grid()
+
+    def _cancel_grid_on_destroy(self, event):
+        if event.widget is not self:
+            return
+        self._grid_ready = False
+        if self._grid_job is not None:
+            job, self._grid_job = self._grid_job, None
+            try:
+                self.after_cancel(job)
+            except tk.TclError:
+                pass
 
     def set_grid_color(self, color):
         self._grid_color = color
@@ -52,7 +64,7 @@ class GridTreeview(ttk.Treeview):
         if not self._grid_ready or self._grid_job is not None:
             return
         try:
-            self._grid_job = self.after_idle(self._draw_grid)
+            self._grid_job = self.after(40, self._draw_grid)
         except tk.TclError:
             pass
 

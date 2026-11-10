@@ -127,10 +127,17 @@ def build_course_scene(doc: ProjectDocument, focus: str | None = None, *, max_de
     for link in doc.links:
         if link.get('type') == '2':
             parent_of[link.get('afe2', '')] = link.get('afe1', '')
+    # Leaves without any arrangement or composition links have no children.
+    # Avoid scanning the entire link table once per leaf.
+    parents_with_links = {link.get('afe1', '') for link in doc.links
+                          if link.get('type') in ('2', '3')}
     for ident in nodes_by_id:
+        if ident not in parents_with_links:
+            children[ident] = []
+            continue
         try:
             children[ident] = doc.sibling_order(ident)
-        except Exception:
+        except (ValueError, KeyError):
             children[ident] = [n.get('afe2', '') for n in doc.links if n.get('type') == '2' and n.get('afe1') == ident]
     if focus is not None:
         roots = [focus]
@@ -143,15 +150,19 @@ def build_course_scene(doc: ProjectDocument, focus: str | None = None, *, max_de
     edges: list[CourseEdge] = []
     slot = 0
 
-    def allocate(ident: str, depth: int, ancestry: frozenset[str]):
+    def allocate(ident: str, depth: int, ancestry: frozenset[str], branch_preview: bool = False):
         nonlocal slot
         if ident in emitted or ident not in nodes_by_id or ident in ancestry:
             return None
         emitted.add(ident)
-        kids = children.get(ident, []) if max_depth is None or depth < max_depth else []
+        # At the depth boundary show the immediate real children of an
+        # alternative, so its two exits do not disappear from the overview.
+        at_alternative_boundary = (max_depth is not None and depth == max_depth
+                                   and nodes_by_id[ident].get('type') == '1')
+        kids = children.get(ident, []) if not branch_preview and (max_depth is None or depth < max_depth or at_alternative_boundary) else []
         children_x = []
         for child in kids:
-            x = allocate(child, depth + 1, ancestry | {ident})
+            x = allocate(child, depth + 1, ancestry | {ident}, at_alternative_boundary)
             if x is not None:
                 children_x.append(x)
                 edges.append(CourseEdge(ident, child, nodes_by_id[ident].get('type', '')))
@@ -193,6 +204,27 @@ def build_course_scene(doc: ProjectDocument, focus: str | None = None, *, max_de
     return CourseScene(rendered, tuple(edges), width, height)
 
 
+def edge_paths(scene: CourseScene):
+    """Return orthogonal paths; alternative exits originate in their own cells."""
+    by_id = {node.ident: node for node in scene.nodes}
+    groups = defaultdict(list)
+    for edge in scene.edges:
+        if edge.source in by_id and edge.target in by_id:
+            groups[edge.source].append(edge)
+    for parent_id, edges in groups.items():
+        parent = by_id[parent_id]
+        edges.sort(key=lambda edge: by_id[edge.target].x)
+        for index, edge in enumerate(edges):
+            child = by_id[edge.target]
+            # Exactly two cells are visible; additional branches use the last
+            # cell rather than inventing extra conditions.
+            fraction = (0.25 if index == 0 else 0.75) if parent.kind == '1' else 0.5
+            x1, y1 = parent.x + scene.node_width * fraction, parent.y + scene.node_height
+            x2, y2 = child.x + scene.node_width / 2, child.y
+            mid = (y1 + y2) / 2
+            yield edge, (x1, y1, x1, mid, x2, mid, x2, y2)
+
+
 def _wrapped_lines(value: str, line_width: int = 24, max_lines: int = 3) -> list[str]:
     lines = textwrap.wrap(value or '(без названия)', width=line_width, break_long_words=True, break_on_hyphens=False)
     if len(lines) > max_lines:
@@ -209,12 +241,10 @@ def scene_svg(scene: CourseScene, *, selected: str | None = None, title: str = '
              f'<title>{escape(title)}</title>',
              '<rect width="100%" height="100%" fill="#fff"/>',
              '<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 Z" fill="#555"/></marker></defs>']
-    for edge in scene.edges:
-        parent, child = by_id[edge.source], by_id[edge.target]
-        x1, y1 = parent.x + w / 2, parent.y + h
-        x2, y2 = child.x + w / 2, child.y
-        mid = (y1 + y2) / 2
-        lines.append(f'<path d="M{x1:.1f},{y1:.1f} V{mid:.1f} H{x2:.1f} V{y2:.1f}" stroke="#666" stroke-width="1.5" fill="none"/>')
+    for edge, points in edge_paths(scene):
+        x1,y1,_,mid,x2,_,_,y2 = points
+        arrow = ' marker-end="url(#arrow)"' if edge.kind == '1' else ''
+        lines.append(f'<path d="M{x1:.1f},{y1:.1f} V{mid:.1f} H{x2:.1f} V{y2:.1f}" stroke="#666" stroke-width="1.5" fill="none"{arrow}/>')
     # Sibling order is rendered as a rail for sequences; alternative branch
     # semantics are not automatically interpreted as control flow.
     for parent in scene.nodes:

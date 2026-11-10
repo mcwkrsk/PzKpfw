@@ -11,13 +11,17 @@ from tkinter import ttk, filedialog, messagebox, font as tkfont
 from pathlib import Path
 
 from .coursework import (
-    build_course_scene, scene_svg, course_checklist, renumber_structure, set_alternative_labels, _wrapped_lines,
+    build_course_scene, scene_svg, course_checklist, renumber_structure, set_alternative_labels, _wrapped_lines, edge_paths,
 )
 from .gui_models import action_tree_rows
 from .specifications import action_code, parameter_code, primary_links, add_primary_link, remove_primary_link, FORM_NAMES
 from .exports import export_report
 from .specifications import form_html
 from .grid_tree import GridTreeview
+from .ui_performance import CoalescedCallback
+from .ui_resources import persistent_menu
+from .focus_view import PackSnapshot, restored_sash_positions
+from .is2_spd_view import build_is2_spd_scene, is2_connectors, is2_parameter_marks, is2_spd_svg
 from .ui_theme import BACKGROUND, SURFACE, INK, MUTED, BORDER, PRIMARY, PALE_BLUE, TEAL
 
 KIND_TEXT = {'0': 'Элементарное', '1': 'Альтернатива', '2': 'Последовательность', '3': 'Цикл'}
@@ -67,6 +71,10 @@ class CourseworkPanel(ttk.Frame):
         self._param_options: dict[str, str] = {}
         self._scene = None
         self._edit_buttons = []
+        self._navigation_history = []
+        self._navigation_document = None
+        self._is2_view = False
+        self._is2_sheets = {}
         self._build()
 
     @property
@@ -81,6 +89,12 @@ class CourseworkPanel(ttk.Frame):
         ttk.Label(top, text='Формирование СПД', font=('TkDefaultFont', 13, 'bold')).pack(side='left')
         ttk.Label(top, text='Выберите действие на схеме или слева; свойства редактируются справа',
                   style='Muted.TLabel').pack(side='left', padx=(17, 0))
+        focus_button = ttk.Button(top, text='⛶ На весь экран', command=lambda: self.app.enter_diagram_focus(self))
+        focus_button._tooltip_text = 'Скрыть панели и показать схему на всю рабочую область.'
+        focus_button.pack(side='right')
+        self._is2_mode_button = ttk.Button(top, text='Вид ИС-2', command=self._toggle_is2_view)
+        self._is2_mode_button._tooltip_text = 'Переключить расположение схемы на листы по образцу ИС-2.'
+        self._is2_mode_button.pack(side='right', padx=(0, 6))
 
         structure = ttk.Frame(self, padding=(11, 7, 11, 2))
         structure.pack(fill='x')
@@ -115,19 +129,30 @@ class CourseworkPanel(ttk.Frame):
         views.pack(fill='x')
         for label, action in (
             ('Общая схема', self._root_scene), ('Вся декомпозиция', self._full_scene),
-            ('Лист действия', self._focus_scene), ('−', lambda: self._zoom(.8)),
-            ('+', lambda: self._zoom(1.25)), ('Вписать', self._fit_scene),
             ('Экспорт SVG', self._export_svg), ('Проверить модель', self._check),
         ):
             ttk.Button(views, text=label, command=action).pack(side='left', padx=(0, 5))
         self.mode_label = ttk.Label(views, text='Вся модель · 100%', style='Muted.TLabel')
         self.mode_label.pack(side='right')
+        self._is2_sheet_bar = ttk.Frame(self, padding=(11, 2, 11, 5))
+        ttk.Label(self._is2_sheet_bar, text='Лист:').pack(side='left', padx=(0, 6))
+        self._is2_sheet_choice = ttk.Combobox(self._is2_sheet_bar, state='readonly', width=54)
+        self._is2_sheet_choice.pack(side='left', fill='x', expand=True)
+        self._is2_sheet_choice.bind('<<ComboboxSelected>>', self._select_is2_sheet)
+        ttk.Label(self._is2_sheet_bar, text='Расположение — реконструкция', style='Muted.TLabel').pack(side='left', padx=10)
 
         panes = ttk.Panedwindow(self, orient='horizontal')
         panes.pack(fill='both', expand=True, padx=10, pady=(0, 9))
         left = ttk.Frame(panes, width=245)
         center = ttk.Frame(panes)
         right = ttk.Frame(panes, width=330)
+        self._focus_panes, self._focus_left, self._focus_right = panes, left, right
+        self._focus_return_bar = ttk.Frame(self, padding=(6, 4))
+        self._navigation_back_button = ttk.Button(self._focus_return_bar, text='← Назад по схеме',
+                                                   command=self._back_scene, state='disabled')
+        self._navigation_back_button._tooltip_text = 'Вернуться к предыдущему виду схемы; изменения проекта не отменяются.'
+        self._navigation_back_button.pack(side='left')
+        ttk.Button(self._focus_return_bar, text='← Вернуться', command=self.app.exit_diagram_focus).pack(side='right')
         panes.add(left, weight=2)
         panes.add(center, weight=8)
         panes.add(right, weight=3)
@@ -173,18 +198,21 @@ class CourseworkPanel(ttk.Frame):
         self.canvas.grid(row=0, column=0, sticky='nsew')
         sy.grid(row=0, column=1, sticky='ns'); sx.grid(row=1, column=0, sticky='ew')
         center.columnconfigure(0, weight=1); center.rowconfigure(0, weight=1)
-        self.canvas.bind('<Configure>', self._on_canvas_resize)
+        self._resize_redraw = CoalescedCallback(self.canvas, self._draw)
+        self.canvas.bind('<Configure>', self._resize_redraw.request)
         self.canvas.bind('<Button-1>', self._canvas_select)
         self.canvas.bind('<Double-1>', self._canvas_open)
         self.canvas.bind('<Button-3>', self._canvas_context_menu)
         self.canvas.bind('<ButtonPress-2>', lambda e: self.canvas.scan_mark(e.x, e.y))
         self.canvas.bind('<B2-Motion>', lambda e: self.canvas.scan_dragto(e.x, e.y, gain=1))
         self.canvas.bind('<Control-MouseWheel>', self._wheel)
-        self.canvas.bind('<Control-Button-4>', lambda _event: self._zoom(1.2))
-        self.canvas.bind('<Control-Button-5>', lambda _event: self._zoom(.83))
+        self.canvas.bind('<Control-Button-4>', lambda _event: self._zoom(1.08))
+        self.canvas.bind('<Control-Button-5>', lambda _event: self._zoom(1/1.08))
+        self.canvas.bind('<Control-Key-0>', lambda _event: self._fit_scene())
         self.canvas.bind('<F2>', lambda _event: self._focus_name())
-        ttk.Label(center, text='ЛКМ — выбрать · двойной щелчок — открыть лист · колесо + Ctrl — масштаб · средняя кнопка — перемещение',
-                  style='Muted.TLabel', padding=(6, 4)).grid(row=2, column=0, sticky='w')
+        self._canvas_help = ttk.Label(center, text='ЛКМ — выбрать · двойной щелчок — открыть лист · Ctrl + колесо — масштаб · Ctrl + 0 — вписать · средняя кнопка — перемещение',
+                                      style='Muted.TLabel', padding=(6, 4))
+        self._canvas_help.grid(row=2, column=0, sticky='w')
 
         # Scrollable inspector: on 650–720 px screens the function/argument
         # controls remain available, unlike the previous fixed-height sidebar.
@@ -196,8 +224,22 @@ class CourseworkPanel(ttk.Frame):
         side_scroll.pack(side='right', fill='y')
         inspector = ttk.Frame(side_canvas, padding=(10, 8, 10, 16))
         self._inspector_window = side_canvas.create_window((0, 0), window=inspector, anchor='nw')
-        inspector.bind('<Configure>', lambda _e: side_canvas.configure(scrollregion=side_canvas.bbox('all')))
-        side_canvas.bind('<Configure>', lambda e: side_canvas.itemconfigure(self._inspector_window, width=e.width))
+        def update_inspector_region(_event=None):
+            bounds = side_canvas.bbox(self._inspector_window)
+            if not bounds:
+                return
+            viewport_height = side_canvas.winfo_height()
+            side_canvas.configure(scrollregion=(0, 0, max(1, side_canvas.winfo_width()),
+                                                max(viewport_height, bounds[3])))
+            if bounds[3] <= viewport_height:
+                side_canvas.yview_moveto(0)
+
+        def resize_inspector(event):
+            side_canvas.itemconfigure(self._inspector_window, width=event.width)
+            update_inspector_region()
+
+        inspector.bind('<Configure>', update_inspector_region)
+        side_canvas.bind('<Configure>', resize_inspector)
         side_canvas.bind('<MouseWheel>', lambda e: side_canvas.yview_scroll(-1 if e.delta > 0 else 1, 'units'))
         side_canvas.bind('<Button-4>', lambda _e: side_canvas.yview_scroll(-1, 'units'))
         side_canvas.bind('<Button-5>', lambda _e: side_canvas.yview_scroll(1, 'units'))
@@ -273,26 +315,67 @@ class CourseworkPanel(ttk.Frame):
                 if tag.startswith('course-action:'):
                     self.select_action(tag.split(':', 1)[1])
                     break
-        menu = tk.Menu(self, tearoff=False)
-        for label, callback in (
+        menu = persistent_menu(self, '_action_context_popup', (
             ('Редактировать название', self._focus_name),
             ('Добавить дочернее действие', self._add_child),
             ('Вставить после', lambda: self._insert(True)),
             ('Изменить тип…', self._convert),
             ('Открыть лист', self._focus_scene),
-        ):
-            menu.add_command(label=label, command=callback)
-        menu.add_separator()
-        menu.add_command(label='Удалить действие', command=self._confirm_delete)
+            None,
+            ('Удалить действие', self._confirm_delete),
+        ))
         try:
             menu.tk_popup(event.x_root, event.y_root)
         finally:
             menu.grab_release()
 
+    def enter_focus_view(self):
+        self._update_navigation_controls()
+        self._focus_layout = PackSnapshot(self)
+        self._focus_restore_token = getattr(self, '_focus_restore_token', 0) + 1
+        self._focus_pane_width = self._focus_panes.winfo_width()
+        self._focus_sashes = [self._focus_panes.sashpos(i) for i in (0, 1)]
+        self._focus_layout.hide_except({self._focus_panes})
+        self._focus_panes.forget(self._focus_left)
+        self._focus_panes.forget(self._focus_right)
+        self._canvas_help.grid_remove()
+        self._focus_return_bar.pack(fill='x', before=self._focus_panes)
+
+    def exit_focus_view(self):
+        self._focus_return_bar.pack_forget()
+        self._focus_panes.insert(0, self._focus_left, weight=2)
+        self._focus_panes.add(self._focus_right, weight=3)
+        self._canvas_help.grid()
+        self._focus_layout.restore()
+        token = self._focus_restore_token
+
+        def restore_sashes(attempt=0):
+            try:
+                if (not self._focus_panes.winfo_exists() or self.app._diagram_focus is not None
+                        or token != self._focus_restore_token):
+                    return
+                # Geometry must settle after both the notebook and its sidebars
+                # are restored; otherwise Tk can place the right sash offscreen.
+                self._focus_panes.update_idletasks()
+                width = self._focus_panes.winfo_width()
+                if width < 300 and attempt < 2:
+                    self.after(80, lambda: restore_sashes(attempt + 1))
+                    return
+                first, second = restored_sash_positions(width, self._focus_pane_width, self._focus_sashes)
+                self._focus_panes.sashpos(1, second)
+                self._focus_panes.sashpos(0, first)
+                self._focus_panes.sashpos(1, second)
+                self._focus_panes.update_idletasks()
+                if self._focus_right.winfo_width() < min(80, width // 4) and attempt < 2:
+                    self.after(80, lambda: restore_sashes(attempt + 1))
+            except tk.TclError:
+                pass
+        self.after_idle(restore_sashes)
+
     def _fit_scene(self):
         if self.doc is None:
             return
-        scene = build_course_scene(self.doc, self.focus_id, max_depth=self.depth_limit)
+        scene = self._display_scene()
         self.canvas.update_idletasks()
         width = max(240, self.canvas.winfo_width() - 32)
         height = max(200, self.canvas.winfo_height() - 32)
@@ -342,7 +425,11 @@ class CourseworkPanel(ttk.Frame):
         self.tree_count.configure(text=f'Показано: {len(visible)} из {len(nodes)}')
 
     def refresh(self):
+        if self.doc is not self._navigation_document:
+            self._navigation_document = self.doc
+            self._navigation_history.clear()
         if self.doc is None:
+            self._update_navigation_controls()
             self.canvas.delete('all')
             self.tree.delete(*self.tree.get_children())
             self._clear_properties()
@@ -353,12 +440,116 @@ class CourseworkPanel(ttk.Frame):
             self.focus_id = None
         if self.selected_id not in nodes:
             self.selected_id = None
+        self._update_navigation_controls()
         self._refresh_tree()
+        if self._is2_view:
+            self._refresh_is2_sheets()
         self._draw()
         self._show_properties()
 
-    def _on_canvas_resize(self, _event=None):
+    def _display_scene(self):
+        builder = build_is2_spd_scene if getattr(self, '_is2_view', False) else build_course_scene
+        return builder(self.doc, self.focus_id, max_depth=self.depth_limit)
+
+    def _toggle_is2_view(self):
+        self._is2_view = not self._is2_view
+        self._is2_mode_button.configure(text='Обычный вид' if self._is2_view else 'Вид ИС-2')
+        if self._is2_view:
+            self._refresh_is2_sheets()
+            self._is2_sheet_bar.pack(fill='x', before=self._focus_panes)
+        else:
+            self._is2_sheet_bar.pack_forget()
         self._draw()
+
+    def _refresh_is2_sheets(self):
+        self._is2_sheets = {'Общая схема': None}
+        if self.doc is not None:
+            nodes = {node.get('id', ''): node for node in self.doc.actions}
+            parents = {link.get('afe1', '') for link in self.doc.links if link.get('type') == '2'}
+            for row in action_tree_rows(self.doc):
+                if row.action_id in parents:
+                    node = nodes[row.action_id]
+                    label = f'{action_code(node)} · {node.get("name", "")} (ID {row.action_id})'
+                    self._is2_sheets[label] = row.action_id
+        self._is2_sheet_choice.configure(values=tuple(self._is2_sheets))
+        self._sync_is2_sheet()
+
+    def _sync_is2_sheet(self):
+        label = next((label for label, ident in self._is2_sheets.items() if ident == self.focus_id), '')
+        self._is2_sheet_choice.set(label)
+
+    def _select_is2_sheet(self, _event=None):
+        label = self._is2_sheet_choice.get()
+        if label in self._is2_sheets:
+            self._navigate_scene(self._is2_sheets[label], 2)
+
+    def _draw_is2(self):
+        canvas = self.canvas
+        scene = self._display_scene()
+        self._scene = scene
+        self._sync_is2_sheet()
+        canvas.configure(background='#eeeeee')
+        z = self.zoom
+        paper_w, paper_h = scene.width*z, scene.height*z
+        width, height = max(paper_w, canvas.winfo_width()), max(paper_h, canvas.winfo_height())
+        ox, oy = max(0, (width-paper_w)/2), max(0, (height-paper_h)/2)
+        canvas.create_rectangle(ox,oy,ox+paper_w,oy+paper_h,fill='#ffffff',outline='#555555',tags=('paper',))
+        step_x, step_y = scene.column_width*z, scene.row_height*z
+        for i in range(int(scene.width/scene.column_width)+1):
+            canvas.create_line(ox+i*step_x,oy,ox+i*step_x,oy+paper_h,fill='#c4c4c4',tags=('grid',))
+        for i in range(int(scene.height/scene.row_height)+1):
+            canvas.create_line(ox,oy+i*step_y,ox+paper_w,oy+i*step_y,fill='#c4c4c4',tags=('grid',))
+        for x1,y1,x2,y2 in is2_connectors(scene):
+            canvas.create_line(ox+x1*z,oy+y1*z,ox+x2*z,oy+y2*z,fill='#555555',width=max(1,1.2*z))
+        scene_nodes = {node.ident: node for node in scene.nodes}
+        for edge in scene.edges:
+            parent, child = scene_nodes[edge.source], scene_nodes[edge.target]
+            if parent.kind == '3':
+                canvas.create_text(ox+(parent.x+scene.node_width/2+7)*z,
+                                   oy+(parent.y+scene.node_height+child.y)*z/2,
+                                   text='+', fill='#202020', font=('Arial', max(6, round(11*z))))
+        marks = is2_parameter_marks(self.doc)
+        show_labels = z >= .55
+        if show_labels:
+            small_font = tkfont.Font(root=canvas,family='Arial',size=-max(6,round(10*z)))
+            title_fonts = {size: tkfont.Font(root=canvas,family='Arial',size=-size)
+                           for size in range(max(5,round(8*z)), max(6,round(12*z))+1)}
+            self._scene_fonts = (small_font, *title_fonts.values())
+        w,h = scene.node_width*z,scene.node_height*z
+        for node in scene.nodes:
+            x,y = ox+node.x*z,oy+node.y*z
+            tags = ('course-node', 'course-action:'+node.ident)
+            color = '#128228' if node.ident == self.selected_id else '#202020'
+            canvas.create_rectangle(x,y,x+w,y+h,fill='#ffffff',outline=color,width=2 if node.ident==self.selected_id else 1.2,tags=tags)
+            band = 15*z if node.kind=='1' else 0
+            if band:
+                canvas.create_line(x,y+h-band,x+w,y+h-band,fill=color,tags=tags)
+                canvas.create_line(x+w/2,y+h-band,x+w/2,y+h,fill=color,tags=tags)
+            if not show_labels:
+                continue
+            if band:
+                for number,fraction in (('1',.25),('2',.75)):
+                    canvas.create_text(x+w*fraction,y+h-band/2,text=number,fill=color,font=small_font,tags=tags)
+            pad=max(2,4*z)
+            available = max(1, h-band-small_font.metrics('linespace')-2*pad)
+            for size in sorted(title_fonts, reverse=True):
+                title_font = title_fonts[size]
+                line_height = title_font.metrics('linespace')
+                line_count = max(1, int(available // line_height))
+                lines = _fit_text_lines(node.title, title_font.measure, w-2*pad, line_count)
+                if lines and not lines[-1].endswith('…'):
+                    break
+            top = y + pad + max(0, (available - len(lines)*line_height)/2)
+            for index,line in enumerate(lines):
+                canvas.create_text(x+w/2,top+index*line_height,anchor='n',text=line,fill='#202020',font=title_font,tags=tags)
+            bottom=y+h-band-pad
+            for text, tx, anchor in ((node.code,x+w-pad,'se'),(marks.get(node.ident,''),x+pad,'sw')):
+                fitted = _fit_text_lines(text,small_font.measure,w*.45,1) if text else []
+                if fitted:
+                    canvas.create_text(tx,bottom,anchor=anchor,text=fitted[0],fill=color,font=small_font,tags=tags)
+        canvas.configure(scrollregion=(0,0,width,height))
+        title = 'Общая схема' if self.focus_id is None else action_code(self.doc.action(self.focus_id))
+        self.mode_label.configure(text=f'Вид ИС-2 · {title} · {round(z*100)}%')
 
     def _draw(self):
         canvas = self.canvas
@@ -373,7 +564,10 @@ class CourseworkPanel(ttk.Frame):
             canvas.create_text(28, 104, anchor='nw', text='Здесь появится схема вашей модели.',
                                fill='#aaaabd' if dark else '#65697d', font=('TkDefaultFont', 10))
             return
-        scene = build_course_scene(self.doc, self.focus_id, max_depth=self.depth_limit)
+        if getattr(self, '_is2_view', False):
+            self._draw_is2()
+            return
+        scene = self._display_scene()
         self._scene = scene
         s = self.zoom
         w = scene.node_width * s; h = scene.node_height * s
@@ -398,14 +592,15 @@ class CourseworkPanel(ttk.Frame):
             small_font = tkfont.Font(root=canvas, family='Arial', size=-max(6, round(10*s)))
             self._scene_fonts = (title_font, code_font, small_font)
         by_id = {n.ident: n for n in scene.nodes}
+        for edge, points in edge_paths(scene):
+            coords = [value*s for value in points]
+            canvas.create_line(*coords, fill='#737d9a' if dark else '#8ba0b8',
+                               width=max(1,1.5*s), arrow='last' if edge.kind == '1' else 'none')
+        children_by_parent = {}
         for edge in scene.edges:
-            p, c = by_id[edge.source], by_id[edge.target]
-            x1, y1 = (p.x + scene.node_width/2)*s, (p.y + scene.node_height)*s
-            x2, y2 = (c.x + scene.node_width/2)*s, c.y*s
-            my = (y1 + y2)/2
-            canvas.create_line(x1,y1,x1,my,x2,my,x2,y2, fill='#737d9a' if dark else '#8ba0b8', width=max(1,1.5*s))
+            children_by_parent.setdefault(edge.source, []).append(by_id[edge.target])
         for parent in scene.nodes:
-            kids = sorted((by_id[e.target] for e in scene.edges if e.source==parent.ident), key=lambda node:node.x)
+            kids = sorted(children_by_parent.get(parent.ident, ()), key=lambda node:node.x)
             if len(kids) > 1 and parent.kind == '2':
                 for a,b in zip(kids,kids[1:]):
                     canvas.create_line((a.x+scene.node_width)*s, (a.y+scene.node_height/2)*s,
@@ -448,7 +643,7 @@ class CourseworkPanel(ttk.Frame):
                                            text=number, fill=ink, font=small_font, tags=tags)
         canvas.configure(scrollregion=(0, 0, grid_width, grid_height))
         title = 'Весь проект' if self.focus_id is None else action_code(self.doc.action(self.focus_id))
-        self.mode_label.configure(text=f'{title} · {"глубина 2" if self.depth_limit == 2 else "вся структура"} · {round(s*100)}%' + (' · увеличьте масштаб для подписей' if not show_labels else ''))
+        self.mode_label.configure(text=f'{title} · {"глубина 2 + выходы альтернатив" if self.depth_limit == 2 else "вся структура"} · {round(s*100)}%' + (' · увеличьте масштаб для подписей' if not show_labels else ''))
 
     def _tree_select(self, _event=None):
         selected = self.tree.selection()
@@ -471,6 +666,7 @@ class CourseworkPanel(ttk.Frame):
         self._show_properties()
 
     def _canvas_select(self, _event=None):
+        self.canvas.focus_set()
         items = self.canvas.find_withtag('current')
         if not items:
             return
@@ -485,23 +681,69 @@ class CourseworkPanel(ttk.Frame):
 
     def _zoom(self, scale):
         self.zoom = max(0.25, min(2.5, self.zoom*scale))
-        self._draw()
+        self._resize_redraw.request()
 
     def _wheel(self, event):
-        self._zoom(1.15 if event.delta > 0 else 0.87)
+        if event.delta:
+            steps = event.delta / 120 if self.canvas.tk.call('tk', 'windowingsystem') == 'win32' else event.delta
+            self._zoom(1.08 ** steps)
         return 'break'
 
+    def _view_state(self):
+        return (self.focus_id, self.depth_limit, self.zoom,
+                self.canvas.xview()[0], self.canvas.yview()[0])
+
+    def _update_navigation_controls(self):
+        can_return = self.doc is not None and (bool(self._navigation_history) or self.focus_id is not None)
+        self._navigation_back_button.configure(state='normal' if can_return else 'disabled')
+
+    def _navigate_scene(self, focus, depth):
+        if self.doc is None or (focus, depth) == (self.focus_id, self.depth_limit):
+            return
+        self._navigation_history.append(self._view_state())
+        # Limit retained view states; this is not document undo history.
+        del self._navigation_history[:-100]
+        self.focus_id, self.depth_limit = focus, depth
+        self._draw()
+        self.canvas.xview_moveto(0)
+        self.canvas.yview_moveto(0)
+        self._update_navigation_controls()
+
+    def _back_scene(self):
+        if self.doc is None:
+            return
+        ids = {node.get('id', '') for node in self.doc.actions}
+        while self._navigation_history:
+            focus, depth, zoom, xview, yview = self._navigation_history.pop()
+            if focus is not None and focus not in ids:
+                continue
+            self.focus_id, self.depth_limit, self.zoom = focus, depth, zoom
+            self._draw()
+            self.canvas.xview_moveto(xview)
+            self.canvas.yview_moveto(yview)
+            self._update_navigation_controls()
+            return
+        # A leaf can already be focused when fullscreen is entered. In that
+        # case, navigate to its real parent even without earlier view history.
+        if self.focus_id is not None:
+            parent = next((link.get('afe1') for link in self.doc.links
+                           if link.get('type') == '2' and link.get('afe2') == self.focus_id), None)
+            self.focus_id = parent if parent in ids else None
+            self.depth_limit = 2
+            self._draw()
+            self.canvas.xview_moveto(0)
+            self.canvas.yview_moveto(0)
+        self._update_navigation_controls()
+
     def _full_scene(self):
-        self.focus_id = None; self.depth_limit = None; self._draw()
+        self._navigate_scene(None, None)
 
     def _root_scene(self):
-        self.focus_id = None; self.depth_limit = 2; self._draw()
+        self._navigate_scene(None, 2)
 
     def _focus_scene(self):
         if self.selected_id:
-            self.focus_id = self.selected_id
-            self.depth_limit = 2
-            self._draw()
+            self._navigate_scene(self.selected_id, 2)
 
     def _clear_properties(self):
         self.property_code.configure(text='Выберите действие')
@@ -647,36 +889,10 @@ class CourseworkPanel(ttk.Frame):
             messagebox.showerror('Матрица',str(exc),parent=self)
 
     def _add_parameter(self):
-        if self.doc is None:return
-        # Native parameter columns: group, codingType, number, object, sign, name.
-        from .gui import RecordDialog
-        current=[p for p in self.doc.params_node.findall('param') if p.get('group','0')=='0']
-        new_number=max((int(p.get('number','0')) for p in current if p.get('number','').isdigit()),default=0)+1
-        fields=[('name','Наименование параметра','',None),('group','Группа (обычно 0)','0',None),
-                ('number','Номер в группе',str(new_number),None),('sign','Обозначение','',None)]
-        dialog=RecordDialog(self,'Добавить параметр',fields);self.wait_window(dialog)
-        if dialog.result is None:return
-        d=dialog.result
-        if not d['name'].strip():
-            messagebox.showerror('Параметр','Укажите наименование',parent=self);return
-        try:
-            self.doc.add_parameter({'name':d['name'].strip(),'group':d['group'],
-                                    'number':d['number'],'sign':d['sign'],'codingType':'1'})
-            self.app._mark_dirty('Добавлен параметр проекта')
-            self.app.refresh_all()
-        except Exception as exc:messagebox.showerror('Параметр',str(exc),parent=self)
+        self.app.add_parameter()
 
     def _add_object(self):
-        if self.doc is None:return
-        from .gui import RecordDialog
-        dialog=RecordDialog(self,'Добавить объект',[('name','Наименование объекта','',None)])
-        self.wait_window(dialog)
-        if dialog.result is None:return
-        try:
-            self.doc.add_object(dialog.result['name'].strip())
-            self.app._mark_dirty('Добавлен объект')
-            self.app.refresh_all()
-        except Exception as exc:messagebox.showerror('Объект',str(exc),parent=self)
+        self.app.add_object()
 
     def _show_form(self,key):
         if self.doc is None:return
@@ -693,7 +909,8 @@ class CourseworkPanel(ttk.Frame):
         target=filedialog.asksaveasfilename(parent=self,title='Схема проекта SVG',defaultextension='.svg',filetypes=[('SVG','*.svg')])
         if not target:return
         try:
-            svg=scene_svg(build_course_scene(self.doc,self.focus_id,max_depth=self.depth_limit),selected=self.selected_id)
+            scene = self._display_scene()
+            svg = is2_spd_svg(self.doc, scene, self.selected_id) if self._is2_view else scene_svg(scene, selected=self.selected_id)
             Path(target).write_text(svg,encoding='utf-8')
             self.app.status.set('Схема SVG сохранена: '+target)
         except OSError as exc: messagebox.showerror('Экспорт SVG',str(exc),parent=self)

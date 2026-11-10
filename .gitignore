@@ -19,3 +19,8 @@ dist/
 .vscode/
 .DS_Store
 Thumbs.db
+.venv-build/
+.venv-build-py312/
+/_internal/
+/_internal.backup-*/
+/PzKpfw.exe.backup-*

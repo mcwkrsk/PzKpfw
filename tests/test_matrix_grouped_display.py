@@ -3,7 +3,7 @@ import xml.etree.ElementTree as ET
 from types import SimpleNamespace
 from is2_re.coursework import create_course_project
 from is2_re.gui import Is2Studio
-from is2_re.matrix_view import grouped_matrix, cell_description, inferred_structural_marks
+from is2_re.matrix_view import grouped_matrix, cell_description, inferred_structural_marks, matrix_context
 from is2_re.specifications import add_primary_link, project_forms
 
 class FakeTree:
@@ -27,7 +27,7 @@ class MatrixDisplayTests(unittest.TestCase):
         headers,rows,ids,warnings=grouped_matrix(self.doc)
         self.assertEqual(ids,[self.param_detail,self.param_unit])
         self.assertEqual(headers[2:],['Деталь\nA5.2','Узел\nA9.1'])
-        self.assertEqual(rows[1][2:],['* ]~','+×2'])
+        self.assertEqual(rows[1][2:],['*]','+×2'])
         tip=cell_description(self.doc,self.act,self.param_unit)
         self.assertIn('Нагрузка',tip);self.assertIn('аргумент',tip);self.assertIn('кратность 2',tip)
         self.assertEqual(before,self.doc.to_bytes())
@@ -38,6 +38,8 @@ class MatrixDisplayTests(unittest.TestCase):
         marks = inferred_structural_marks(self.doc)
         self.assertIn('[', marks[(root, self.param_detail)])
         self.assertIn(']', marks[(self.act, self.param_detail)])
+        self.assertIn('] — конец последовательности', cell_description(self.doc, self.act, self.param_detail))
+        self.assertEqual(grouped_matrix(self.doc)[1][1][0], ']')
         self.assertEqual(before, self.doc.to_bytes())
         # Multiple possible function outputs cannot choose a sequence result.
         matrix = self.doc.root.find('./models/primaryModel/matrix')
@@ -55,6 +57,14 @@ class MatrixDisplayTests(unittest.TestCase):
         self.assertTrue(any('Запись matrix' in warning for warning in warnings))
         self.assertEqual(before,self.doc.to_bytes())
 
+    def test_context_matches_fresh_projection_and_updates_after_edit(self):
+        ctx = matrix_context(self.doc)
+        self.assertEqual(grouped_matrix(self.doc, context=ctx), grouped_matrix(self.doc))
+        self.assertEqual(cell_description(self.doc, self.act, self.param_unit, context=ctx),
+                         cell_description(self.doc, self.act, self.param_unit))
+        self.doc.parameter(self.param_unit).set('name', 'Новая нагрузка')
+        self.assertIn('Новая нагрузка', cell_description(self.doc, self.act, self.param_unit, context=matrix_context(self.doc)))
+
     def test_object_row_number_is_distinct_from_id_and_parameter_shows_name(self):
         self.doc.objects_node.set('LastID','1')
         # Keep an existing file's valid non-consecutive IDs intact.
@@ -65,7 +75,7 @@ class MatrixDisplayTests(unittest.TestCase):
         obj=SimpleNamespace(doc=self.doc,param_tree=FakeTree(),object_tree=FakeTree())
         Is2Studio._refresh_params(obj);Is2Studio._refresh_objects(obj)
         self.assertEqual(obj.object_tree.rows[0][1][:3],(1,'2','Деталь'))
-        self.assertEqual(obj.param_tree.rows[1][1][-1],'Деталь (ID 2)')
+        self.assertEqual(obj.param_tree.rows[1][1][4],'Деталь (ID 2)')
 
     def test_loop_label(self):
         self.doc.add_action('Цикл',action_type=3,parent_id='1')

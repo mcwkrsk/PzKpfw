@@ -24,7 +24,7 @@ COLUMN_X = {
     "relation": 3270.0,
 }
 TOP = 70.0
-ROW_STEP = 88.0
+ROW_STEP = 108.0
 RELATION_ORDER = ("scbinarylink", "aie_binary_link", "ae_content_link", "parameter_object")
 
 
@@ -56,6 +56,10 @@ def automatic_relationship_layout(graph: dict[str, Any]) -> dict[str, tuple[floa
     if not nodes:
         return {}
 
+    active = {node_column(node) for node in nodes}
+    compact_x = {key: 30.0 + 360.0 * index for index, key in
+                 enumerate(key for key in COLUMN_X if key in active)}
+
     entity_kinds = ("action", "category", "spz_element", "parameter", "object")
     entities: dict[str, list[dict[str, Any]]] = {
         kind: sorted((n for n in nodes if n.get("kind") == kind), key=_natural_id)
@@ -73,7 +77,7 @@ def automatic_relationship_layout(graph: dict[str, Any]) -> dict[str, tuple[floa
     def place_entities() -> None:
         for kind in entity_kinds:
             for index, node in enumerate(entities[kind]):
-                positions[str(node["key"])] = (COLUMN_X[kind], TOP + index * ROW_STEP)
+                positions[str(node["key"])] = (compact_x[kind], TOP + index * ROW_STEP)
 
     targets_by_relation: dict[str, list[str]] = {}
     for edge in edges:
@@ -96,7 +100,7 @@ def automatic_relationship_layout(graph: dict[str, Any]) -> dict[str, tuple[floa
         previous = TOP - ROW_STEP
         for target_y, _index, _key, node in desired:
             y = max(target_y, previous + ROW_STEP)
-            positions[str(node["key"])] = (COLUMN_X[column_key], y)
+            positions[str(node["key"])] = (compact_x[column_key], y)
             previous = y
 
     place_entities()
@@ -122,7 +126,7 @@ def automatic_relationship_layout(graph: dict[str, Any]) -> dict[str, tuple[floa
 
             entities[kind].sort(key=entity_order)
             for index, node in enumerate(entities[kind]):
-                positions[str(node["key"])] = (COLUMN_X[kind], TOP + index * ROW_STEP)
+                positions[str(node["key"])] = (compact_x[kind], TOP + index * ROW_STEP)
 
     for group_key, group in relation_groups.items():
         pack_group(group_key, group)
@@ -130,5 +134,5 @@ def automatic_relationship_layout(graph: dict[str, Any]) -> dict[str, tuple[floa
     # Unknown node domains are retained in a final diagnostics column.
     unknown = [n for n in nodes if n.get("kind") not in {*entity_kinds, "relation"}]
     for index, node in enumerate(sorted(unknown, key=_natural_id)):
-        positions[str(node["key"])] = (COLUMN_X["relation"], TOP + index * ROW_STEP)
+        positions[str(node["key"])] = (compact_x["relation"], TOP + index * ROW_STEP)
     return positions

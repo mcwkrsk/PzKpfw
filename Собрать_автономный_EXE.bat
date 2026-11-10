@@ -6,6 +6,7 @@ if errorlevel 1 (
   echo Build failed. See message above.
 ) else (
   echo.
-  echo Standalone EXE is in dist\PzKpfw.exe
+  echo EXE: PzKpfw.exe in this folder
+  echo Keep the _internal folder next to the EXE.
 )
 pause

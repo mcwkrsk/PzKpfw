@@ -8,7 +8,9 @@ from __future__ import annotations
 import hashlib
 import json
 import sys
+import textwrap
 import tkinter as tk
+import tkinter.font as tkfont
 from tkinter import filedialog, messagebox, ttk
 from pathlib import Path
 import xml.etree.ElementTree as ET
@@ -37,10 +39,17 @@ from .course_gui import CourseworkPanel
 from .grid_tree import GridTreeview
 from .decomposition_view import DecompositionPanel
 from .button_notebook import ButtonNotebook
-from .ui_theme import apply_theme, load_theme, save_theme, BACKGROUND, SURFACE, INK, MUTED, BORDER, PRIMARY
+from .ui_resources import persistent_menu, canvas_tag_at
+from .ui_performance import CoalescedCallback
+from .focus_view import PackSnapshot
+from .tooltips import ButtonTooltips
+from .ui_theme import apply_theme, load_theme, save_theme, load_tooltips, save_tooltips, BACKGROUND, SURFACE, INK, MUTED, BORDER, PRIMARY, PALETTES
 from .feature_audit import feature_audit
-from .matrix_view import grouped_matrix, cell_description, inferred_structural_marks
+from .matrix_view import grouped_matrix, cell_description, inferred_structural_marks, matrix_context
+from .matrix_canvas import MatrixCanvas, wheel_steps
+from . import __version__
 from .ui_icons import make_history_icon
+from .parameter_dialog import ParameterDialog, group_label
 
 
 class RecordDialog(tk.Toplevel):
@@ -75,6 +84,59 @@ class RecordDialog(tk.Toplevel):
 
     def _accept(self):
         self.result = {key: var.get() for key, var in self.vars.items()}
+        self.destroy()
+
+
+class ObjectDialog(RecordDialog):
+    def __init__(self, master, name=None):
+        super().__init__(master, 'Новый объект' if name is None else 'Изменить объект',
+                         [('name', 'Наименование объекта', name or '', None)])
+
+    def _accept(self):
+        name = self.vars['name'].get().strip()
+        if not name:
+            messagebox.showerror('Объект', 'Укажите наименование объекта.', parent=self)
+            return
+        self.result = {'name': name}
+        self.destroy()
+
+
+class ReportOptionsDialog(tk.Toplevel):
+    def __init__(self, master, topic):
+        super().__init__(master)
+        self.title('Отчёт в DOCX')
+        self.result = None
+        self.resizable(True, False)
+        self.author = tk.StringVar(value='')
+        self.group = tk.StringVar(value='ИДБ-24-17')
+        self.topic = tk.StringVar(value=topic)
+        self.sections = {key: tk.BooleanVar(value=True) for key in ('diagrams', 'forms', 'matrix', 'placeholders')}
+        body = ttk.Frame(self, padding=14)
+        body.grid(sticky='nsew')
+        for row, (label, variable) in enumerate((('ФИО', self.author), ('Группа', self.group), ('Тема', self.topic))):
+            ttk.Label(body, text=label).grid(row=row, column=0, sticky='w', padx=(0, 10), pady=4)
+            ttk.Entry(body, textvariable=variable, width=52).grid(row=row, column=1, sticky='ew', pady=4)
+        for row, (key, label) in enumerate((('diagrams', 'Диаграммы декомпозиции'),
+                                            ('forms', 'Формы A, B, D, D1, D2'),
+                                            ('matrix', 'Матричная диаграмма'),
+                                            ('placeholders', 'Разделы для ручного заполнения')), start=3):
+            ttk.Checkbutton(body, text=label, variable=self.sections[key]).grid(row=row, column=0, columnspan=2, sticky='w', pady=3)
+        ttk.Label(body, text='ФИО можно оставить пустым. Таблицы будут редактируемыми.', wraplength=440).grid(row=7, column=0, columnspan=2, sticky='w', pady=(8, 0))
+        buttons = ttk.Frame(body)
+        buttons.grid(row=8, column=0, columnspan=2, sticky='e', pady=(12, 0))
+        ttk.Button(buttons, text='Отмена', command=self.destroy).pack(side='right', padx=(6, 0))
+        ttk.Button(buttons, text='Продолжить', command=self._accept).pack(side='right')
+        body.columnconfigure(1, weight=1)
+        self.transient(master)
+        self.grab_set()
+        self.bind('<Escape>', lambda _e: self.destroy())
+        self.wait_visibility()
+        self.focus_set()
+
+    def _accept(self):
+        from .docx_report import ReportOptions
+        self.result = ReportOptions(author=self.author.get(), group=self.group.get(), topic=self.topic.get(),
+                                    **{key: var.get() for key, var in self.sections.items()})
         self.destroy()
 
 
@@ -120,6 +182,8 @@ class Is2Studio(tk.Tk):
         self.minsize(1050, 650)
         self._install_app_icon()
         self.theme_name = tk.StringVar(value=load_theme())
+        self.tooltips_enabled = tk.BooleanVar(value=load_tooltips())
+        self.tooltip_button_text = tk.StringVar(value=self._tooltip_label())
         apply_theme(self, self.theme_name.get())
         self.doc: ProjectDocument | None = None
         self.path: Path | None = None
@@ -137,8 +201,12 @@ class Is2Studio(tk.Tk):
         self.history_tree = None
         self.history_journal_tree = None
         self._pending_editor_state: dict = {}
+        self._diagram_focus = None
+        self._deferred_views = set()
+        self.bind('<Escape>', self._escape_diagram_focus, add='+')
         self._build_menu()
         self._build_layout()
+        self.button_tooltips = ButtonTooltips(self, self.tooltips_enabled, self.theme_name)
         apply_theme(self, self.theme_name.get())
         self.course_panel._draw()
         self.notebook.bind("<<NotebookTabChanged>>", self._on_notebook_tab_changed, add="+")
@@ -180,6 +248,26 @@ class Is2Studio(tk.Tk):
             return
         messagebox.showinfo("Экспорт", "Файл создан. Это справочный экспорт PzKpfw; соответствие формам ИС-2 не проверено.", parent=self)
 
+    def export_docx_report(self):
+        if self.doc is None:
+            messagebox.showinfo('Экспорт', 'Сначала откройте проект.', parent=self)
+            return
+        dialog = ReportOptionsDialog(self, self.doc.root.get('name', ''))
+        self.wait_window(dialog)
+        if dialog.result is None:
+            return
+        destination = filedialog.asksaveasfilename(parent=self, title='Сохранить отчёт',
+                                                    defaultextension='.docx', filetypes=[('Документ Word', '*.docx')])
+        if not destination:
+            return
+        try:
+            from .docx_report import write_docx_report
+            write_docx_report(self.doc, destination, dialog.result, source_path=self.path)
+        except (OSError, ValueError, RuntimeError, ProjectFormatError) as exc:
+            messagebox.showerror('Ошибка экспорта DOCX', str(exc), parent=self)
+            return
+        messagebox.showinfo('Экспорт DOCX', 'Отчёт создан. Проверьте схемы, формы и заполните оставленные разделы.', parent=self)
+
     def _build_menu(self):
         menu = tk.Menu(self)
         file_menu = tk.Menu(menu, tearoff=False)
@@ -191,6 +279,7 @@ class Is2Studio(tk.Tk):
         file_menu.add_command(label="Резервные копии…", command=self.show_backups)
         file_menu.add_separator()
         file_menu.add_command(label="Экспорт обзора в HTML…", command=lambda: self.export_document("report"))
+        file_menu.add_command(label="Отчёт в DOCX…", command=self.export_docx_report)
         file_menu.add_command(label="Экспорт схемы в SVG…", command=lambda: self.export_document("diagram"))
         file_menu.add_command(label="Экспорт таблицы связей в CSV…", command=lambda: self.export_document("relations"))
         file_menu.add_command(label="Экспорт матрицы состава в CSV…", command=lambda: self.export_document("matrix"))
@@ -248,6 +337,11 @@ class Is2Studio(tk.Tk):
                   style='Eyebrow.TLabel').pack(side='left', padx=(20, 0), pady=(4, 0))
         self.theme_button = ttk.Button(header, style='Quiet.TButton', command=self.toggle_theme)
         self.theme_button.pack(side='right')
+        tooltip_button = ttk.Button(header, textvariable=self.tooltip_button_text,
+                                    command=self.toggle_tooltips, style='Quiet.TButton')
+        tooltip_button._tooltip_text = 'Включить или выключить пояснения к кнопкам при наведении.'
+        tooltip_button.pack(side='right', padx=(0, 8))
+        self.tooltip_button = tooltip_button
         self.file_label = ttk.Label(header, text='Файл не открыт', style='Muted.TLabel')
         self.file_label.pack(side='right', padx=(0, 18))
         self._update_theme_button()
@@ -297,6 +391,7 @@ class Is2Studio(tk.Tk):
         self.advanced_tabs = ButtonNotebook(self.service_page)
         self.advanced_tabs.pack(fill='both', expand=True, padx=5, pady=5)
         self.metadata_page = ttk.Frame(self.advanced_tabs)
+        self.action_editor_page = ttk.Frame(self.advanced_tabs)
         self.diagram_page = ttk.Frame(self.advanced_tabs)
         self.concept_page = ttk.Frame(self.advanced_tabs)
         self.link_page = ttk.Frame(self.advanced_tabs)
@@ -304,7 +399,8 @@ class Is2Studio(tk.Tk):
         self.graph_page = ttk.Frame(self.advanced_tabs)
         self.xml_page = ttk.Frame(self.advanced_tabs)
         for frame, name in (
-            (self.metadata_page, 'Паспорт'), (self.diagram_page, 'Техническая схема'),
+            (self.metadata_page, 'Паспорт'), (self.action_editor_page, 'Дерево и редактирование'),
+            (self.diagram_page, 'Техническая схема'),
             (self.concept_page, 'Категории (cs)'), (self.link_page, 'Связи (cs)'),
             (self.other_page, 'spz / content'), (self.graph_page, 'Граф связей'),
             (self.xml_page, 'XML'),
@@ -334,29 +430,56 @@ class Is2Studio(tk.Tk):
                   style='Muted.TLabel').pack(side='right')
         self.bind_all('<F1>', lambda _event: self._show_shortcuts())
 
+    def enter_diagram_focus(self, panel):
+        """Hide chrome temporarily while keeping the existing diagram alive."""
+        if self._diagram_focus is not None:
+            return
+        self.button_tooltips.hide()
+        self._diagram_focus = panel
+        self._focus_root_layout = PackSnapshot(self)
+        self._focus_root_layout.hide_except({self.notebook})
+        self.notebook.pack_configure(padx=0, pady=0)
+        self._focus_menu = self.cget('menu')
+        self.configure(menu='')
+        panel.enter_focus_view()
+
+    def exit_diagram_focus(self):
+        panel = self._diagram_focus
+        if panel is None:
+            return
+        self._diagram_focus = None
+        self.configure(menu=self._focus_menu)
+        self._focus_root_layout.restore()
+        panel.exit_focus_view()
+
+    def _escape_diagram_focus(self, _event=None):
+        if self._diagram_focus is not None:
+            self.exit_diagram_focus()
+            return 'break'
+        return None
+
     def _show_shortcuts(self):
         messagebox.showinfo('Работа в PzKpfw',
             'Формирование СПД — схема, создание и изменение действий, свойства справа.\n'
-            'Декомпозиция — табличное дерево тех же действий.\n'
+            'Декомпозиция — диаграмма и листы действий.\n'
             'Параметры и Объекты — редактирование данных модели.\n'
             'Спецификации — формы A, B, D, D1, D2.\n'
             'Матричная диаграмма — связи действий с параметрами; двойной щелчок по ячейке — редактирование.\n'
-            'Дополнительно — паспорт, графы, XML, исследовательские средства.\n\n'
+            'Дополнительно — дерево и редактирование действий, паспорт, графы, XML.\n\n'
             'Ctrl+N — новый пустой проект, Ctrl+O — открыть, Ctrl+S — сохранить.\n'
             'Ctrl+Z / Ctrl+Y — история правок. В СПД: F2 — имя, Ctrl+Enter — применить свойства.',
             parent=self)
 
     def _show_export_menu(self):
         """Keep rarely used exports off the permanent primary toolbar."""
-        menu = tk.Menu(self, tearoff=False)
-        for label, command in (
+        menu = persistent_menu(self, '_export_popup', (
             ('Комплект проекта (схемы, формы, проверка)…', self.course_panel._export_all),
+            ('Отчёт в DOCX…', self.export_docx_report),
             ('Схема СПД в SVG…', self.course_panel._export_svg),
             ('Спецификации в HTML…', lambda: self.export_document('specifications')),
             ('Матрица в CSV…', lambda: self.export_document('primary-matrix')),
             ('Отчёт в HTML…', lambda: self.export_document('report')),
-        ):
-            menu.add_command(label=label, command=command)
+        ))
         try:
             x, y = self.winfo_pointerxy()
             menu.tk_popup(x, y)
@@ -365,7 +488,7 @@ class Is2Studio(tk.Tk):
 
     def _show_page(self, page):
         """Navigate advanced pages without exposing seven extra top-level tabs."""
-        if page in (self.metadata_page, self.diagram_page, self.concept_page,
+        if page in (self.metadata_page, self.action_editor_page, self.diagram_page, self.concept_page,
                     self.link_page, self.other_page, self.graph_page, self.xml_page):
             self.notebook.select(self.service_page)
             self.advanced_tabs.select(page)
@@ -375,7 +498,7 @@ class Is2Studio(tk.Tk):
     def _set_enabled(self, enabled: bool):
         self.course_panel.set_editing_enabled(enabled)
         state = "normal" if enabled else "disabled"
-        for page in (self.metadata_page, self.action_page, self.forms_page, self.diagram_page, self.param_page, self.object_page, self.concept_page, self.link_page, self.other_page, self.graph_page, self.xml_page):
+        for page in (self.metadata_page, self.action_page, self.action_editor_page, self.forms_page, self.diagram_page, self.param_page, self.object_page, self.concept_page, self.link_page, self.other_page, self.graph_page, self.xml_page):
             try:
                 for child in page.winfo_children():
                     if isinstance(child, ttk.Frame):
@@ -415,6 +538,9 @@ class Is2Studio(tk.Tk):
         self.forms_tree.configure(yscrollcommand=y.set,xscrollcommand=x.set)
         self.forms_tree.grid(row=0,column=0,sticky="nsew"); y.grid(row=0,column=1,sticky="ns"); x.grid(row=1,column=0,sticky="ew")
         container.columnconfigure(0,weight=1); container.rowconfigure(0,weight=1)
+        self.form_cell_text = tk.StringVar(value='Щёлкните по ячейке, чтобы увидеть её содержимое полностью.')
+        ttk.Label(self.forms_page, textvariable=self.form_cell_text, wraplength=1300, padding=(8, 4)).pack(anchor='w', fill='x')
+        self.forms_tree.bind('<ButtonRelease-1>', self._show_form_cell, add='+')
         self.form_status=tk.StringVar(value="Откройте проект и нажмите «Обновить».")
         ttk.Label(self.forms_page,textvariable=self.form_status,wraplength=1150,padding=6).pack(anchor="w")
 
@@ -427,17 +553,38 @@ class Is2Studio(tk.Tk):
         ttk.Button(bar, text='Кратность…', command=self.edit_primary_link_power).pack(side='left', padx=(0, 4))
         ttk.Button(bar, text='CSV…', command=lambda: self.export_document('primary-matrix')).pack(side='left', padx=(0, 4))
         ttk.Button(bar, text='Обновить', command=self._refresh_matrix).pack(side='left')
-        ttk.Label(self.matrix_page, text='Дважды нажмите на пересечение строки действия и столбца параметра, чтобы добавить или изменить связь.',
+        self._matrix_zoom = 1.0
+        self._matrix_zoom_text = tk.StringVar(value='100%')
+        ttk.Button(bar, text='−', width=3, command=lambda: self._scale_matrix(-1)).pack(side='left', padx=(14, 2))
+        ttk.Label(bar, textvariable=self._matrix_zoom_text, width=5, anchor='center').pack(side='left')
+        ttk.Button(bar, text='+', width=3, command=lambda: self._scale_matrix(1)).pack(side='left', padx=(2, 0))
+        ttk.Label(self.matrix_page, text='Щелчок — выделить строку и столбец; двойной щелчок — изменить связь.',
                   padding=(12, 0), style='Muted.TLabel').pack(anchor='w')
         box = ttk.Frame(self.matrix_page, padding=9)
         box.pack(fill='both', expand=True)
-        self.matrix_tree = GridTreeview(box, show='headings', selectmode='browse')
+        self._matrix_font = tkfont.nametofont('TkDefaultFont').copy()
+        self._matrix_heading_font = tkfont.nametofont('TkDefaultFont').copy()
+        self._matrix_heading_font.configure(weight='bold')
+        self._matrix_base_font_size = abs(int(self._matrix_font.cget('size')))
+        self._matrix_group_labels = []
+        self.matrix_group_header = tk.Canvas(box, height=25, highlightthickness=0)
+        self.matrix_group_header._theme_course_canvas = True
+        self.matrix_group_header.grid(row=0, column=0, sticky='ew')
+        self.matrix_tree = MatrixCanvas(box, theme=self.theme_name.get, font=self._matrix_font,
+                                        heading_font=self._matrix_heading_font,
+                                        on_width_change=self._draw_matrix_groups)
         yy=ttk.Scrollbar(box, orient='vertical', command=self.matrix_tree.yview)
         xx=ttk.Scrollbar(box, orient='horizontal', command=self.matrix_tree.xview)
-        self.matrix_tree.configure(yscrollcommand=yy.set, xscrollcommand=xx.set)
-        self.matrix_tree.grid(row=0, column=0, sticky='nsew')
-        yy.grid(row=0, column=1, sticky='ns'); xx.grid(row=1, column=0, sticky='ew')
-        box.columnconfigure(0, weight=1); box.rowconfigure(0, weight=1)
+        self.matrix_tree.set_callbacks(lambda first, last: self._matrix_xscroll(xx, first, last),
+                                       lambda first, last: self._matrix_yscroll(yy, first, last))
+        self.matrix_tree.grid(row=1, column=0, sticky='nsew')
+        yy.grid(row=1, column=1, sticky='ns'); xx.grid(row=2, column=0, sticky='ew')
+        box.columnconfigure(0, weight=1); box.rowconfigure(1, weight=1)
+        self.matrix_tree.bind('<Control-MouseWheel>', lambda e: self._scale_matrix(1 if e.delta > 0 else -1), add='+')
+        self.matrix_tree.bind('<Control-Button-4>', lambda _e: self._scale_matrix(1), add='+')
+        self.matrix_tree.bind('<Control-Button-5>', lambda _e: self._scale_matrix(-1), add='+')
+        self.matrix_group_header.bind('<Configure>', lambda _e: self._draw_matrix_groups())
+        self._apply_matrix_scale()
         self.matrix_tree.bind('<Double-1>', self._edit_matrix_cell)
         self._matrix_hover_job = None
         self._matrix_tooltip = None
@@ -449,31 +596,87 @@ class Is2Studio(tk.Tk):
                   style='Muted.TLabel', padding=(12, 7)).pack(anchor='w')
         self._matrix_action_ids: list[str] = []
         self._matrix_parameter_ids: list[str] = []
+        self._matrix_context = None
 
     def _refresh_matrix(self):
         if hasattr(self, "_matrix_hover_job"):
             self._matrix_hide_tooltip()
         if self.doc is None:
+            self._matrix_context = None
+            self._matrix_group_labels = []
+            self.matrix_tree.set_data([], [], [])
+            self._draw_matrix_groups()
             return
         try:
-            headers, rows, self._matrix_parameter_ids, warnings = grouped_matrix(self.doc)
+            self._matrix_context = matrix_context(self.doc)
+            headers, rows, self._matrix_parameter_ids, warnings = grouped_matrix(self.doc, context=self._matrix_context)
             self._matrix_action_ids = [r.action_id for r in action_tree_rows(self.doc)]
             if len(headers) > 300:
+                self._matrix_group_labels = []
+                self.matrix_tree.set_data([], [], [])
+                self._draw_matrix_groups()
                 self.matrix_status.set('Матрица очень широкая: используйте CSV-экспорт.')
                 return
-            cols = [f'm{i}' for i in range(len(headers))]
-            self.matrix_tree.delete(*self.matrix_tree.get_children())
-            self.matrix_tree.configure(columns=cols)
-            for i, (key, caption) in enumerate(zip(cols, headers)):
-                self.matrix_tree.heading(key, text=caption)
-                self.matrix_tree.column(key, width=76 if i == 0 else 128 if i == 1 else 94,
-                                        minwidth=58, stretch=False, anchor='center')
-            for index, row in enumerate(rows):
-                self.matrix_tree.insert('', 'end', iid=f'matrix{index}', values=row)
+            self._matrix_group_labels = [caption.split('\n', 1)[0] for caption in headers[2:]]
+            widths = [round((72 if i == 0 else 90 if i == 1 else 66) * self._matrix_zoom) for i in range(len(headers))]
+            self.matrix_tree.set_data([caption.split('\n', 1)[-1] for caption in headers], rows, widths)
+            self.matrix_tree._sync_scrollbars()
             self.matrix_status.set(f'{len(rows)} действий · {len(self._matrix_parameter_ids)} параметров · * функция, + аргумент, . по умолчанию. '
-                                   f'Неоднозначных записей: {sum(1 for w in warnings if w.startswith("Запись matrix"))}. ~ — предположение о структурном символе; не записано в файл, требует сверки с ИС-2.')
+                                   f'Неоднозначных записей: {sum(1 for w in warnings if w.startswith("Запись matrix"))}. [ / ] — начало / конец последовательности; структурные знаки рассчитаны для просмотра.')
+            self.after_idle(self._draw_matrix_groups)
         except (ValueError, ProjectFormatError, KeyError) as exc:
             messagebox.showerror('Матричная диаграмма', str(exc), parent=self)
+
+    def _matrix_xscroll(self, scrollbar, first, last):
+        scrollbar.set(first, last)
+        self.matrix_group_header.xview_moveto(float(first))
+        if getattr(self, '_matrix_tooltip', None) is not None or getattr(self, '_matrix_hover_job', None) is not None:
+            self._matrix_hide_tooltip()
+
+    def _matrix_yscroll(self, scrollbar, first, last):
+        scrollbar.set(first, last)
+        if getattr(self, '_matrix_tooltip', None) is not None or getattr(self, '_matrix_hover_job', None) is not None:
+            self._matrix_hide_tooltip()
+
+    def _scale_matrix(self, direction):
+        self._matrix_zoom = max(0.7, min(1.4, round(self._matrix_zoom + direction * 0.1, 1)))
+        self._apply_matrix_scale()
+        return 'break'
+
+    def _apply_matrix_scale(self):
+        size = max(7, round(self._matrix_base_font_size * self._matrix_zoom))
+        self._matrix_font.configure(size=size)
+        self._matrix_heading_font.configure(size=size)
+        self._matrix_zoom_text.set(f'{round(self._matrix_zoom * 100)}%')
+        widths = [max(40, round((72 if i == 0 else 90 if i == 1 else 66) * self._matrix_zoom))
+                  for i in range(len(self.matrix_tree.headers))]
+        self.matrix_tree.set_scale(widths, round(27 * self._matrix_zoom))
+        self.matrix_tree._sync_scrollbars()
+        self._draw_matrix_groups()
+
+    def _draw_matrix_groups(self):
+        canvas = self.matrix_group_header
+        canvas.delete('all')
+        widths = self.matrix_tree.widths
+        if len(widths) < 2:
+            return
+        total = sum(widths)
+        palette = PALETTES[self.theme_name.get()]
+        canvas.configure(background=palette['field'], scrollregion=(0, 0, total, 25))
+        x = widths[0] + widths[1]
+        canvas.create_rectangle(0, 0, x, 25, fill=palette['surface'], outline=palette['border'])
+        start = 0
+        while start < len(self._matrix_group_labels):
+            end = start + 1
+            while end < len(self._matrix_group_labels) and self._matrix_group_labels[end] == self._matrix_group_labels[start]:
+                end += 1
+            width = sum(widths[2 + start:2 + end])
+            canvas.create_rectangle(x, 0, x + width, 25, fill=palette['surface'], outline=palette['border'])
+            canvas.create_text(x + width / 2, 12, text=self._matrix_group_labels[start],
+                               fill=palette['ink'], font=self._matrix_heading_font, width=max(1, width - 6))
+            x += width
+            start = end
+        canvas.xview_moveto(self.matrix_tree.xview()[0])
 
     def _matrix_hide_tooltip(self, _event=None):
         if self._matrix_hover_job is not None:
@@ -499,7 +702,7 @@ class Is2Studio(tk.Tk):
             try:
                 row_idx = int(row.removeprefix('matrix'))
                 col_idx = int(col[1:])-3
-                text = cell_description(self.doc, self._matrix_action_ids[row_idx], self._matrix_parameter_ids[col_idx])
+                text = cell_description(self.doc, self._matrix_action_ids[row_idx], self._matrix_parameter_ids[col_idx], context=self._matrix_context)
                 tip = tk.Toplevel(self)
                 tip.wm_overrideredirect(True)
                 tip.wm_geometry(f'+{event.x_root + 14}+{event.y_root + 18}')
@@ -621,24 +824,35 @@ class Is2Studio(tk.Tk):
             self.forms_tree.delete(*self.forms_tree.get_children())
             cols=[f"c{i}" for i in range(len(headers))]
             self.forms_tree.configure(columns=cols)
-            for name,title in zip(cols,headers):
+            font = tkfont.nametofont('TkDefaultFont')
+            for index, (name,title) in enumerate(zip(cols,headers)):
                 self.forms_tree.heading(name,text=title)
-                self.forms_tree.column(name,width=180 if len(headers)<12 else 100,minwidth=50,stretch=False)
+                samples = (str(row[index]) for row in rows[:1000] if len(row) > index)
+                content_width = max((font.measure(value.replace('\n', ' ')) for value in samples), default=0)
+                width = min(600, max(90, font.measure(title) + 24, content_width + 24))
+                self.forms_tree.column(name,width=width,minwidth=60,stretch=False)
             for row in rows:
                 self.forms_tree.insert("", "end", values=row)
             self.form_status.set(f"Строк: {len(rows)}. " + " ".join(warnings))
+            self.form_cell_text.set('Щёлкните по ячейке, чтобы увидеть её содержимое полностью.')
         except (ValueError, ProjectFormatError, KeyError) as exc:
             messagebox.showerror("Формы",str(exc),parent=self)
 
+    def _show_form_cell(self, event):
+        row = self.forms_tree.identify_row(event.y)
+        col = self.forms_tree.identify_column(event.x)
+        if not row or not col:
+            return
+        index = int(col[1:]) - 1
+        values = self.forms_tree.item(row, 'values')
+        if 0 <= index < len(values):
+            heading = self.forms_tree.heading(f'#{index + 1}', 'text')
+            self.form_cell_text.set(f'{heading}: {values[index]}')
+
     def _build_action_page(self):
-        views = ButtonNotebook(self.action_page)
-        views.pack(fill='both', expand=True)
-        diagram_page = ttk.Frame(views)
-        editor_page = ttk.Frame(views)
-        views.add(diagram_page, text='Диаграмма')
-        views.add(editor_page, text='Дерево и редактирование')
-        self.decomposition_panel = DecompositionPanel(diagram_page, self)
+        self.decomposition_panel = DecompositionPanel(self.action_page, self)
         self.decomposition_panel.pack(fill='both', expand=True)
+        editor_page = self.action_editor_page
         bar = ttk.Frame(editor_page, padding=6)
         bar.pack(fill="x")
         for text, command in (("Новый корень", self.add_root_action), ("Добавить дочерний", self.add_child_action), ("↑", lambda: self.move_action(-1)), ("↓", lambda: self.move_action(1)), ("Изменить", self.edit_action), ("Удалить", self.delete_action), ("Обновить", self._refresh_actions)):
@@ -699,11 +913,20 @@ class Is2Studio(tk.Tk):
         bar.pack(fill="x")
         ttk.Button(bar, text="Обновить схему", command=self._refresh_diagram).pack(side="left")
         ttk.Button(bar, text="Изменить выбранное действие", command=self.edit_action).pack(side="left", padx=5)
+        self.diagram_zoom = 1.0
+        ttk.Button(bar, text='−', width=3, command=lambda: self._diagram_scale(.8)).pack(side='left')
+        ttk.Button(bar, text='+', width=3, command=lambda: self._diagram_scale(1.25)).pack(side='left', padx=3)
+        ttk.Button(bar, text='100%', command=self._diagram_reset_zoom).pack(side='left')
         ttk.Label(bar, text="Сплошная стрелка — состав (type=2); пунктир — порядок соседей (type=3).", padding=(8, 0)).pack(side="left")
         holder = ttk.Frame(self.diagram_page)
         holder.pack(fill="both", expand=True, padx=6, pady=(0, 6))
         self.diagram_canvas = tk.Canvas(holder, background="white", highlightthickness=0,
                                         xscrollincrement=30, yscrollincrement=30)
+        self.diagram_canvas.bind('<Map>', lambda _e: self._flush_deferred_view('diagram'), add='+')
+        self._diagram_zoom_redraw = CoalescedCallback(self.diagram_canvas, self._refresh_diagram, interval_ms=30)
+        self.diagram_canvas._theme_course_canvas = True
+        self.diagram_caption = tk.StringVar(value='Выберите действие для просмотра полного названия.')
+        ttk.Label(self.diagram_page, textvariable=self.diagram_caption, wraplength=1200, padding=(8, 2)).pack(anchor='w', fill='x')
         xscroll = ttk.Scrollbar(holder, orient="horizontal", command=self.diagram_canvas.xview)
         yscroll = ttk.Scrollbar(holder, orient="vertical", command=self.diagram_canvas.yview)
         self.diagram_canvas.configure(xscrollcommand=xscroll.set, yscrollcommand=yscroll.set)
@@ -714,6 +937,25 @@ class Is2Studio(tk.Tk):
         holder.columnconfigure(0, weight=1)
         self.diagram_canvas.bind("<Button-1>", self._diagram_click)
         self.diagram_canvas.bind("<Double-Button-1>", self._diagram_double_click)
+        self.diagram_canvas.bind('<Control-MouseWheel>', self._diagram_wheel_zoom)
+        self.diagram_canvas.bind('<Control-Button-4>', lambda _e: self._diagram_scale(1.08))
+        self.diagram_canvas.bind('<Control-Button-5>', lambda _e: self._diagram_scale(1/1.08))
+        self.diagram_canvas.bind('<ButtonPress-2>', lambda e: self.diagram_canvas.scan_mark(e.x, e.y))
+        self.diagram_canvas.bind('<B2-Motion>', lambda e: self.diagram_canvas.scan_dragto(e.x, e.y, gain=1))
+
+    def _diagram_scale(self, factor):
+        self.diagram_zoom = max(.5, min(2.0, self.diagram_zoom * factor))
+        self._diagram_zoom_redraw.request()
+        return 'break'
+
+    def _diagram_wheel_zoom(self, event):
+        steps = wheel_steps(event.delta, self.diagram_canvas.tk.call('tk', 'windowingsystem'))
+        if steps: self._diagram_scale(1.08 ** steps)
+        return 'break'
+
+    def _diagram_reset_zoom(self):
+        self.diagram_zoom = 1.0
+        self._refresh_diagram()
 
     def _refresh_diagram(self):
         if self.doc is None:
@@ -723,18 +965,22 @@ class Is2Studio(tk.Tk):
         canvas = self.diagram_canvas
         canvas.delete("all")
         rows, positions, composition_edges, sequence_edges = action_diagram_layout(self.doc)
-        node_width, node_height = 190, 62
+        zoom = self.diagram_zoom
+        positions = {ident:(x*zoom, y*zoom) for ident,(x,y) in positions.items()}
+        node_width, node_height = 250*zoom, 94*zoom
+        palette = PALETTES[self.theme_name.get()]
+        canvas.configure(background=palette['field'])
         # Draw edges first so that node boxes remain visually on top.
         for parent_id, child_id in composition_edges:
             px, py = positions[parent_id]
             cx, cy = positions[child_id]
             canvas.create_line(px + node_width, py + node_height / 2, cx, cy + node_height / 2,
-                               arrow="last", width=2, fill="#334155", tags=("edge", "composition"))
+                               arrow="last", width=max(1, 2*zoom), fill=palette['muted'], tags=("edge", "composition"))
         for current_id, next_id in sequence_edges:
             ax, ay = positions[current_id]
             bx, by = positions[next_id]
             canvas.create_line(ax + node_width / 2, ay + node_height, bx + node_width / 2, by,
-                               arrow="last", width=2, dash=(6, 4), fill="#2563eb",
+                               arrow="last", width=max(1, 2*zoom), dash=(6, 4), fill=palette['accent'],
                                tags=("edge", "sequence"))
         nodes = {node.get("id", ""): node for node in self.doc.actions}
         selected = self._selected_id(self.action_tree) if hasattr(self, "action_tree") else None
@@ -745,21 +991,22 @@ class Is2Studio(tk.Tk):
             subtitle = f"ID {row.action_id}   type={node.get('type', '?')}   level={node.get('level', '?')}"
             tags = ("node", f"action:{row.action_id}")
             is_selected = row.action_id == selected
-            outline = "#1d4ed8" if is_selected else "#475569"
+            outline = palette['primary'] if is_selected else palette['border']
             width = 3 if is_selected else 1
             canvas.create_rectangle(x, y, x + node_width, y + node_height,
-                                    fill="#eff6ff" if is_selected else "#f8fafc",
+                                    fill=palette['selected'] if is_selected else palette['surface'],
                                     outline=outline, width=width, tags=tags)
-            canvas.create_text(x + 9, y + 8, anchor="nw", width=node_width - 18,
-                               text=title, font=("TkDefaultFont", 10, "bold"), fill="#0f172a", tags=tags)
-            canvas.create_text(x + 9, y + 36, anchor="nw", text=subtitle,
-                               font=("TkDefaultFont", 8), fill="#475569", tags=tags)
+            title_lines = textwrap.wrap(title, width=32, max_lines=3, placeholder='…') or ['(без названия)']
+            canvas.create_text(x + 9*zoom, y + 8*zoom, anchor="nw", width=node_width - 18*zoom,
+                               text='\n'.join(title_lines), font=("TkDefaultFont", max(7,round(10*zoom)), "bold"), fill=palette['ink'], tags=tags)
+            canvas.create_text(x + 9*zoom, y + 72*zoom, anchor="nw", text=subtitle,
+                               font=("TkDefaultFont", max(6,round(8*zoom))), fill=palette['muted'], tags=tags)
         max_x = max((x for x, _ in positions.values()), default=0) + node_width + 80
         max_y = max((y for _, y in positions.values()), default=0) + node_height + 80
         canvas.configure(scrollregion=(0, 0, max(800, max_x), max(600, max_y)))
         if not rows:
             canvas.create_text(30, 30, anchor="nw", text="В проекте пока нет действий.",
-                               font=("TkDefaultFont", 12), fill="#475569")
+                               font=("TkDefaultFont", 12), fill=palette['muted'])
 
     def _diagram_click(self, event):
         canvas = self.diagram_canvas
@@ -772,6 +1019,7 @@ class Is2Studio(tk.Tk):
                 if self.action_tree.exists(ident):
                     self.action_tree.selection_set(ident)
                     self.action_tree.see(ident)
+                    self.diagram_caption.set(f"{ident}: {self.doc.action(ident).get('name', '')}")
                     self.status.set(f"Выбрано действие {ident}")
                     return ident
                 break
@@ -790,7 +1038,7 @@ class Is2Studio(tk.Tk):
         tree = GridTreeview(page, show="headings", selectmode="browse")
         tree.pack(fill="both", expand=True, padx=6, pady=(0, 6))
         if title == "Параметры":
-            columns = ("id", "name", "group", "codingType", "number", "sign", "object")
+            columns = ("row", "group", "codingType", "number", "object", "sign", "name", "id")
         else:
             columns = ("row", "id", "name", "attributes")
         tree["columns"] = columns
@@ -799,16 +1047,21 @@ class Is2Studio(tk.Tk):
                     "object": "Объект", "attributes": "Атрибуты XML"}
         for column in columns:
             tree.heading(column, text=captions.get(column, column))
-            tree.column(column, width=(270 if column == "name" else 130) if column != "attributes" else 500, anchor="w")
+            width = {"row": 45, "group": 180, "codingType": 130, "number": 70,
+                     "object": 180, "sign": 120, "name": 400, "id": 65, "attributes": 500}[column]
+            tree.column(column, width=width, minwidth=40, stretch=column in ("name", "attributes"), anchor="w")
         if title == "Параметры":
             self.param_tree = tree
             ttk.Button(bar, text="Доп. XML…", command=self.edit_parameter_advanced).pack(side="left", padx=(6, 0))
             ttk.Button(bar, text="Назначить объект…", command=self.assign_parameter_object).pack(side="left", padx=(6, 0))
             ttk.Button(bar, text="Снять объект", command=self.clear_parameter_object).pack(side="left", padx=(4, 0))
             tree.bind("<<TreeviewSelect>>", self._on_tree_selection_changed, add="+")
+            tree.bind('<Double-1>', lambda event: self._edit_record_at(tree, event, edit))
         else:
             self.object_tree = tree
+            ttk.Button(bar, text='Доп. XML…', command=self.edit_object_advanced).pack(side='left', padx=(6, 0))
             tree.bind("<<TreeviewSelect>>", self._on_tree_selection_changed, add="+")
+            tree.bind('<Double-1>', lambda event: self._edit_record_at(tree, event, edit))
 
     def _build_category_page(self):
         bar = ttk.Frame(self.concept_page, padding=6)
@@ -868,6 +1121,8 @@ class Is2Studio(tk.Tk):
         bar.pack(fill="x")
         for text, command in (("Добавить связь", self.add_concept_link), ("Изменить", self.edit_concept_link), ("Доп. атрибуты…", self.edit_concept_link_attributes), ("Удалить", self.delete_concept_link), ("Пересчитать AutoRange", self.recompute_auto_ranges), ("Обновить", self._refresh_links)):
             ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 5))
+        self.concept_links_summary = tk.StringVar(value='Откройте проект.')
+        ttk.Label(self.link_page, textvariable=self.concept_links_summary, padding=(8, 3)).pack(anchor='w')
         self.link_tree = GridTreeview(self.link_page, columns=("id", "type", "label", "e1", "e2", "e3", "range"), show="headings", selectmode="browse")
         labels = {"id":"ID", "type":"Тип", "label":"Связь", "e1":"E1", "e2":"E2", "e3":"E3", "range":"Range"}
         for c in self.link_tree["columns"]:
@@ -884,6 +1139,8 @@ class Is2Studio(tk.Tk):
                               ("Удалить", self.delete_spz_element),
                               ("Обновить", self._refresh_other)):
             ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 5))
+        self.dynamic_summary = tk.StringVar(value='Откройте проект.')
+        ttk.Label(self.other_page, textvariable=self.dynamic_summary, padding=(8, 3)).pack(anchor='w')
         split = ttk.Panedwindow(self.other_page, orient="vertical")
         split.pack(fill="both", expand=True, padx=6, pady=(0, 6))
         upper = ttk.Frame(split)
@@ -1013,6 +1270,9 @@ class Is2Studio(tk.Tk):
             canvas_holder, background="white", highlightthickness=0,
             xscrollincrement=30, yscrollincrement=30,
         )
+        self._graph_drag_redraw = CoalescedCallback(self.graph_canvas, self._refresh_graph, interval_ms=25)
+        self._graph_zoom_redraw = CoalescedCallback(self.graph_canvas, self._finish_graph_zoom, interval_ms=30)
+        self.graph_canvas.bind('<Map>', lambda _e: self._flush_deferred_view('graph'), add='+')
         xscroll = ttk.Scrollbar(canvas_holder, orient="horizontal", command=self.graph_canvas.xview)
         yscroll = ttk.Scrollbar(canvas_holder, orient="vertical", command=self.graph_canvas.yview)
         self.graph_canvas.configure(xscrollcommand=xscroll.set, yscrollcommand=yscroll.set)
@@ -1028,8 +1288,8 @@ class Is2Studio(tk.Tk):
         self.graph_canvas.bind("<ButtonPress-2>", lambda e: self.graph_canvas.scan_mark(e.x, e.y))
         self.graph_canvas.bind("<B2-Motion>", lambda e: self.graph_canvas.scan_dragto(e.x, e.y, gain=1))
         self.graph_canvas.bind("<Control-MouseWheel>", self._graph_wheel_zoom)
-        self.graph_canvas.bind("<Control-Button-4>", lambda e: self._graph_zoom_step(1.15))
-        self.graph_canvas.bind("<Control-Button-5>", lambda e: self._graph_zoom_step(0.87))
+        self.graph_canvas.bind("<Control-Button-4>", lambda e: self._graph_zoom_step(1.08))
+        self.graph_canvas.bind("<Control-Button-5>", lambda e: self._graph_zoom_step(1/1.08))
         ttk.Label(detail_holder, text="Сведения о выбранном узле", padding=(2, 4)).pack(anchor="w")
         self.graph_detail = tk.Text(detail_holder, wrap="word", height=7, state="disabled", font=("Consolas", 9))
         self.graph_detail.pack(fill="both", expand=True)
@@ -1164,6 +1424,10 @@ class Is2Studio(tk.Tk):
 
     def _on_notebook_tab_changed(self, _event=None):
         selected = self.notebook.select()
+        if self._diagram_focus is not None:
+            focus_page = self.course_page if self._diagram_focus is self.course_panel else self.action_page
+            if selected != str(focus_page):
+                self.exit_diagram_focus()
         for page, button in self.navigation_buttons.items():
             button.state(['selected'] if page == selected else ['!selected'])
         if self.notebook.select() == str(self.forms_page):
@@ -1188,8 +1452,8 @@ class Is2Studio(tk.Tk):
         graph = build_relationship_graph(self.doc)
         self.graph_positions = automatic_relationship_layout(graph)
         self.graph_selected_key = None
+        self.graph_zoom = 1.0
         self._refresh_graph()
-        self._graph_fit()
         self._save_graph_view_state()
         self.status.set("Выполнена автоматическая раскладка графа; координаты сохранены отдельно от .is2")
 
@@ -1242,8 +1506,11 @@ class Is2Studio(tk.Tk):
             else:
                 group_key = kind if kind in columns else "relation"
             grouped[group_key].append(node)
+        active_keys = [key for key, items in grouped.items() if items]
+        columns = {key: (30 + 360 * i, *columns[key][1:]) for i, key in enumerate(active_keys)}
+        grouped = {key: grouped[key] for key in active_keys}
         positions = {}
-        top, row_step = 70, 78
+        top, row_step = 70, 108
         for group_key, items in grouped.items():
             items.sort(key=lambda n: (
                 int(n.get("record_index", 0)) if n.get("kind") == "relation" else (0 if str(n.get("id", "")).isdigit() else 1),
@@ -1275,13 +1542,20 @@ class Is2Studio(tk.Tk):
         columns, grouped, defaults = self._graph_default_layout(nodes)
         for key, position in defaults.items():
             self.graph_positions.setdefault(key, position)
+        # Existing saved layouts keep their coordinates; align headings with them.
+        columns = {key: (min(self.graph_positions[n['key']][0] for n in grouped[key]), *config[1:])
+                   for key, config in columns.items()}
         # Drop stale keys so a removed link cannot leave phantom layout data.
         all_graph_keys = {node["key"] for node in graph["nodes"]}
         self.graph_positions = {key: value for key, value in self.graph_positions.items() if key in all_graph_keys}
         zoom = self.graph_zoom
-        node_width, node_height = 280 * zoom, 58 * zoom
+        node_width, node_height = 280 * zoom, 82 * zoom
         scale = lambda v: v * zoom
-        colors = {"scbinarylink": "#64748b", "aie_binary_link": "#0f766e", "ae_content_link": "#7c3aed", "parameter_object": "#4d7c0f"}
+        palette = PALETTES[self.theme_name.get()]
+        canvas.configure(background=palette['field'])
+        dark = self.theme_name.get() == 'dark'
+        colors = ({"scbinarylink": "#aebdd4", "aie_binary_link": "#6bd5c4", "ae_content_link": "#c0a5ff", "parameter_object": "#a6d27d"} if dark else
+                  {"scbinarylink": "#64748b", "aie_binary_link": "#0f766e", "ae_content_link": "#7c3aed", "parameter_object": "#4d7c0f"})
         node_groups = {}
         for group_key, group_nodes in grouped.items():
             for group_node in group_nodes:
@@ -1300,24 +1574,25 @@ class Is2Studio(tk.Tk):
             color = colors.get(relation_node.get("relation_kind"), "#64748b")
             x1, y1 = relation_pos
             x2, y2 = target_pos
-            start = (scale(x2 + 280), scale(y2 + 29))
-            end = (scale(x1), scale(y1 + 29))
+            start = (scale(x2 + 280), scale(y2 + 41))
+            end = (scale(x1), scale(y1 + 41))
             canvas.create_line(*start, *end, fill=color, width=max(1, 1.5 * zoom), tags=("graph-edge",))
             mid_x, mid_y = (start[0] + end[0]) / 2, (start[1] + end[1]) / 2
             canvas.create_text(mid_x, mid_y - 7 * zoom, text=edge["slot"], fill=color,
                                font=("TkDefaultFont", max(7, int(8 * zoom)), "bold"), tags=("graph-edge-label",))
         visible_positions = []
         for kind, (x, heading, fill, outline) in columns.items():
+            if dark:
+                fill, outline = '#262b3b', palette['accent']
             x_scaled = scale(x)
             collapsed = kind in self.graph_collapsed_groups
             marker = "▸" if collapsed else "▾"
-            heading_item = canvas.create_text(
+            canvas.create_text(
                 x_scaled, scale(28), anchor="nw",
                 text=f"{marker} {heading} ({len(grouped[kind])})",
                 font=("TkDefaultFont", max(7, int(9 * zoom)), "bold"), fill=outline,
                 tags=("graph-group-header", f"graph-group:{kind}"),
             )
-            canvas.tag_bind(heading_item, "<Button-1>", lambda event, group=kind: self._toggle_graph_group(group))
             if collapsed:
                 continue
             for node in grouped[kind]:
@@ -1332,12 +1607,14 @@ class Is2Studio(tk.Tk):
                     width=max(1, 3 * zoom if selected else 1.4 * zoom), tags=tags,
                 )
                 self.graph_item_ids[node["key"]] = rect
+                title = '\n'.join(textwrap.wrap(node.get('label', node['key']), width=38, max_lines=2, placeholder='…'))
+                detail = textwrap.shorten(node.get('detail', ''), width=48, placeholder='…')
                 canvas.create_text(x0 + 9 * zoom, y0 + 7 * zoom, anchor="nw", width=node_width - 18 * zoom,
-                                   text=node.get("label", node["key"]),
-                                   font=("TkDefaultFont", max(7, int(9 * zoom)), "bold"), fill="#18212f", tags=tags)
-                canvas.create_text(x0 + 9 * zoom, y0 + 34 * zoom, anchor="nw", width=node_width - 18 * zoom,
-                                   text=node.get("detail", ""),
-                                   font=("TkDefaultFont", max(6, int(8 * zoom))), fill="#475569", tags=tags)
+                                   text=title,
+                                   font=("TkDefaultFont", max(7, int(10 * zoom)), "bold"), fill=palette['ink'] if dark else '#18212f', tags=tags)
+                canvas.create_text(x0 + 9 * zoom, y0 + 59 * zoom, anchor="nw", width=node_width - 18 * zoom,
+                                   text=detail,
+                                   font=("TkDefaultFont", max(7, int(9 * zoom))), fill=palette['muted'] if dark else '#475569', tags=tags)
 
         max_x = max((px + 310 for px, _py in visible_positions), default=1380)
         max_y = max((py + 100 for _px, py in visible_positions), default=480)
@@ -1359,9 +1636,9 @@ class Is2Studio(tk.Tk):
             "Семейства связей показаны отдельными колонками; вид хранится отдельно от .is2."
         )
         if not nodes:
-            canvas.create_text(30, 45, anchor="nw", text="По заданному фильтру узлы не найдены.", font=("TkDefaultFont", 11), fill="#475569")
+            canvas.create_text(30, 45, anchor="nw", text="По заданному фильтру узлы не найдены.", font=("TkDefaultFont", 11), fill=palette['muted'])
         elif not edges:
-            canvas.create_text(30, 45, anchor="nw", text="Записи связей не найдены. Изолированные элементы показаны в своих колонках.", font=("TkDefaultFont", 10), fill="#64748b")
+            canvas.create_text(30, 45, anchor="nw", text="Записи связей не найдены. Изолированные элементы показаны в своих колонках.", font=("TkDefaultFont", 10), fill=palette['muted'])
         details = "Выберите узел. Двойной щелчок открывает его таблицу; связь можно изменить или удалить кнопками выше."
         if graph["dangling_references"]:
             details += "\n\nНеразрешённые endpoint-ы:\n" + "\n".join(
@@ -1397,16 +1674,15 @@ class Is2Studio(tk.Tk):
             self._save_graph_view_state()
 
     def _graph_node_key_at(self, event):
-        x, y = self.graph_canvas.canvasx(event.x), self.graph_canvas.canvasy(event.y)
-        found = self.graph_canvas.find_overlapping(x - 1, y - 1, x + 1, y + 1)
-        for item in reversed(found):
-            for tag in self.graph_canvas.gettags(item):
-                if tag.startswith("graph-key:"):
-                    return tag.split(":", 1)[1]
-        return None
+        return canvas_tag_at(self.graph_canvas, event, 'graph-key:')
 
     def _graph_press(self, event):
         self.graph_canvas.focus_set()
+        group = canvas_tag_at(self.graph_canvas, event, 'graph-group:')
+        if group is not None:
+            self.graph_drag = None
+            self._toggle_graph_group(group)
+            return 'break'
         key = self._graph_node_key_at(event)
         if key:
             self._graph_select_node(key)
@@ -1434,12 +1710,14 @@ class Is2Studio(tk.Tk):
         drag["moved"] = True
         ox, oy = drag["origin"]
         self.graph_positions[drag["key"]] = (max(0.0, ox + dx), max(45.0, oy + dy))
-        self._refresh_graph()
+        self._graph_drag_redraw.request()
 
     def _graph_release(self, _event):
         drag = self.graph_drag
         self.graph_drag = None
         if drag and drag.get("moved"):
+            self._graph_drag_redraw.cancel()
+            self._refresh_graph()
             self._save_graph_view_state()
             self.status.set("Положение узла изменено (только sidecar представления, XML проекта не менялся)")
         return "break"
@@ -1458,7 +1736,7 @@ class Is2Studio(tk.Tk):
         kind = node.get("kind")
         ident = str(node.get("id", ""))
         if kind == "action" and self.action_tree.exists(ident):
-            self.notebook.select(self.action_page); self.action_tree.selection_set(ident); self.action_tree.see(ident)
+            self._show_page(self.action_editor_page); self.action_tree.selection_set(ident); self.action_tree.see(ident)
         elif kind == "category" and self.category_tree.exists(ident):
             self._show_page(self.concept_page); self.category_tree.selection_set(ident); self.category_tree.see(ident)
         elif kind == "spz_element" and self.spz_tree.exists(ident):
@@ -1480,11 +1758,15 @@ class Is2Studio(tk.Tk):
 
     def _graph_zoom_step(self, factor):
         self.graph_zoom = min(2.5, max(0.5, self.graph_zoom * factor))
+        self._graph_zoom_redraw.request()
+
+    def _finish_graph_zoom(self):
         self._refresh_graph()
         self._save_graph_view_state()
 
     def _graph_wheel_zoom(self, event):
-        self._graph_zoom_step(1.15 if event.delta > 0 else 0.87)
+        steps = wheel_steps(event.delta, self.graph_canvas.tk.call('tk', 'windowingsystem'))
+        if steps: self._graph_zoom_step(1.08 ** steps)
         return "break"
 
     def _graph_fit(self):
@@ -3132,6 +3414,17 @@ class Is2Studio(tk.Tk):
         self.undo_button.configure(image=(self._history_icons[0], 'disabled', self._history_icons[1]))
         self.redo_button.configure(image=(self._history_icons[2], 'disabled', self._history_icons[3]))
 
+    def _tooltip_label(self):
+        return 'Подсказки: вкл' if self.tooltips_enabled.get() else 'Подсказки: выкл'
+
+    def toggle_tooltips(self):
+        enabled = not self.tooltips_enabled.get()
+        self.tooltips_enabled.set(enabled)
+        self.tooltip_button_text.set(self._tooltip_label())
+        self.button_tooltips.hide()
+        if not save_tooltips(enabled):
+            messagebox.showwarning('Настройки', 'Подсказки переключены, но сохранить настройку не удалось.', parent=self)
+
     def _update_theme_button(self):
         self.theme_button.configure(text='☼  Светлая' if self.theme_name.get() == 'dark' else '☾  Тёмная')
 
@@ -3146,6 +3439,10 @@ class Is2Studio(tk.Tk):
         self._update_history_icons()
         self.course_panel._draw()
         self.decomposition_panel.draw()
+        self._draw_matrix_groups()
+        self.matrix_tree._schedule()
+        self._refresh_diagram()
+        self._refresh_graph()
         if not save_theme(name):
             messagebox.showwarning("Настройки", "Тема применена, но сохранить её для следующего запуска не удалось.", parent=self)
 
@@ -3216,6 +3513,20 @@ class Is2Studio(tk.Tk):
             messagebox.showwarning("Совместимость с ИС-2", "\n".join(lines), parent=self)
             self.status.set("Совместимость: найдены структурные проблемы")
 
+    def _refresh_or_defer(self, key, widget, callback):
+        if widget.winfo_ismapped():
+            self._deferred_views.discard(key)
+            callback()
+        else:
+            self._deferred_views.add(key)
+
+    def _flush_deferred_view(self, key):
+        if key not in self._deferred_views:
+            return
+        self._deferred_views.discard(key)
+        if self.doc is not None:
+            {'diagram': self._refresh_diagram, 'graph': self._refresh_graph}[key]()
+
     def refresh_all(self):
         if self.doc is None:
             return
@@ -3223,13 +3534,13 @@ class Is2Studio(tk.Tk):
         self._refresh_actions()
         self.course_panel.refresh()
         self._refresh_matrix()
-        self._refresh_diagram()
+        self._refresh_or_defer('diagram', self.diagram_canvas, self._refresh_diagram)
         self._refresh_params()
         self._refresh_objects()
         self._refresh_categories()
         self._refresh_links()
         self._refresh_other()
-        self._refresh_graph()
+        self._refresh_or_defer('graph', self.graph_canvas, self._refresh_graph)
         xml = ET.tostring(self.doc.root, encoding="unicode")
         self.xml_text.configure(state="normal")
         self.xml_text.delete("1.0", "end")
@@ -3312,10 +3623,12 @@ class Is2Studio(tk.Tk):
             return
         self.param_tree.delete(*self.param_tree.get_children())
         objects = {node.get('id', ''): node.get('name', '') for node in self.doc.objects_node}
-        for node in self.doc.params_node.findall("param"):
+        for row, node in enumerate(self.doc.params_node.findall("param"), start=1):
             ref = node.get('o', '')
             object_label = (f"{objects[ref]} (ID {ref})" if ref in objects else (f"Не найден (ID {ref})" if ref and ref != '0' else '—'))
-            values = tuple(node.get(k, "") for k in ("id", "name", "group", "codingType", "number", "sign")) + (object_label,)
+            values = (row, group_label(node.get('group', '')), node.get('codingType', ''),
+                      node.get('number', ''), object_label, node.get('sign', ''),
+                      node.get('name', ''), node.get('id', ''))
             self.param_tree.insert("", "end", iid=node.get("id", ""), values=values)
 
     def _refresh_objects(self):
@@ -3358,15 +3671,19 @@ class Is2Studio(tk.Tk):
         duplicate_count = len(report["duplicate_numbers"])
         self.concept_summary_var.set(
             f"Категорий: {report['category_count']} · классов: {report['class_count']} · групп: {report['group_count']} · "
-            f"связей cs: {report['link_count']} · повторяющихся номеров: {duplicate_count} · показано: {len(visible)}"
+            f"связей cs: {report['link_count']} · повторяющихся номеров: {duplicate_count} · показано: {len(visible)}" +
+            (' · В проекте нет категорий cs; это допустимо.' if not records else
+             ' · Нет результатов для выбранных фильтров.' if not visible else '')
         )
 
     def _refresh_links(self):
         if self.doc is None:
             return
         self.link_tree.delete(*self.link_tree.get_children())
-        for record in self.doc.concept_structure.link_records():
+        records = self.doc.concept_structure.link_records()
+        for record in records:
             self.link_tree.insert("", "end", iid=record.id, values=(record.id, record.type, record.label, record.e1, record.e2, record.e3, record.range))
+        self.concept_links_summary.set(f'Связей cs: {len(records)}' + (' · В проекте нет связей cs; это допустимо.' if not records else ''))
 
     def _refresh_other(self):
         if self.doc is None:
@@ -3404,8 +3721,11 @@ class Is2Studio(tk.Tk):
                 f"content: {len(structure.content_records)} AEContentLink "
                 "(создание / изменение / удаление доступны)"
             )
+            self.dynamic_summary.set(f"Элементов spz: {len(structure.elements)} · связей spz: {len(structure.links)} · связей content: {len(structure.content_records)}. "
+                                     "Пустые разделы допустимы: проект может использовать только основную модель.")
         except Exception as exc:
             self.status.set(f"spz/content read warning: {exc}")
+            self.dynamic_summary.set(f'Ошибка чтения spz/content: {exc}')
         self._set_inspector_text(self.spz_link_detail, "Выберите запись, чтобы увидеть исходный XML.")
         self._set_inspector_text(self.content_detail, "Выберите запись, чтобы увидеть исходный XML.")
 
@@ -3423,40 +3743,46 @@ class Is2Studio(tk.Tk):
         self.wait_window(dialog)
         return dialog.result
 
+    def _edit_record_at(self, tree, event, edit):
+        ident = tree.identify_row(event.y)
+        if ident:
+            tree.selection_set(ident)
+            edit()
+
     def add_parameter(self):
         if self.doc is None: return
-        attrs = self._edit_json_record("Новый параметр — атрибуты", {"name":"", "group":"0", "codingType":"1", "number":"1", "sign":""})
+        dialog = ParameterDialog(self, self.doc)
+        self.wait_window(dialog)
+        attrs = dialog.result
         if attrs is None: return
+        if not attrs['o']: attrs.pop('o')
         try:
             ident = self.doc.add_parameter(attrs)
             self._mark_dirty(f"Создан параметр {ident}")
             self.refresh_all()
+            self.param_tree.selection_set(ident)
+            self.param_tree.see(ident)
         except Exception as exc: messagebox.showerror("Параметр", str(exc), parent=self)
 
     def edit_parameter(self):
         if self.doc is None: return
         ident, node = self._selected_attrs(self.param_tree, self.doc.params_node, "param")
         if node is None: return
-        object_options = tuple(["нет"] + [n.get("id", "") for n in self.doc.objects_node])
-        current_object = node.get("o", "") if node.get("o", "") in object_options else "нет"
-        dialog = RecordDialog(self, f"Параметр {ident}", [
-            ("name", "Наименование", node.get("name", ""), None),
-            ("group", "Группа", node.get("group", "0"), None),
-            ("number", "Номер", node.get("number", "1"), None),
-            ("codingType", "Тип кодирования (XML)", node.get("codingType", "1"), None),
-            ("sign", "Обозначение", node.get("sign", ""), None),
-            ("o", "Объект (ID)", current_object, object_options),
-        ])
+        dialog = ParameterDialog(self, self.doc, node)
         self.wait_window(dialog)
         if dialog.result is None: return
         data = dialog.result
-        if not data["number"].isdigit() or not data["group"].isdigit():
-            messagebox.showerror("Параметр", "Группа и номер должны быть целыми неотрицательными числами", parent=self)
-            return
         try:
-            changes = {key: value for key, value in data.items() if key != "o"}
+            defaults = {'group': '5', 'number': str(data['number']), 'codingType': '1', 'sign': '', 'name': ''}
+            changes = {key: value for key, value in data.items() if key != 'o'
+                       and value != node.get(key, defaults.get(key, ''))}
+            current_object = node.get('o', '')
+            object_changed = data['o'] != current_object and not (data['o'] == '' and current_object == '0')
+            if object_changed and data['o']:
+                self.doc.object(data['o'])
             self.doc.update_parameter(ident, **changes)
-            self.doc.set_parameter_object(ident, None if data["o"] == "нет" else data["o"])
+            if object_changed:
+                self.doc.set_parameter_object(ident, data['o'] or None)
             self._mark_dirty(f"Изменён параметр {ident}")
             self.refresh_all()
             self.param_tree.selection_set(ident)
@@ -3540,25 +3866,43 @@ class Is2Studio(tk.Tk):
 
     def add_object(self):
         if self.doc is None: return
-        attrs = self._edit_json_record("Новый объект — атрибуты", {"name":"Новый объект"})
-        if attrs is None: return
-        name = attrs.pop("name", "")
+        dialog = ObjectDialog(self)
+        self.wait_window(dialog)
+        if dialog.result is None: return
         try:
-            ident = self.doc.add_object(name, attributes=attrs)
+            ident = self.doc.add_object(dialog.result['name'])
             self._mark_dirty(f"Создан объект {ident}"); self.refresh_all()
+            self.object_tree.selection_set(ident)
+            self.object_tree.see(ident)
         except Exception as exc: messagebox.showerror("Объект", str(exc), parent=self)
 
     def edit_object(self):
         if self.doc is None: return
         ident, node = self._selected_attrs(self.object_tree, self.doc.objects_node)
         if node is None: return
+        dialog = ObjectDialog(self, node.get('name', ''))
+        self.wait_window(dialog)
+        if dialog.result is None or dialog.result['name'] == node.get('name', ''): return
+        try:
+            self.doc.update_object(ident, name=dialog.result['name'])
+            self._mark_dirty(f"Изменён объект {ident}"); self.refresh_all()
+            self.object_tree.selection_set(ident)
+            self.object_tree.see(ident)
+        except Exception as exc: messagebox.showerror("Объект", str(exc), parent=self)
+
+    def edit_object_advanced(self):
+        if self.doc is None: return
+        ident, node = self._selected_attrs(self.object_tree, self.doc.objects_node)
+        if node is None: return
         attrs = dict(node.attrib); attrs.pop("id", None)
-        changed = self._edit_json_record(f"Объект {ident}", attrs)
+        changed = self._edit_json_record(f"Дополнительные XML-атрибуты объекта {ident}", attrs)
         if changed is None: return
         try:
             self.doc.update_object(ident, **{k: (v if v != "" else None) for k,v in changed.items() if k != "id"})
             for k in set(attrs) - set(changed): self.doc.update_object(ident, **{k: None})
             self._mark_dirty(f"Изменён объект {ident}"); self.refresh_all()
+            self.object_tree.selection_set(ident)
+            self.object_tree.see(ident)
         except Exception as exc: messagebox.showerror("Объект", str(exc), parent=self)
 
     def _dependency_entry(self, domain: str, ident: str) -> dict | None:
@@ -3965,7 +4309,7 @@ class Is2Studio(tk.Tk):
             ttk.Label(body, image=window._brand_logo).pack(pady=(0, 12))
         except (OSError, tk.TclError):
             pass
-        ttk.Label(body, text='PzKpfw', font=('TkDefaultFont', 18, 'bold')).pack()
+        ttk.Label(body, text=f'PzKpfw {__version__}', font=('TkDefaultFont', 18, 'bold')).pack()
         ttk.Label(body, text='Редактор проектов .is2', style='Muted.TLabel').pack(pady=(0, 12))
         explanation = ('Независимый редактор моделей ИС-2: СПД, декомпозиция, '
                        'параметры, объекты, спецификации и матричные формы.\n\n'
@@ -3982,6 +4326,8 @@ class Is2Studio(tk.Tk):
         if self.dirty and not self._save_prompt():
             return
         self._save_graph_view_state()
+        self._matrix_hide_tooltip()
+        self.button_tooltips.hide()
         self.destroy()
 
 

@@ -9,7 +9,8 @@ from .gui_models import action_tree_rows
 
 ACTION_TYPES={'0':'Элементарное','1':'Альтернатива','2':'Последовательность','3':'Цикл'}
 STATUS={'0':'Э','1':'П'}
-FORMAL={'0':'Ан.','2':'Алг.'}
+FORMAL={'0':'Ан.','1':'Э','2':'Ал.','3':'С'}
+FORMAL_D={'0':'ан','1':'эм','2':'ал','3':'ст'}
 ROLES={'*':'Функция','+':'Аргумент','.':'Аргумент по умолчанию'}
 FORM_NAMES={'A':'Форма A — структура действий','B':'Форма B — предметные действия',
             'D1':'Форма D1 — параметры','D':'Форма D — элементарные действия',
@@ -36,6 +37,17 @@ def parameter_code(node):
 def _sort_number(value):
     try: return (0,int(value))
     except (ValueError,TypeError): return (1,str(value or ''))
+
+
+def action_sort_key(node):
+    return (_sort_number(node.get('level')), _sort_number(node.get('number')),
+            _sort_number(node.get('id')))
+
+
+def parameter_description(node):
+    name = node.get('name', '')
+    sign = node.get('sign', '')
+    return f'{name}, {sign}' if name and sign else name or sign or parameter_code(node)
 
 
 def _char(node):
@@ -78,9 +90,12 @@ def project_forms(doc):
     p_order={n.get('id',''):i for i,n in enumerate(params)}
     links.sort(key=lambda x:(order_by_id.get(x[0],len(actions)),p_order.get(x[1],len(params)),x[2]))
     forms={}
+    parents_with_links = {link.get('afe1', '') for link in doc.links if link.get('type') in ('2', '3')}
     rows=[]
-    for parent in actions:
+    for parent in sorted(actions, key=action_sort_key):
         pid=parent.get('id','')
+        if pid not in parents_with_links:
+            continue
         try: children=doc.sibling_order(pid)
         except Exception as exc:
             warnings.append(f'Порядок потомков действия {pid} не восстановлен: {exc}')
@@ -99,20 +114,60 @@ def project_forms(doc):
     forms['A']=(['Код ПД1','Код ПД2','Код ПД3','Вид компоновки'],rows)
     forms['B']=(['Код','Наименование','Статус','Степень формализации'],[
         [action_code(n),n.get('name',''),STATUS.get(n.get('status'),'код '+n.get('status','?')),
-         FORMAL.get(n.get('formalization'),'код '+n.get('formalization','?'))] for n in actions])
+         FORMAL.get(n.get('formalization'),'код '+n.get('formalization','?'))] for n in sorted(actions, key=action_sort_key)])
     forms['D1']=(['Код','Наименование','Обозначение','Объект'],[
         [parameter_code(n),n.get('name',''),n.get('sign',''),objects.get(n.get('o',''),'—')] for n in params])
+    links_by_action = defaultdict(list)
+    for a, p, mark, power in links:
+        links_by_action[a].append((param_by_id[p], mark))
     rows=[]
-    for n in actions:
+    for n in sorted(actions, key=action_sort_key):
         if n.get('type')!='0': continue
         aid=n.get('id','')
-        related=[(param_by_id[p],m) for a,p,m,power in links if a==aid]
-        functions=', '.join(parameter_code(p) for p,m in related if m=='*') or '—'
-        args=', '.join(parameter_code(p)+' ('+m+')' for p,m in related if m in ('+','.')) or '—'
-        rows.append([action_code(n),n.get('name',''),FORMAL.get(n.get('formalization'),'код '+n.get('formalization','?')),functions,args,n.get('mark','')])
+        related=links_by_action[aid]
+        functions='; '.join(parameter_description(p) for p,m in related if m=='*')
+        args='; '.join(('-' if m == '+' else '-/') + parameter_description(p) for p,m in related if m in ('+','.'))
+        rows.append([action_code(n),n.get('name',''),FORMAL_D.get(n.get('formalization'),'код '+n.get('formalization','?')),functions,args,n.get('mark','')])
     forms['D']=(['Код ПД','Наименование','Форм.','Функция','Аргументы','Примечание'],rows)
-    forms['D2']=(['Код ПД','Наименование ПД','Код параметра','Наименование параметра','Роль','Символ','Кратность'],[
-        [action_code(nodes[a]),nodes[a].get('name',''),parameter_code(param_by_id[p]),param_by_id[p].get('name',''),ROLES.get(mark,'Другая / не расшифрована'),mark,power] for a,p,mark,power in links])
+    # IS-2 examples show the condition of an alternative as a default argument
+    # on each immediate elementary branch. Keep explicit links and their order.
+    direct_children = defaultdict(list)
+    for link in doc.links:
+        if link.get('type') == '2':
+            direct_children[link.get('afe1', '')].append(link.get('afe2', ''))
+    by_action = defaultdict(list)
+    for a, p, mark, power in links:
+        by_action[a].append((p, mark, power))
+    defaults = defaultdict(list)
+    inferred_conditions = set()
+    for a, p, mark, power in links:
+        if mark == '?' and nodes[a].get('type') == '1':
+            children = direct_children[a]
+            if children and all(c in nodes and nodes[c].get('type') == '0' for c in children):
+                for child in children:
+                    defaults[child].append(p)
+                inferred_conditions.add((a, p, mark, power))
+    d2_rows = []
+    for node in actions:
+        aid = node.get('id', '')
+        entries = sorted(by_action[aid], key=lambda entry: 0 if entry[1] == '*' else 1)
+        for pid, mark, power in entries:
+            if (aid, pid, mark, power) in inferred_conditions:
+                continue
+            role = ROLES.get(mark, f'Другая ({mark})')
+            if power not in ('', '1'):
+                role += f' × {power}'
+            d2_rows.append([action_code(node), parameter_code(param_by_id[pid]), role])
+        for pid in defaults[aid]:
+            if not any(p == pid and mark == '.' for p, mark, _ in entries):
+                d2_rows.append([action_code(node), parameter_code(param_by_id[pid]), 'Аргумент по умолчанию'])
+    forms['D2']=(['Код ПД','Код параметра','Роль параметра'],d2_rows)
+    for node, row in zip((n for n in sorted(actions, key=action_sort_key) if n.get('type') == '0'), forms['D'][1]):
+        aid = node.get('id', '')
+        inferred = ['-/' + parameter_description(param_by_id[pid]) for pid in defaults[aid]
+                    if not any(p == pid and mark == '.' for p, mark, _ in by_action[aid])]
+        if inferred:
+            row[4] = '; '.join(filter(None, [row[4], *inferred]))
     headers=['Структ.', 'Код ПД']+[parameter_code(p) for p in params]
     rows=[]
     if len(actions)*len(params)>250_000:

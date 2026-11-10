@@ -27,6 +27,13 @@ class ButtonNotebook(ttk.Frame):
             button.destroy()
         self._update_buttons()
 
+    def clear_pages(self):
+        """Remove and destroy owned pages when a dynamic notebook is rebuilt."""
+        for tab in self.tabs():
+            page = self.nametowidget(tab)
+            self.forget(tab)
+            page.destroy()
+
     def tabs(self):
         return self.book.tabs()
 

@@ -9,6 +9,9 @@ transitive dependencies. A built executable includes runtime components; check
 the actual build's dependency versions, licenses and distribution obligations
 before publishing it.
 
+DOCX report export uses python-docx (MIT license) and Pillow (HPND license);
+these optional dependencies are installed separately or included in the EXE build.
+
 No original IS-2 binaries or proprietary runtime are included in this snapshot.
 Confirm rights to any included project assets and third-party materials before
 wider distribution.

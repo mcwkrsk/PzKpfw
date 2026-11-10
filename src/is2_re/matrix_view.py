@@ -1,18 +1,24 @@
 """Read-only, object-grouped matrix projection with cell descriptions."""
 from .specifications import project_forms, primary_links, parameter_code, action_code, _sort_number
 from .gui_models import action_tree_rows
+from collections import defaultdict
 
-def inferred_structural_marks(doc):
+def inferred_structural_marks(doc, *, links=None):
     """Conservative visual hints only; never modify XML or claim native parity."""
     actions = {n.get('id',''):n for n in doc.actions}
-    links, _ = primary_links(doc)
+    if links is None:
+        links, _ = primary_links(doc)
     by_action = {}
     for action, param, mark, _ in links:
         by_action.setdefault(action, []).append((param, mark))
     children = {}
+    parents_with_links = {link.get('afe1', '') for link in doc.links if link.get('type') in ('2', '3')}
     for ident in actions:
+        if ident not in parents_with_links:
+            children[ident] = []
+            continue
         try: children[ident] = doc.sibling_order(ident)
-        except Exception: children[ident] = []
+        except (ValueError, KeyError): children[ident] = []
     def output(ident, seen=frozenset()):
         if ident in seen or ident not in actions:
             return set()
@@ -43,7 +49,10 @@ def inferred_structural_marks(doc):
         elif kind=='1':
             inputs={p for p,m in by_action.get(ident,()) if m=='?'}
             if len(inputs)==1:
-                for kid in kids: add(kid,next(iter(inputs)),'/')
+                for kid in kids:
+                    add(kid,next(iter(inputs)),'/')
+                    if actions.get(kid) is not None and actions[kid].get('type') == '0':
+                        add(kid,next(iter(inputs)),'.')
             if len(results)==1: add(ident,next(iter(results)),'#')
         elif kind=='3' and len(results)==1:
             param=next(iter(results));add(ident,param,'{')
@@ -51,7 +60,16 @@ def inferred_structural_marks(doc):
             if end is not None: add(end,param,'}')
     return marks
 
-def grouped_matrix(doc):
+def matrix_context(doc):
+    """Build a bounded lookup for one refresh; contains no document reference."""
+    links, _ = primary_links(doc)
+    by_cell = defaultdict(list)
+    for action, parameter, marker, power in links:
+        by_cell[(action, parameter)].append((marker, power))
+    return by_cell, inferred_structural_marks(doc, links=links)
+
+
+def grouped_matrix(doc, *, context=None):
     forms, warnings = project_forms(doc)
     headers, rows = forms['M']
     params = sorted(doc.params_node.findall('param'), key=lambda p: (_sort_number(p.get('group')), _sort_number(p.get('number')), _sort_number(p.get('id'))))
@@ -67,26 +85,63 @@ def grouped_matrix(doc):
     if rows:
         actions = {n.get('id',''): n for n in doc.actions}
         ordered_actions = [actions[r.action_id] for r in action_tree_rows(doc)]
-        inferred = {'2':'~[', '1':'~?', '3':'~{'}
-        derived = inferred_structural_marks(doc)
+        row_marks = structural_row_marks(doc, ordered_actions)
+        derived = context[1] if context is not None else inferred_structural_marks(doc)
         new_rows=[]
         for row,node in zip(rows,ordered_actions):
             cells=[]
             for i in order:
                 raw=row[2+i]
-                hints=''.join(sorted(derived.get((node.get('id',''),params[i].get('id','')),set())))
-                cells.append(raw + ((' ' if raw else '') + hints + '~' if hints else ''))
-            new_rows.append([inferred.get(node.get('type'), ''), row[1]] + cells)
+                hints=derived.get((node.get('id',''),params[i].get('id','')),set())
+                mark_order = '.#][{}/' if node.get('type') == '1' else '.][{}#/'
+                cells.append(raw + ''.join(mark for mark in mark_order if mark in hints and mark not in raw))
+            new_rows.append([row_marks.get(node.get('id',''), ''), row[1]] + cells)
         rows=new_rows
-    return ['Структ. ≈', headers[1]]+labels, rows, [params[i].get('id','') for i in order], warnings
+    return ['Структ.', headers[1]]+labels, rows, [params[i].get('id','') for i in order], warnings
 
-def cell_description(doc, action_id, parameter_id):
+def structural_row_marks(doc, actions):
+    """Reconstruct observed sequence boundaries and alternative branches for display."""
+    nodes = {n.get('id', ''): n for n in actions}
+    parent = {}
+    for link in doc.links:
+        if link.get('type') == '2':
+            parent[link.get('afe2', '')] = link.get('afe1', '')
+    children = {}
+    for ident in set(parent.values()):
+        try:
+            children[ident] = doc.sibling_order(ident)
+        except (ValueError, KeyError):
+            continue
+    result = {}
+    for ident, node in nodes.items():
+        parent_id = parent.get(ident)
+        parent_node = nodes.get(parent_id)
+        prefix = '/' if parent_node is not None and parent_node.get('type') == '1' else ''
+        close = ']' if (parent_node is not None and parent_node.get('type') == '2'
+                        and children.get(parent_id) and children[parent_id][-1] == ident) else ''
+        own = {'2':'[', '1':'#?', '3':'{'}.get(node.get('type'), '') if children.get(ident) else ''
+        result[ident] = prefix + (own + close if node.get('type') == '1' else close + own)
+    return result
+
+def cell_description(doc, action_id, parameter_id, *, context=None):
     action, param = doc.action(action_id), doc.parameter(parameter_id)
-    links, _ = primary_links(doc)
-    roles = {'*':'функция', '+':'аргумент', '.':'аргумент по умолчанию', '?':'аргумент альтернативы', '!':'счётчик цикла'}
-    entries = [(m,power) for a,p,m,power in links if a==str(action_id) and p==str(parameter_id)]
+    roles = {'*':'функция', '+':'аргумент', '.':'аргумент по умолчанию', '?':'аргумент альтернативы', '!':'счётчик цикла',
+             '[':'начало последовательности', ']':'конец последовательности', '#':'альтернатива',
+             '/':'ветвь альтернативы', '{':'начало цикла', '}':'конец цикла'}
+    key = (str(action_id), str(parameter_id))
+    if context is None:
+        links, _ = primary_links(doc)
+        entries = [(m,power) for a,p,m,power in links if (a,p)==key]
+        marks = inferred_structural_marks(doc, links=links)
+    else:
+        entries = context[0].get(key, ())
+        marks = context[1]
     details = ', '.join(f"{m} — {roles.get(m, 'значение не расшифровано')}" + (f"; кратность {power}" if power not in ('','1') else '') for m,power in entries) or 'Записанная связь отсутствует'
-    hints = inferred_structural_marks(doc).get((str(action_id),str(parameter_id)), set())
+    hints = marks.get(key, set())
     if hints:
-        details += '\n' + ''.join(sorted(hints)) + ' — предполагаемые структурные знаки; в XML не записаны'
+        explanations = {'[':'начало последовательности', ']':'конец последовательности',
+                        '#':'альтернатива', '/':'ветвь альтернативы',
+                        '.':'аргумент по умолчанию', '{':'начало цикла', '}':'конец цикла'}
+        details += '\n' + '; '.join(f'{mark} — {explanations[mark]}' for mark in '.[]{}#/' if mark in hints)
+        details += ' (вычислено для отображения; в XML отдельно не записано)'
     return f"{action_code(action)}  {action.get('name','')}\n{parameter_code(param)}  {param.get('name','')}\n{details}"

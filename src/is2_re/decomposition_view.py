@@ -15,6 +15,8 @@ from .coursework import build_course_scene, _wrapped_lines
 from .gui_models import action_tree_rows
 from .specifications import action_code
 from .button_notebook import ButtonNotebook
+from .ui_performance import CoalescedCallback
+from .focus_view import PackSnapshot
 
 
 def sheet_scene(doc, focus=None):
@@ -37,18 +39,29 @@ def sheet_scene(doc, focus=None):
     return base, geom, lines
 
 
-def structural_mark(doc, ident):
+def structural_mark(doc, ident, *, nodes=None, parents=None, orders=None):
     """Approximate display-only structural signs, not serialized."""
-    node=doc.action(ident)
-    mark={'2':'[','1':'?','3':'{'}.get(node.get('type'), '')
-    parent=next((l.get('afe1') for l in doc.links if l.get('type')=='2' and l.get('afe2')==ident), None)
+    if nodes is None:
+        nodes = {node.get('id', ''): node for node in doc.actions}
+    if parents is None:
+        parents = {}
+        for link in doc.links:
+            if link.get('type') == '2':
+                parents.setdefault(link.get('afe2'), link.get('afe1'))
+    if orders is None:
+        orders = {}
+    node = nodes[ident]
+    mark = {'2':'[','1':'?','3':'{'}.get(node.get('type'), '')
+    parent = parents.get(ident)
     if parent:
         try:
-            siblings=doc.sibling_order(parent)
-            kind=doc.action(parent).get('type')
-            if kind=='2' and siblings and siblings[-1]==ident: mark += ']'
-            if kind=='1': mark += '/'
-        except (KeyError,ValueError):
+            if parent not in orders:
+                orders[parent] = doc.sibling_order(parent)
+            siblings = orders[parent]
+            kind = nodes[parent].get('type')
+            if kind == '2' and siblings and siblings[-1] == ident: mark += ']'
+            if kind == '1': mark += '/'
+        except (KeyError, ValueError):
             pass
     return mark
 
@@ -62,6 +75,12 @@ def primitives(doc, focus=None, *, show_codes=True, show_symbols=True):
         children[edge.source].append(edge.target)
     for parent in children:
         children[parent].sort(key=lambda ident:geom[ident][0])
+    all_nodes = {node.get('id', ''): node for node in doc.actions}
+    parents = {}
+    for link in doc.links:
+        if link.get('type') == '2':
+            parents.setdefault(link.get('afe2'), link.get('afe1'))
+    orders = {}
     ops=[]
     for ident,kids in children.items():
         if not kids: continue
@@ -93,7 +112,7 @@ def primitives(doc, focus=None, *, show_codes=True, show_symbols=True):
         if branch_h:
             ops.append(('path',[(x,y+h-branch_h),(x+w,y+h-branch_h)],False))
             ops.append(('path',[(x+w/2,y+h-branch_h),(x+w/2,y+h)],False))
-            alts=doc.action(n.ident).findall('alts')
+            alts=all_nodes[n.ident].findall('alts')
             for i in range(2):
                 label=(alts[i].get('text','') if i<len(alts) else '') or str(i+1)
                 if focus is None: label=str(i+1)
@@ -112,7 +131,7 @@ def primitives(doc, focus=None, *, show_codes=True, show_symbols=True):
             # The compact view uses codes as its content; retain them for identity.
             pass
         if show_symbols:
-            symbol=structural_mark(doc,n.ident)
+            symbol=structural_mark(doc,n.ident,nodes=all_nodes,parents=parents,orders=orders)
             if symbol: ops.append(('text',x+w+7,y+8,symbol,11,'start'))
     extent_w=max((x+w+75 for x,y,w,h in geom.values()),default=800)
     extent_h=max((y+h+45 for x,y,w,h in geom.values()),default=500)
@@ -142,16 +161,22 @@ class DecompositionPanel(ttk.Frame):
         super().__init__(master);self.app=app;self.focus=None;self.zoom=1.;self._ids=[]
         self.show_codes=tk.BooleanVar(value=True);self.show_symbols=tk.BooleanVar(value=True)
         bar=ttk.Frame(self,padding=(6,6));bar.pack(fill='x')
-        for title,fn in [('◀',lambda:self.step(-1)),('▶',lambda:self.step(1)),('−',lambda:self.scale(.8)),('+',lambda:self.scale(1.25)),('Вписать',self.fit),('Сохранить SVG…',self.export),('Сохранить все…',self.export_all)]:
+        focus_button=ttk.Button(bar,text='⛶ На весь экран',command=lambda:self.app.enter_diagram_focus(self))
+        focus_button._tooltip_text='Скрыть панели и показать диаграмму на всю рабочую область.'
+        focus_button.pack(side='right')
+        for title,fn in [('◀',lambda:self.step(-1)),('▶',lambda:self.step(1)),('Сохранить SVG…',self.export),('Сохранить все…',self.export_all)]:
             ttk.Button(bar,text=title,command=fn).pack(side='left',padx=(0,5))
         ttk.Checkbutton(bar,text='Коды блоков',variable=self.show_codes,command=self.draw).pack(side='left',padx=8)
         ttk.Checkbutton(bar,text='Структурные символы',variable=self.show_symbols,command=self.draw).pack(side='left',padx=8)
-        ttk.Label(self,text='Полная диаграмма и листы действий · структурные символы приблизительные',style='Muted.TLabel',padding=(8,2)).pack(anchor='w')
+        ttk.Label(self,text='Листы: ◀ ▶ · Ctrl + колесо — масштаб · Ctrl + 0 — вписать · структурные символы приблизительные',style='Muted.TLabel',padding=(8,2)).pack(anchor='w')
         self.tabs=ButtonNotebook(self);self.tabs.pack(fill='x',padx=6)
         self.tabs.bind('<<NotebookTabChanged>>',self._tab_changed)
         holder=ttk.Frame(self);holder.pack(fill='both',expand=True,padx=6,pady=6)
+        self._focus_holder = holder
+        self._focus_return_bar=ttk.Button(self.tabs.bar,text='← Вернуться',command=self.app.exit_diagram_focus)
         self.canvas=tk.Canvas(holder,background='#1b1b29',highlightthickness=0)
-        self.canvas.bind('<Configure>', lambda _event: self.draw())
+        self._resize_redraw = CoalescedCallback(self.canvas, self.draw)
+        self.canvas.bind('<Configure>', self._resize_redraw.request)
         self.canvas.bind('<ButtonPress-2>', lambda e: self.canvas.scan_mark(e.x, e.y))
         self.canvas.bind('<B2-Motion>', lambda e: self.canvas.scan_dragto(e.x, e.y, gain=1))
         sx=ttk.Scrollbar(holder,orient='horizontal',command=self.canvas.xview)
@@ -160,20 +185,41 @@ class DecompositionPanel(ttk.Frame):
         self.canvas.grid(row=0,column=0,sticky='nsew');sy.grid(row=0,column=1,sticky='ns');sx.grid(row=1,column=0,sticky='ew')
         holder.columnconfigure(0,weight=1);holder.rowconfigure(0,weight=1)
         self.canvas.bind('<Double-1>',self._open_node)
-        self.canvas.bind('<Control-MouseWheel>',lambda e:self.scale(1.2 if e.delta>0 else 1/1.2))
+        self.canvas.bind('<Button-1>', lambda _e: self.canvas.focus_set())
+        self.canvas.bind('<Control-MouseWheel>', self._wheel_zoom)
+        self.canvas.bind('<Control-Button-4>',lambda _e:self.scale(1.08))
+        self.canvas.bind('<Control-Button-5>',lambda _e:self.scale(1/1.08))
+        self.canvas.bind('<Control-Key-0>',lambda _e:self.fit())
+        self.canvas.bind('<Left>',lambda _e:self.step(-1))
+        self.canvas.bind('<Right>',lambda _e:self.step(1))
         self.refresh()
+
+    def enter_focus_view(self):
+        self._focus_layout = PackSnapshot(self)
+        self._focus_layout.hide_except({self.tabs, self._focus_holder})
+        buttons = self.tabs.bar.pack_slaves()
+        if buttons:
+            self._focus_return_bar.pack(side='right', padx=(8, 0), before=buttons[0])
+        else:
+            self._focus_return_bar.pack(side='right', padx=(8, 0))
+
+    def exit_focus_view(self):
+        self._focus_return_bar.pack_forget()
+        self._focus_layout.restore()
 
     def refresh(self):
         doc=self.app.doc
-        ids=[] if doc is None else [r.action_id for r in action_tree_rows(doc) if doc.composition_children(r.action_id)]
-        signature=tuple((ident, action_code(doc.action(ident))) for ident in ids) if doc is not None else ()
+        nodes = {} if doc is None else {node.get('id', ''): node for node in doc.actions}
+        parents = set() if doc is None else {link.get('afe1', '') for link in doc.links if link.get('type') == '2'}
+        ids = [] if doc is None else [row.action_id for row in action_tree_rows(doc) if row.action_id in parents]
+        signature = tuple((ident, action_code(nodes[ident])) for ident in ids)
         if signature!=getattr(self, '_signature', None) or not self.tabs.tabs():
             previous=self.focus
-            for item in self.tabs.tabs():self.tabs.forget(item)
+            self.tabs.clear_pages()
             self._frames={}
             for ident in [None]+ids:
                 frame=ttk.Frame(self.tabs);self._frames[str(frame)]=ident
-                self.tabs.add(frame,text='Полная диаграмма' if ident is None else action_code(doc.action(ident)))
+                self.tabs.add(frame,text='Полная диаграмма' if ident is None else action_code(nodes[ident]))
             self._ids=ids
             self._signature=signature
             frame=next((k for k,v in self._frames.items() if v==previous),None)
@@ -192,7 +238,13 @@ class DecompositionPanel(ttk.Frame):
         if tabs:self.tabs.select(tabs[max(0,min(len(tabs)-1,self.tabs.index('current')+direction))])
 
     def scale(self,factor):
-        self.zoom=max(.25,min(2.5,self.zoom*factor));self.draw();return 'break'
+        self.zoom=max(.25,min(2.5,self.zoom*factor));self._resize_redraw.request();return 'break'
+
+    def _wheel_zoom(self, event):
+        if event.delta:
+            steps = event.delta / 120 if self.canvas.tk.call('tk', 'windowingsystem') == 'win32' else event.delta
+            self.scale(1.08 ** steps)
+        return 'break'
 
     def fit(self):
         if self.app.doc is None:return
@@ -221,11 +273,12 @@ class DecompositionPanel(ttk.Frame):
             canvas.create_line(i*step,0,i*step,grid_h,fill=grid,tags=('grid',))
         for i in range(int(grid_h/step)+2):
             canvas.create_line(0,i*step,grid_w,i*step,fill=grid,tags=('grid',))
+        kinds = {node.get('id', ''): node.get('type') for node in self.app.doc.actions}
         for op in ops:
             if op[0]=='rect':
                 _,x,y,w0,h0,ident=op
                 canvas.create_rectangle(x*z+2,y*z+3,(x+w0)*z+2,(y+h0)*z+3,fill='#12121d' if dark else '#e8edf5',outline='')
-                kind=self.app.doc.action(ident).get('type')
+                kind=kinds.get(ident)
                 outline=('#70cfcb' if dark else '#207a75') if kind=='1' else ('#72758d' if dark else '#526c88')
                 canvas.create_rectangle(x*z,y*z,(x+w0)*z,(y+h0)*z,fill='#282836' if dark else '#ffffff',outline=outline,width=1.4,tags=('node', 'node:'+ident))
             elif op[0]=='path':
