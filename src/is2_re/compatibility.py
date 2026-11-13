@@ -38,16 +38,16 @@ def audit_document(doc: ProjectDocument) -> dict[str, Any]:
     module_records = module_params.findall("Module") if module_params is not None else []
     runtime_risk_notes: list[str] = []
     if module_params is None:
-        runtime_risk_notes.append("ModuleParams section is absent.")
+        runtime_risk_notes.append("Раздел ModuleParams отсутствует.")
     elif not module_records:
-        runtime_risk_notes.append("ModuleParams contains no Module records.")
+        runtime_risk_notes.append("В ModuleParams нет записей Module.")
     primary_auto = next((m for m in module_records if m.get("name") == "PrimaryModelAuto"), None)
     if primary_auto is None:
-        runtime_risk_notes.append("PrimaryModelAuto ModuleParams entry is absent; this project may not have stored those plug-in settings.")
+        runtime_risk_notes.append("Запись PrimaryModelAuto в ModuleParams отсутствует; настройки этого подключаемого модуля могли не сохраниться.")
     else:
         param = primary_auto.find("param")
         if param is None or param.get("decStr") is None:
-            runtime_risk_notes.append("PrimaryModelAuto has no param/@decStr; do not infer a non-empty selection list.")
+            runtime_risk_notes.append("В PrimaryModelAuto отсутствует param/@decStr; не следует предполагать наличие непустого списка выбора.")
 
     required_paths = (
         "models/primaryModel/spd/actions",
@@ -57,7 +57,7 @@ def audit_document(doc: ProjectDocument) -> dict[str, Any]:
     )
     envelope = all(doc.root.find(path) is not None for path in required_paths)
     return {
-        "format": "IS-2 project XML",
+        "format": "XML проекта ИС-2",
         "root_tag": doc.root.tag,
         "native_envelope": "PASS" if doc.root.tag == "project" and envelope else "FAIL",
         "structural_validation": "PASS" if not validation_issues else "FAIL",
@@ -95,7 +95,8 @@ def audit_document(doc: ProjectDocument) -> dict[str, Any]:
         "undo_redo_storage": "memory-only; not serialized into .is2",
         "original_is2_runtime_acceptance": "NOT_TESTED",
         "runtime_note": (
-            "A Windows run of the original IS.exe is required to certify that it "
-            "opens a PzKpfw-saved file and that PzKpfw opens an IS-2-saved file."
+            "Для подтверждения необходимо запустить оригинальную IS.exe в Windows "
+            "и проверить, что она открывает файл, сохранённый PzKpfw, а PzKpfw "
+            "открывает файл, сохранённый IS-2."
         ),
     }

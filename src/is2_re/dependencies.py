@@ -47,7 +47,7 @@ def dependency_report(doc: ProjectDocument) -> dict[str, Any]:
             or (domain == "category" and ("ConceptModel/content" in opaque_branches or "ConceptModel/cs/links" in opaque_branches))
             or (domain == "spz_element" and "ConceptModel/spz/links" in opaque_branches)
         )
-        risk_level = "BLOCKED_UNKNOWN" if opaque_risk else ("REFERENCED" if refs else "NO_KNOWN_REFERENCES")
+        risk_level = "BLOCKED_UNKNOWN" if opaque_risk else ("ЕСТЬ ССЫЛКИ" if refs else "NO_KNOWN_REFERENCES")
         entities.append({
             "key": node.get("key"),
             "domain": domain,
@@ -68,7 +68,7 @@ def dependency_report(doc: ProjectDocument) -> dict[str, Any]:
         })
     risk_summary = {
         level: sum(1 for item in entities if item["risk_level"] == level)
-        for level in ("NO_KNOWN_REFERENCES", "REFERENCED", "BLOCKED_UNKNOWN")
+        for level in ("NO_KNOWN_REFERENCES", "ЕСТЬ ССЫЛКИ", "BLOCKED_UNKNOWN")
     }
     return {
         "schema_version": 1,

@@ -1,7 +1,7 @@
 """Conservative three-way merge for native IS-2 XML projects.
 
 The merger applies only changes that can be reconciled from a common base.
-Concurrent edits are reported as stable, addressable conflicts. Unresolved
+Concurrent edits are reported as stable, addressable conflicts. Неразрешённое
 conflicts keep the local/ours value in the in-memory preview and block CLI
 output. Unknown XML nodes and attributes are carried through unchanged.
 """
@@ -16,6 +16,7 @@ import xml.etree.ElementTree as ET
 
 from .document import ProjectDocument, _clean_formatting_text
 from .diff import _stable_identity
+from .i18n import tr
 
 
 class ProjectMergeError(ValueError):
@@ -121,7 +122,7 @@ def _chosen_value(base: Any, ours: Any, theirs: Any, ctx: _MergeContext,
         return ours
     choice = ctx.conflict(
         kind, path, field, base, ours, theirs,
-        f"Обе ветки изменили {field or 'структуру'} по-разному",
+        tr("Обе ветки изменили {field} по-разному").format(field=field or tr("структуру")),
     )
     return {"ours": ours, "theirs": theirs, "base": base}[choice]
 
@@ -174,7 +175,7 @@ def _merge_node(base: ET.Element, ours: ET.Element, theirs: ET.Element,
         return deepcopy(ours)
     if not (isinstance(base.tag, str) and isinstance(ours.tag, str) and isinstance(theirs.tag, str)):
         choice = ctx.conflict("opaque_node", path, None, _display(base), _display(ours), _display(theirs),
-                              "Одновременно изменён непрозрачный XML-узел")
+                              tr("Одновременно изменён непрозрачный XML-узел"))
         return deepcopy({"ours": ours, "theirs": theirs, "base": base}[choice])
 
     result = ET.Element(ours.tag)
@@ -208,7 +209,7 @@ def _merge_node(base: ET.Element, ours: ET.Element, theirs: ET.Element,
             [_display(n) for n in base_children],
             [_display(n) for n in ours_children],
             [_display(n) for n in theirs_children],
-            "В группе есть повторяющиеся анонимные или дублирующиеся XML-узлы; автоматическое сопоставление небезопасно",
+            tr("В группе есть повторяющиеся анонимные или дублирующиеся XML-узлы; автоматическое сопоставление небезопасно"),
         )
         chosen = {"ours": ours_children, "theirs": theirs_children, "base": base_children}[choice]
         result.extend(deepcopy(chosen))
@@ -249,7 +250,7 @@ def _merge_presence(base: ET.Element | None, ours: ET.Element | None,
         if theirs is None or _semantic(ours) == _semantic(theirs):
             return deepcopy(ours)
         choice = ctx.conflict("concurrent_add", path, None, None, _display(ours), _display(theirs),
-                              "Обе ветки независимо добавили узел с одинаковой идентичностью")
+                              tr("Обе ветки независимо добавили узел с одинаковой идентичностью"))
         chosen = {"ours": ours, "theirs": theirs, "base": None}[choice]
         return deepcopy(chosen) if chosen is not None else None
 
@@ -259,14 +260,14 @@ def _merge_presence(base: ET.Element | None, ours: ET.Element | None,
         if _semantic(theirs) == _semantic(base):
             return None  # ours deleted; theirs did not change
         choice = ctx.conflict("delete_modify", path, None, _display(base), None, _display(theirs),
-                              "Локальная ветка удалила узел, а входящая изменила его")
+                              tr("Локальная ветка удалила узел, а входящая изменила его"))
         chosen = {"ours": None, "theirs": theirs, "base": base}[choice]
         return deepcopy(chosen) if chosen is not None else None
     if theirs is None:
         if _semantic(ours) == _semantic(base):
             return None  # theirs deleted; ours did not change
         choice = ctx.conflict("modify_delete", path, None, _display(base), _display(ours), None,
-                              "Локальная ветка изменила узел, а входящая удалила его")
+                              tr("Локальная ветка изменила узел, а входящая удалила его"))
         chosen = {"ours": ours, "theirs": None, "base": base}[choice]
         return deepcopy(chosen) if chosen is not None else None
 

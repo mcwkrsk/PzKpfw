@@ -12,17 +12,22 @@ from typing import Mapping, Iterable
 
 from .document import ProjectDocument
 from .graph import build_relationship_graph
+from .i18n import tr
 
 
 class RepairError(ValueError):
     """A proposed repair is ambiguous, unsafe or does not match the document."""
 
 
+def _message(source: str, **values: object) -> str:
+    return tr(source).format(**values)
+
+
 _DOMAIN_LABELS = {
-    "action": "AFElement action",
-    "category": "AIElement ConceptModel category",
-    "spz_element": "AIElement spz AElement",
-    "object": "PrimaryModel object",
+    "action": "Действие AFElement",
+    "category": "Категория AIElement в ConceptModel",
+    "spz_element": "Элемент AIElement в spz/AElement",
+    "object": "Объект PrimaryModel",
 }
 
 
@@ -36,21 +41,21 @@ def _domain_ids(doc: ProjectDocument, domain: str) -> list[str]:
     elif domain == "object":
         nodes = list(doc.objects_node)
     else:  # pragma: no cover - graph contracts control this field
-        raise RepairError(f"unsupported endpoint domain: {domain}")
+        raise RepairError(_message("Неподдерживаемый домен endpoint-а: {domain}", domain=domain))
     return [str(node.get("id", "")) for node in nodes if node.get("id") not in (None, "")]
 
 
 def _can_clear(issue: dict, relation_node: dict | None) -> tuple[bool, str]:
     kind, slot = issue["relation_kind"], issue["slot"]
     if kind == "aie_binary_link":
-        return True, "AIEBinaryLink endpoint slots accept the native null value 0."
+        return True, "AIEBinaryLink допускает нулевые значения в слотах endpoint-ов."
     if kind == "parameter_object" and slot == "object":
-        return True, "Parameter/@o is optional; clearing removes the native attribute."
+        return True, "Атрибут Parameter/@o необязателен; снятие связи удаляет этот атрибут."
     if kind == "scbinarylink" and slot == "e3" and relation_node:
         link_type = str(relation_node.get("attributes", {}).get("type", ""))
         if link_type == "3":
-            return True, "SCBinaryLink type=3 permits a null e3 endpoint."
-    return False, "This endpoint is required by the recovered contract and cannot be cleared safely."
+            return True, "SCBinaryLink типа 3 допускает нулевое значение endpoint-а e3."
+    return False, "Этот endpoint обязателен по восстановленному контракту и не может быть безопасно очищен."
 
 
 def available_repair_targets(doc: ProjectDocument, domain: str) -> list[str]:
@@ -105,16 +110,16 @@ def parse_repair_selector(value: str) -> tuple[str, int, str]:
     """Parse KIND:INDEX:SLOT and reject malformed selectors."""
     parts = value.split(":")
     if len(parts) != 3:
-        raise RepairError(f"selector must be KIND:INDEX:SLOT, got {value!r}")
+        raise RepairError(_message("Селектор должен иметь формат KIND:INDEX:SLOT; получено: {value}", value=repr(value)))
     kind, raw_index, slot = parts
     if kind not in {"scbinarylink", "aie_binary_link", "ae_content_link", "parameter_object"}:
-        raise RepairError(f"unsupported relationship kind in selector: {kind!r}")
+        raise RepairError(_message("В селекторе указан неподдерживаемый тип связи: {kind}", kind=repr(kind)))
     try:
         index = int(raw_index, 10)
     except ValueError as exc:
-        raise RepairError(f"selector index must be a non-negative integer: {raw_index!r}") from exc
+        raise RepairError(_message("Индекс селектора должен быть неотрицательным целым числом: {value}", value=repr(raw_index))) from exc
     if index < 0:
-        raise RepairError("selector index must be non-negative")
+        raise RepairError(tr("Индекс селектора не может быть отрицательным."))
     allowed_slots = {
         "scbinarylink": {"e1", "e2", "e3"},
         "aie_binary_link": {"e1", "e2", "e3"},
@@ -122,19 +127,19 @@ def parse_repair_selector(value: str) -> tuple[str, int, str]:
         "parameter_object": {"object"},
     }
     if slot not in allowed_slots[kind]:
-        raise RepairError(f"unsupported slot {slot!r} for {kind}")
+        raise RepairError(_message("Слот {slot} не поддерживается для связи {kind}.", slot=repr(slot), kind=kind))
     return kind, index, slot
 
 
 def parse_repair_assignment(value: str) -> tuple[str, str]:
     """Parse KIND:INDEX:SLOT=TARGET_ID."""
     if "=" not in value:
-        raise RepairError(f"repair assignment must be KIND:INDEX:SLOT=TARGET_ID, got {value!r}")
+        raise RepairError(_message("Назначение исправления должно иметь формат KIND:INDEX:SLOT=TARGET_ID; получено: {value}", value=repr(value)))
     selector, target_id = value.split("=", 1)
     parse_repair_selector(selector)
     target_id = target_id.strip()
     if not target_id or target_id == "0":
-        raise RepairError("replacement target must be a nonzero existing ID")
+        raise RepairError(tr("Целевой ID должен быть существующим ненулевым идентификатором."))
     return selector, target_id
 
 
@@ -153,11 +158,11 @@ def apply_link_repairs(
     replacements = dict(replacements or {})
     clears = tuple(clears)
     if not replacements and not clears:
-        raise RepairError("no repairs were specified")
+        raise RepairError(tr("Исправления не заданы."))
 
     selectors = list(replacements) + list(clears)
     if len(selectors) != len(set(selectors)):
-        raise RepairError("a dangling endpoint may be repaired only once per operation")
+        raise RepairError(tr("Один endpoint можно исправить только один раз за операцию."))
 
     original_report = link_integrity_report(doc)
     issue_by_selector = {item["selector"]: item for item in original_report["issues"]}
@@ -166,30 +171,30 @@ def apply_link_repairs(
         parsed_selector = parse_repair_selector(selector)
         target = str(target).strip()
         if not target or target == "0":
-            raise RepairError(f"{selector}: replacement target must be a nonzero existing ID")
+            raise RepairError(_message("{selector}: целевой ID должен быть существующим ненулевым идентификатором.", selector=selector))
         issue = issue_by_selector.get(selector)
         if issue is None:
-            raise RepairError(f"{selector}: endpoint is not currently reported as dangling")
+            raise RepairError(_message("{selector}: endpoint не найден среди текущих неразрешённых ссылок.", selector=selector))
         if issue["endpoint_id"] in (None, "", "0"):
-            raise RepairError(f"{selector}: null endpoints are not repair candidates")
+            raise RepairError(_message("{selector}: нулевые endpoint-ы нельзя переназначить.", selector=selector))
         domain_ids = _domain_ids(doc, issue["expected_domain"])
         counts = Counter(domain_ids)
         if counts.get(str(target), 0) != 1:
             if counts.get(str(target), 0) > 1:
-                raise RepairError(f"target ID {target!r} is duplicated in domain {issue['expected_domain']}")
-            raise RepairError(
-                f"target ID {target!r} does not exist in expected domain "
-                f"{issue['expected_domain']} ({issue['expected_domain_label']})"
-            )
+                raise RepairError(_message("Целевой ID {target} повторяется в домене {domain}.", target=repr(target), domain=issue["expected_domain"]))
+            raise RepairError(_message(
+                "Целевой ID {target} отсутствует в ожидаемом домене {domain} ({label}).",
+                target=repr(target), domain=issue["expected_domain"], label=issue["expected_domain_label"],
+            ))
         parsed.append((selector, parsed_selector, issue, str(target)))
 
     for selector in clears:
         parsed_selector = parse_repair_selector(selector)
         issue = issue_by_selector.get(selector)
         if issue is None:
-            raise RepairError(f"{selector}: endpoint is not currently reported as dangling")
+            raise RepairError(_message("{selector}: endpoint не найден среди текущих неразрешённых ссылок.", selector=selector))
         if not issue["can_clear"]:
-            raise RepairError(f"{selector}: cannot clear safely. {issue['clear_reason']}")
+            raise RepairError(_message("{selector}: endpoint нельзя безопасно очистить. {reason}", selector=selector, reason=issue["clear_reason"]))
         parsed.append((selector, parsed_selector, issue, None))
 
     repaired = doc.clone()
@@ -199,13 +204,13 @@ def apply_link_repairs(
         if kind == "scbinarylink":
             nodes = repaired.concept_structure.links
             if index >= len(nodes):
-                raise RepairError(f"{selector}: record index is out of range")
+                raise RepairError(_message("{selector}: индекс записи вне допустимого диапазона.", selector=selector))
             node = nodes[index]
             link_id = node.get("id")
             if not link_id or sum(1 for item in nodes if item.get("id") == link_id) != 1:
-                raise RepairError(f"{selector}: SCBinaryLink ID is missing or duplicated; refusing ambiguous edit")
+                raise RepairError(_message("{selector}: ID SCBinaryLink отсутствует или повторяется; неоднозначное изменение запрещено.", selector=selector))
             if target is None and not (slot == "e3" and node.get("type") == "3"):
-                raise RepairError(f"{selector}: only type=3 e3 may be cleared for SCBinaryLink")
+                raise RepairError(_message("{selector}: для SCBinaryLink можно очистить только e3 при type=3.", selector=selector))
             repaired.concept_structure.update_link(link_id, **{slot: target if target is not None else "0"})
         elif kind == "aie_binary_link":
             repaired.dynamic_structure.update_spz_link(index, **{slot: target})
@@ -214,13 +219,13 @@ def apply_link_repairs(
         elif kind == "parameter_object":
             params = repaired.params_node.findall("param")
             if index >= len(params):
-                raise RepairError(f"{selector}: parameter index is out of range")
+                raise RepairError(_message("{selector}: индекс параметра вне допустимого диапазона.", selector=selector))
             parameter_id = params[index].get("id")
             if not parameter_id or sum(1 for item in params if item.get("id") == parameter_id) != 1:
-                raise RepairError(f"{selector}: Parameter ID is missing or duplicated; refusing ambiguous edit")
+                raise RepairError(_message("{selector}: ID параметра отсутствует или повторяется; неоднозначное изменение запрещено.", selector=selector))
             repaired.set_parameter_object(parameter_id, target)
         else:  # pragma: no cover - parse_repair_selector fences this
-            raise RepairError(f"unsupported relationship kind: {kind}")
+            raise RepairError(_message("Неподдерживаемый тип связи: {kind}.", kind=kind))
         applied.append({
             "selector": selector,
             "relation_kind": kind,
@@ -236,7 +241,7 @@ def apply_link_repairs(
     remaining_selectors = {item["selector"] for item in remaining_report["issues"]}
     unresolved_requested = sorted(set(selectors) & remaining_selectors)
     if unresolved_requested:
-        raise RepairError(f"repair did not resolve requested endpoint(s): {unresolved_requested}")
+        raise RepairError(_message("Исправление не устранило выбранные endpoint-ы: {endpoints}", endpoints=unresolved_requested))
     validation_issues = repaired.validate(deep=True)
     result = {
         "schema_version": 1,

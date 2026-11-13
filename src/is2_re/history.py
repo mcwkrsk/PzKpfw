@@ -107,7 +107,7 @@ class SnapshotHistory:
 
     @property
     def timeline(self) -> tuple[tuple[str, str, int], ...]:
-        """Read-only UI projection: (stack, label, ordinal)."""
+        """Только чтение UI projection: (stack, label, ordinal)."""
         items: list[tuple[str, str, int]] = []
         for index, label in enumerate(self.undo_labels, start=1):
             items.append(("undo", label, index))

@@ -1,11 +1,12 @@
 """User-facing conversions for action construction and symbol input."""
 from __future__ import annotations
+from .i18n import tr
 
 KIND_LABELS = {
-    'Элементарное': 'elementary',
-    'Последовательность': 'sequence',
-    'Альтернатива': 'alternative',
-    'Цикл': 'iteration',
+    tr('Элементарное'): 'elementary',
+    tr('Последовательность'): 'sequence',
+    tr('Альтернатива'): 'alternative',
+    tr('Цикл'): 'iteration',
 }
 KIND_NAMES = {v: k for k, v in KIND_LABELS.items()}
 
@@ -19,9 +20,9 @@ def encode_action_symbol(value: str) -> str | None:
     elif len(value) == 1:
         code = ord(value)
     else:
-        raise ValueError('Укажите один символ, например z, или его числовой код 122.')
+        raise ValueError(tr('Укажите один символ, например z, или его числовой код 122.'))
     if not 32 <= code <= 65535 or 0xD800 <= code <= 0xDFFF or not chr(code).isprintable():
-        raise ValueError('Символ должен быть печатным символом в диапазоне U+0020–U+FFFF.')
+        raise ValueError(tr('Символ должен быть печатным символом в диапазоне U+0020–U+FFFF.'))
     return str(code)
 
 def display_action_symbol(value: str | None) -> str:

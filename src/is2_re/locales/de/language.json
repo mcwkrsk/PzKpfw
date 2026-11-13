@@ -1,0 +1,9 @@
+{
+  "format_version": 1,
+  "locale": "de",
+  "native_name": "Deutsch",
+  "english_name": "German",
+  "direction": "ltr",
+  "author": "PzKpfw initial translation; community review welcome",
+  "notes": "All current catalog entries have an initial translation. Native-speaker proofreading is welcome; new source strings may use the Russian fallback until translated."
+}

@@ -1,9 +1,10 @@
-"""Read-only decomposition diagrams with full view and local action sheets.
+"""Только чтение decomposition diagrams with full view and local action sheets.
 
 Independent reconstruction from the project structure; native geometry and
 structural code generation have not been verified against IS-2.
 """
 from __future__ import annotations
+from .i18n import tr
 from html import escape
 from pathlib import Path
 import textwrap
@@ -31,8 +32,8 @@ def sheet_scene(doc, focus=None):
         depth = 2 if root.get('type') == '3' else 1
         base = build_course_scene(doc, focus, max_depth=depth)
         width, stepx = 280, 340
-        lines = {n.ident: (textwrap.wrap(n.title or '(без названия)', width=33,
-                              break_long_words=True, break_on_hyphens=False) or ['(без названия)']) for n in base.nodes}
+        lines = {n.ident: (textwrap.wrap(n.title or tr('(без названия)'), width=33,
+                              break_long_words=True, break_on_hyphens=False) or [tr('(без названия)')]) for n in base.nodes}
         height = max(110, max((len(v) for v in lines.values()), default=1)*19+50)
         stepy = height+95
     geom={n.ident: (35+(n.x-30)/215*stepx, 30+n.depth*stepy, width, height) for n in base.nodes}
@@ -161,19 +162,19 @@ class DecompositionPanel(ttk.Frame):
         super().__init__(master);self.app=app;self.focus=None;self.zoom=1.;self._ids=[]
         self.show_codes=tk.BooleanVar(value=True);self.show_symbols=tk.BooleanVar(value=True)
         bar=ttk.Frame(self,padding=(6,6));bar.pack(fill='x')
-        focus_button=ttk.Button(bar,text='⛶ На весь экран',command=lambda:self.app.enter_diagram_focus(self))
-        focus_button._tooltip_text='Скрыть панели и показать диаграмму на всю рабочую область.'
+        focus_button=ttk.Button(bar,text=tr('⛶ На весь экран'),command=lambda:self.app.enter_diagram_focus(self))
+        focus_button._tooltip_text=tr('Скрыть панели и показать диаграмму на всю рабочую область.')
         focus_button.pack(side='right')
-        for title,fn in [('◀',lambda:self.step(-1)),('▶',lambda:self.step(1)),('Сохранить SVG…',self.export),('Сохранить все…',self.export_all)]:
+        for title,fn in [('◀',lambda:self.step(-1)),('▶',lambda:self.step(1)),(tr('Сохранить SVG…'),self.export),(tr('Сохранить все…'),self.export_all)]:
             ttk.Button(bar,text=title,command=fn).pack(side='left',padx=(0,5))
-        ttk.Checkbutton(bar,text='Коды блоков',variable=self.show_codes,command=self.draw).pack(side='left',padx=8)
-        ttk.Checkbutton(bar,text='Структурные символы',variable=self.show_symbols,command=self.draw).pack(side='left',padx=8)
-        ttk.Label(self,text='Листы: ◀ ▶ · Ctrl + колесо — масштаб · Ctrl + 0 — вписать · структурные символы приблизительные',style='Muted.TLabel',padding=(8,2)).pack(anchor='w')
+        ttk.Checkbutton(bar,text=tr('Коды блоков'),variable=self.show_codes,command=self.draw).pack(side='left',padx=8)
+        ttk.Checkbutton(bar,text=tr('Структурные символы'),variable=self.show_symbols,command=self.draw).pack(side='left',padx=8)
+        ttk.Label(self,text=tr('Листы: ◀ ▶ · Ctrl + колесо — масштаб · Ctrl + 0 — вписать · структурные символы приблизительные'),style='Muted.TLabel',padding=(8,2)).pack(anchor='w')
         self.tabs=ButtonNotebook(self);self.tabs.pack(fill='x',padx=6)
         self.tabs.bind('<<NotebookTabChanged>>',self._tab_changed)
         holder=ttk.Frame(self);holder.pack(fill='both',expand=True,padx=6,pady=6)
         self._focus_holder = holder
-        self._focus_return_bar=ttk.Button(self.tabs.bar,text='← Вернуться',command=self.app.exit_diagram_focus)
+        self._focus_return_bar=ttk.Button(self.tabs.bar,text=tr('← Вернуться'),command=self.app.exit_diagram_focus)
         self.canvas=tk.Canvas(holder,background='#1b1b29',highlightthickness=0)
         self._resize_redraw = CoalescedCallback(self.canvas, self.draw)
         self.canvas.bind('<Configure>', self._resize_redraw.request)
@@ -219,7 +220,7 @@ class DecompositionPanel(ttk.Frame):
             self._frames={}
             for ident in [None]+ids:
                 frame=ttk.Frame(self.tabs);self._frames[str(frame)]=ident
-                self.tabs.add(frame,text='Полная диаграмма' if ident is None else action_code(nodes[ident]))
+                self.tabs.add(frame,text=tr('Полная диаграмма') if ident is None else action_code(nodes[ident]))
             self._ids=ids
             self._signature=signature
             frame=next((k for k,v in self._frames.items() if v==previous),None)
@@ -262,7 +263,7 @@ class DecompositionPanel(ttk.Frame):
         line = '#9da9c4' if dark else '#526c88'
         grid = '#303041' if dark else '#e4eaf2'
         if self.app.doc is None:
-            canvas.create_text(25, 25, anchor='nw', text='Откройте или создайте проект', fill=muted)
+            canvas.create_text(25, 25, anchor='nw', text=tr('Откройте или создайте проект'), fill=muted)
             return
         try: ops,w,h=primitives(self.app.doc,self.focus,show_codes=self.show_codes.get(),show_symbols=self.show_symbols.get())
         except (KeyError,ValueError): return
@@ -306,11 +307,11 @@ class DecompositionPanel(ttk.Frame):
         path=filedialog.asksaveasfilename(parent=self,defaultextension='.svg',filetypes=[('SVG','*.svg')])
         if not path:return
         try:Path(path).write_text(diagram_svg(self.app.doc,self.focus,show_codes=self.show_codes.get(),show_symbols=self.show_symbols.get()),encoding='utf-8')
-        except (OSError,ValueError) as exc:messagebox.showerror('Экспорт',str(exc),parent=self)
+        except (OSError,ValueError) as exc:messagebox.showerror(tr('Экспорт'),str(exc),parent=self)
 
     def export_all(self):
         if self.app.doc is None:return
-        folder=filedialog.askdirectory(parent=self,title='Папка для диаграмм SVG')
+        folder=filedialog.askdirectory(parent=self,title=tr('Папка для диаграмм SVG'))
         if not folder:return
         targets=[(Path(folder)/'00_full_diagram.svg',None)]
         for ident in self._ids:
@@ -318,9 +319,9 @@ class DecompositionPanel(ttk.Frame):
             safe=re.sub(r'[^A-Za-z0-9_.-]+','_',code).strip('._') or 'action'
             targets.append((Path(folder)/f'sheet_{ident}_{safe}.svg',ident))
         if any(path.exists() for path,_ in targets):
-            if not messagebox.askyesno('Экспорт','Некоторые SVG-файлы уже существуют. Перезаписать?',parent=self):return
+            if not messagebox.askyesno(tr('Экспорт'),tr('Некоторые SVG-файлы уже существуют. Перезаписать?'),parent=self):return
         try:
             for path,ident in targets:
                 path.write_text(diagram_svg(self.app.doc,ident,show_codes=self.show_codes.get(),show_symbols=self.show_symbols.get()),encoding='utf-8')
-            messagebox.showinfo('Экспорт',f'Сохранено SVG-файлов: {len(targets)}',parent=self)
-        except (OSError,ValueError) as exc:messagebox.showerror('Экспорт',str(exc),parent=self)
+            messagebox.showinfo(tr('Экспорт'),tr('Сохранено SVG-файлов: {count}').format(count=len(targets)),parent=self)
+        except (OSError,ValueError) as exc:messagebox.showerror(tr('Экспорт'),str(exc),parent=self)

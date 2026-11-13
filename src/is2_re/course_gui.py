@@ -4,6 +4,7 @@ All persistent edits go through ProjectDocument; no private Qt/IS-2 binary is
 required. Unidentified native extensions are kept untouched in the XML.
 """
 from __future__ import annotations
+from .i18n import tr
 
 import json
 import tkinter as tk
@@ -24,16 +25,16 @@ from .focus_view import PackSnapshot, restored_sash_positions
 from .is2_spd_view import build_is2_spd_scene, is2_connectors, is2_parameter_marks, is2_spd_svg
 from .ui_theme import BACKGROUND, SURFACE, INK, MUTED, BORDER, PRIMARY, PALE_BLUE, TEAL
 
-KIND_TEXT = {'0': 'Элементарное', '1': 'Альтернатива', '2': 'Последовательность', '3': 'Цикл'}
-FORMAL_LABELS = {'0': 'Аналитическая', '2': 'Алгоритмическая'}
-STATUS_LABELS = {'0': 'Элементарное', '1': 'Промежуточное'}
+KIND_TEXT = {'0': tr('Элементарное'), '1': tr('Альтернатива'), '2': tr('Последовательность'), '3': tr('Цикл') }
+FORMAL_LABELS = {'0': tr('Аналитическая'), '2': tr('Алгоритмическая')}
+STATUS_LABELS = {'0': tr('Элементарное'), '1': tr('Промежуточное')}
 
 
 def _fit_text_lines(value, measure, max_width, max_lines):
     """Word-wrap and ellipsize using the actual font metrics in pixels."""
     if max_width <= 0 or max_lines <= 0:
         return []
-    remaining = (value or '(без названия)').strip() or '(без названия)'
+    remaining = (value or tr('(без названия)')).strip() or tr('(без названия)')
     lines = []
     while remaining and len(lines) < max_lines:
         count = 0
@@ -86,40 +87,40 @@ class CourseworkPanel(ttk.Frame):
         # to the application header rather than a special 'coursework' workspace.
         top = ttk.Frame(self, padding=(11, 8, 11, 0))
         top.pack(fill='x')
-        ttk.Label(top, text='Формирование СПД', font=('TkDefaultFont', 13, 'bold')).pack(side='left')
-        ttk.Label(top, text='Выберите действие на схеме или слева; свойства редактируются справа',
+        ttk.Label(top, text=tr('Формирование СПД'), font=('TkDefaultFont', 13, 'bold')).pack(side='left')
+        ttk.Label(top, text=tr('Выберите действие на схеме или слева; свойства редактируются справа'),
                   style='Muted.TLabel').pack(side='left', padx=(17, 0))
-        focus_button = ttk.Button(top, text='⛶ На весь экран', command=lambda: self.app.enter_diagram_focus(self))
-        focus_button._tooltip_text = 'Скрыть панели и показать схему на всю рабочую область.'
+        focus_button = ttk.Button(top, text=tr('⛶ На весь экран'), command=lambda: self.app.enter_diagram_focus(self))
+        focus_button._tooltip_text = tr('Скрыть панели и показать схему на всю рабочую область.')
         focus_button.pack(side='right')
-        self._is2_mode_button = ttk.Button(top, text='Вид ИС-2', command=self._toggle_is2_view)
-        self._is2_mode_button._tooltip_text = 'Переключить расположение схемы на листы по образцу ИС-2.'
+        self._is2_mode_button = ttk.Button(top, text=tr('Вид ИС-2'), command=self._toggle_is2_view)
+        self._is2_mode_button._tooltip_text = tr('Переключить расположение схемы на листы по образцу ИС-2.')
         self._is2_mode_button.pack(side='right', padx=(0, 6))
 
         structure = ttk.Frame(self, padding=(11, 7, 11, 2))
         structure.pack(fill='x')
         for label, callback, primary in [
-            ('+ Корневое', self._add_root, False), ('+ Дочернее', self._add_child, True),
-            ('Вставить до', lambda: self._insert(False), False),
-            ('Вставить после', lambda: self._insert(True), False),
-            ('Условия ветвей…', self._alternative_labels, False),
+            (tr('+ Корневое'), self._add_root, False), (tr('+ Дочернее'), self._add_child, True),
+            (tr('Вставить до'), lambda: self._insert(False), False),
+            (tr('Вставить после'), lambda: self._insert(True), False),
+            (tr('Условия ветвей…'), self._alternative_labels, False),
             ('↑', lambda: self._move(-1), False), ('↓', lambda: self._move(1), False),
-            ('Удалить', self._delete, False),
+            (tr('Удалить'), self._delete, False),
         ]:
             button = ttk.Button(structure, text=label, command=callback,
                                 style='Primary.TButton' if primary else 'TButton')
             button.pack(side='left', padx=(0, 5))
             self._edit_buttons.append(button)
-        code_button = ttk.Button(structure, text='Перенумеровать z…', command=self._renumber)
+        code_button = ttk.Button(structure, text=tr('Перенумеровать z…'), command=self._renumber)
         code_button.pack(side='right')
         self._edit_buttons.append(code_button)
 
         # The creation dialog already offers the new action's type. Keep
         # conversion of an existing action available in a compact menu.
-        construction = ttk.Menubutton(structure, text='Изменить конструкцию ▾')
+        construction = ttk.Menubutton(structure, text=tr('Изменить конструкцию ▾'))
         choices = tk.Menu(construction, tearoff=False)
-        for label, kind in (('Последовательность', 'sequence'), ('Альтернатива', 'alternative'),
-                            ('Цикл', 'iteration'), ('Элементарное', 'elementary')):
+        for label, kind in ((tr('Последовательность'), 'sequence'), (tr('Альтернатива'), 'alternative'),
+                            (tr('Цикл'), 'iteration'), (tr('Элементарное'), 'elementary')):
             choices.add_command(label=label, command=lambda k=kind: self._convert(k))
         construction.configure(menu=choices)
         construction.pack(side='left', padx=(0, 5))
@@ -128,18 +129,18 @@ class CourseworkPanel(ttk.Frame):
         views = ttk.Frame(self, padding=(11, 4, 11, 8))
         views.pack(fill='x')
         for label, action in (
-            ('Общая схема', self._root_scene), ('Вся декомпозиция', self._full_scene),
-            ('Экспорт SVG', self._export_svg), ('Проверить модель', self._check),
+            (tr('Общая схема'), self._root_scene), (tr('Вся декомпозиция'), self._full_scene),
+            (tr('Экспорт SVG'), self._export_svg), (tr('Проверить модель'), self._check),
         ):
             ttk.Button(views, text=label, command=action).pack(side='left', padx=(0, 5))
-        self.mode_label = ttk.Label(views, text='Вся модель · 100%', style='Muted.TLabel')
+        self.mode_label = ttk.Label(views, text=tr('Вся модель · 100%'), style='Muted.TLabel')
         self.mode_label.pack(side='right')
         self._is2_sheet_bar = ttk.Frame(self, padding=(11, 2, 11, 5))
-        ttk.Label(self._is2_sheet_bar, text='Лист:').pack(side='left', padx=(0, 6))
+        ttk.Label(self._is2_sheet_bar, text=tr('Лист:')).pack(side='left', padx=(0, 6))
         self._is2_sheet_choice = ttk.Combobox(self._is2_sheet_bar, state='readonly', width=54)
         self._is2_sheet_choice.pack(side='left', fill='x', expand=True)
         self._is2_sheet_choice.bind('<<ComboboxSelected>>', self._select_is2_sheet)
-        ttk.Label(self._is2_sheet_bar, text='Расположение — реконструкция', style='Muted.TLabel').pack(side='left', padx=10)
+        ttk.Label(self._is2_sheet_bar, text=tr('Расположение — реконструкция'), style='Muted.TLabel').pack(side='left', padx=10)
 
         panes = ttk.Panedwindow(self, orient='horizontal')
         panes.pack(fill='both', expand=True, padx=10, pady=(0, 9))
@@ -148,16 +149,16 @@ class CourseworkPanel(ttk.Frame):
         right = ttk.Frame(panes, width=330)
         self._focus_panes, self._focus_left, self._focus_right = panes, left, right
         self._focus_return_bar = ttk.Frame(self, padding=(6, 4))
-        self._navigation_back_button = ttk.Button(self._focus_return_bar, text='← Назад по схеме',
+        self._navigation_back_button = ttk.Button(self._focus_return_bar, text=tr('← Назад по схеме'),
                                                    command=self._back_scene, state='disabled')
-        self._navigation_back_button._tooltip_text = 'Вернуться к предыдущему виду схемы; изменения проекта не отменяются.'
+        self._navigation_back_button._tooltip_text = tr('Вернуться к предыдущему виду схемы; изменения проекта не отменяются.')
         self._navigation_back_button.pack(side='left')
-        ttk.Button(self._focus_return_bar, text='← Вернуться', command=self.app.exit_diagram_focus).pack(side='right')
+        ttk.Button(self._focus_return_bar, text=tr('← Вернуться'), command=self.app.exit_diagram_focus).pack(side='right')
         panes.add(left, weight=2)
         panes.add(center, weight=8)
         panes.add(right, weight=3)
 
-        ttk.Label(left, text='ДЕРЕВО ДЕЙСТВИЙ', font=('TkDefaultFont', 10, 'bold'),
+        ttk.Label(left, text=tr('ДЕРЕВО ДЕЙСТВИЙ'), font=('TkDefaultFont', 10, 'bold'),
                   padding=(4, 4)).pack(anchor='w')
         search_bar = ttk.Frame(left)
         search_bar.pack(fill='x', pady=(5, 6))
@@ -166,7 +167,7 @@ class CourseworkPanel(ttk.Frame):
         ttk.Button(search_bar, text='×', width=3,
                    command=lambda: self.search_var.set('')).pack(side='left', padx=(3, 0))
         self.search_var.trace_add('write', lambda *_: self._refresh_tree())
-        ttk.Label(left, text='Поиск по коду и наименованию',
+        ttk.Label(left, text=tr('Поиск по коду и наименованию'),
                   style='Muted.TLabel').pack(anchor='w', pady=(0, 5))
         treebox = ttk.Frame(left)
         treebox.pack(fill='both', expand=True)
@@ -210,7 +211,7 @@ class CourseworkPanel(ttk.Frame):
         self.canvas.bind('<Control-Button-5>', lambda _event: self._zoom(1/1.08))
         self.canvas.bind('<Control-Key-0>', lambda _event: self._fit_scene())
         self.canvas.bind('<F2>', lambda _event: self._focus_name())
-        self._canvas_help = ttk.Label(center, text='ЛКМ — выбрать · двойной щелчок — открыть лист · Ctrl + колесо — масштаб · Ctrl + 0 — вписать · средняя кнопка — перемещение',
+        self._canvas_help = ttk.Label(center, text=tr('ЛКМ — выбрать · двойной щелчок — открыть лист · Ctrl + колесо — масштаб · Ctrl + 0 — вписать · средняя кнопка — перемещение'),
                                       style='Muted.TLabel', padding=(6, 4))
         self._canvas_help.grid(row=2, column=0, sticky='w')
 
@@ -243,54 +244,54 @@ class CourseworkPanel(ttk.Frame):
         side_canvas.bind('<MouseWheel>', lambda e: side_canvas.yview_scroll(-1 if e.delta > 0 else 1, 'units'))
         side_canvas.bind('<Button-4>', lambda _e: side_canvas.yview_scroll(-1, 'units'))
         side_canvas.bind('<Button-5>', lambda _e: side_canvas.yview_scroll(1, 'units'))
-        ttk.Label(inspector, text='СВОЙСТВА ДЕЙСТВИЯ',
+        ttk.Label(inspector, text=tr('СВОЙСТВА ДЕЙСТВИЯ'),
                   font=('TkDefaultFont', 10, 'bold')).pack(anchor='w')
-        self.property_code = ttk.Label(inspector, text='Выберите действие', style='Muted.TLabel')
+        self.property_code = ttk.Label(inspector, text=tr('Выберите действие'), style='Muted.TLabel')
         self.property_code.pack(anchor='w', pady=(7, 8))
-        ttk.Label(inspector, text='Наименование').pack(anchor='w')
+        ttk.Label(inspector, text=tr('Наименование')).pack(anchor='w')
         self.property_name = tk.Text(inspector, height=4, width=29, wrap='word', undo=True,
                                      bg=SURFACE, fg=INK, relief='solid', bd=1, font=('TkDefaultFont', 10),
                                      highlightthickness=1, highlightcolor=PRIMARY, highlightbackground=BORDER)
         self.property_name.pack(fill='x', pady=(3, 8))
-        self.property_type = ttk.Label(inspector, text='Тип: —', style='Muted.TLabel', wraplength=290)
+        self.property_type = ttk.Label(inspector, text=tr('Тип: —'), style='Muted.TLabel', wraplength=290)
         self.property_type.pack(anchor='w', pady=(0, 7))
-        ttk.Label(inspector, text='Степень формализации').pack(anchor='w')
+        ttk.Label(inspector, text=tr('Степень формализации')).pack(anchor='w')
         self.property_formal = ttk.Combobox(inspector, state='readonly', values=tuple(FORMAL_LABELS.values()))
         self.property_formal.pack(fill='x', pady=(3, 9))
-        ttk.Label(inspector, text='Статус').pack(anchor='w')
+        ttk.Label(inspector, text=tr('Статус')).pack(anchor='w')
         self.property_status = ttk.Combobox(inspector, state='readonly', values=tuple(STATUS_LABELS.values()))
         self.property_status.pack(fill='x', pady=(3, 9))
-        ttk.Label(inspector, text='Структурная метка (XML @mark)').pack(anchor='w')
+        ttk.Label(inspector, text=tr('Структурная метка (XML @mark)')).pack(anchor='w')
         self.property_mark = ttk.Entry(inspector)
         self.property_mark.pack(fill='x', pady=(3, 10))
-        property_button = ttk.Button(inspector, text='Сохранить свойства действия', command=self._apply_properties,
+        property_button = ttk.Button(inspector, text=tr('Сохранить свойства действия'), command=self._apply_properties,
                                      style='Primary.TButton')
         property_button.pack(fill='x', pady=(0, 12))
         self._edit_buttons.append(property_button)
         self.property_name.bind('<Control-Return>', lambda _event: (self._apply_properties(), 'break')[-1])
         ttk.Separator(inspector).pack(fill='x', pady=5)
-        ttk.Label(inspector, text='ФУНКЦИИ И АРГУМЕНТЫ',
+        ttk.Label(inspector, text=tr('ФУНКЦИИ И АРГУМЕНТЫ'),
                   font=('TkDefaultFont', 10, 'bold')).pack(anchor='w', pady=(5, 8))
-        ttk.Label(inspector, text='Параметр для выбранного действия').pack(anchor='w')
+        ttk.Label(inspector, text=tr('Параметр для выбранного действия')).pack(anchor='w')
         self.parameter_var = tk.StringVar()
         self.parameter_choice = ttk.Combobox(inspector, state='readonly', textvariable=self.parameter_var)
         self.parameter_choice.pack(fill='x', pady=(3, 7))
         row = ttk.Frame(inspector)
         row.pack(fill='x')
-        ttk.Button(row, text='+ Функция (*)', command=lambda: self._add_parameter_link('*')).pack(side='left')
-        ttk.Button(row, text='+ Аргумент (+)', command=lambda: self._add_parameter_link('+')).pack(side='left', padx=4)
+        ttk.Button(row, text=tr('+ Функция (*)'), command=lambda: self._add_parameter_link('*')).pack(side='left')
+        ttk.Button(row, text=tr('+ Аргумент (+)'), command=lambda: self._add_parameter_link('+')).pack(side='left', padx=4)
         self.link_tree = GridTreeview(inspector, columns=('role', 'name'), show='headings',
                                       height=5, selectmode='browse')
-        self.link_tree.heading('role', text='Роль'); self.link_tree.heading('name', text='Параметр')
+        self.link_tree.heading('role', text=tr('Роль')); self.link_tree.heading('name', text=tr('Параметр'))
         self.link_tree.column('role', width=58, stretch=False)
         self.link_tree.column('name', width=182)
         self.link_tree.pack(fill='both', expand=True, pady=(8, 5))
-        ttk.Button(inspector, text='Убрать выбранную связь',
+        ttk.Button(inspector, text=tr('Убрать выбранную связь'),
                    command=self._delete_parameter_link).pack(fill='x')
         ttk.Separator(inspector).pack(fill='x', pady=11)
-        ttk.Button(inspector, text='+ Новый параметр…', command=self._add_parameter).pack(fill='x', pady=(0, 5))
-        ttk.Button(inspector, text='+ Новый объект…', command=self._add_object).pack(fill='x')
-        ttk.Label(inspector, text='Все параметры, формы и матрица доступны в верхних разделах программы.',
+        ttk.Button(inspector, text=tr('+ Новый параметр…'), command=self._add_parameter).pack(fill='x', pady=(0, 5))
+        ttk.Button(inspector, text=tr('+ Новый объект…'), command=self._add_object).pack(fill='x')
+        ttk.Label(inspector, text=tr('Все параметры, формы и матрица доступны в верхних разделах программы.'),
                   style='Muted.TLabel', wraplength=290, justify='left').pack(fill='x', pady=(11, 0))
 
     def set_editing_enabled(self, enabled: bool):
@@ -316,13 +317,13 @@ class CourseworkPanel(ttk.Frame):
                     self.select_action(tag.split(':', 1)[1])
                     break
         menu = persistent_menu(self, '_action_context_popup', (
-            ('Редактировать название', self._focus_name),
-            ('Добавить дочернее действие', self._add_child),
-            ('Вставить после', lambda: self._insert(True)),
-            ('Изменить тип…', self._convert),
-            ('Открыть лист', self._focus_scene),
+            (tr('Редактировать название'), self._focus_name),
+            (tr('Добавить дочернее действие'), self._add_child),
+            (tr('Вставить после'), lambda: self._insert(True)),
+            (tr('Изменить тип…'), self._convert),
+            (tr('Открыть лист'), self._focus_scene),
             None,
-            ('Удалить действие', self._confirm_delete),
+            (tr('Удалить действие'), self._confirm_delete),
         ))
         try:
             menu.tk_popup(event.x_root, event.y_root)
@@ -422,7 +423,7 @@ class CourseworkPanel(ttk.Frame):
             self.tree.item(top, open=True)
         if self.selected_id and self.tree.exists(self.selected_id):
             self.tree.selection_set(self.selected_id)
-        self.tree_count.configure(text=f'Показано: {len(visible)} из {len(nodes)}')
+        self.tree_count.configure(text=tr('Показано: {shown} из {total}').format(shown=len(visible), total=len(nodes)))
 
     def refresh(self):
         if self.doc is not self._navigation_document:
@@ -453,7 +454,7 @@ class CourseworkPanel(ttk.Frame):
 
     def _toggle_is2_view(self):
         self._is2_view = not self._is2_view
-        self._is2_mode_button.configure(text='Обычный вид' if self._is2_view else 'Вид ИС-2')
+        self._is2_mode_button.configure(text=tr('Обычный вид') if self._is2_view else tr('Вид ИС-2'))
         if self._is2_view:
             self._refresh_is2_sheets()
             self._is2_sheet_bar.pack(fill='x', before=self._focus_panes)
@@ -462,7 +463,7 @@ class CourseworkPanel(ttk.Frame):
         self._draw()
 
     def _refresh_is2_sheets(self):
-        self._is2_sheets = {'Общая схема': None}
+        self._is2_sheets = {tr('Общая схема'): None}
         if self.doc is not None:
             nodes = {node.get('id', ''): node for node in self.doc.actions}
             parents = {link.get('afe1', '') for link in self.doc.links if link.get('type') == '2'}
@@ -548,8 +549,8 @@ class CourseworkPanel(ttk.Frame):
                 if fitted:
                     canvas.create_text(tx,bottom,anchor=anchor,text=fitted[0],fill=color,font=small_font,tags=tags)
         canvas.configure(scrollregion=(0,0,width,height))
-        title = 'Общая схема' if self.focus_id is None else action_code(self.doc.action(self.focus_id))
-        self.mode_label.configure(text=f'Вид ИС-2 · {title} · {round(z*100)}%')
+        title = tr('Общая схема') if self.focus_id is None else action_code(self.doc.action(self.focus_id))
+        self.mode_label.configure(text=tr('Вид ИС-2 · {title} · {zoom}%').format(title=title, zoom=round(z*100)))
 
     def _draw(self):
         canvas = self.canvas
@@ -557,11 +558,11 @@ class CourseworkPanel(ttk.Frame):
         dark = self.app.theme_name.get() == 'dark'
         canvas.configure(background='#1b1b29' if dark else '#ffffff')
         if self.doc is None:
-            canvas.create_text(28, 32, anchor='nw', text='// РАБОЧАЯ ОБЛАСТЬ',
+            canvas.create_text(28, 32, anchor='nw', text=tr('// РАБОЧАЯ ОБЛАСТЬ'),
                                fill='#aaaabd' if dark else '#65697d', font=('TkDefaultFont', 10))
-            canvas.create_text(28, 70, anchor='nw', text='Создайте или откройте проект',
+            canvas.create_text(28, 70, anchor='nw', text=tr('Создайте или откройте проект'),
                                fill='#f3f3f8' if dark else '#242536', font=('TkDefaultFont', 14, 'bold'))
-            canvas.create_text(28, 104, anchor='nw', text='Здесь появится схема вашей модели.',
+            canvas.create_text(28, 104, anchor='nw', text=tr('Здесь появится схема вашей модели.'),
                                fill='#aaaabd' if dark else '#65697d', font=('TkDefaultFont', 10))
             return
         if getattr(self, '_is2_view', False):
@@ -642,8 +643,10 @@ class CourseworkPanel(ttk.Frame):
                         canvas.create_text(center, band_top+band_height/2, anchor='center',
                                            text=number, fill=ink, font=small_font, tags=tags)
         canvas.configure(scrollregion=(0, 0, grid_width, grid_height))
-        title = 'Весь проект' if self.focus_id is None else action_code(self.doc.action(self.focus_id))
-        self.mode_label.configure(text=f'{title} · {"глубина 2 + выходы альтернатив" if self.depth_limit == 2 else "вся структура"} · {round(s*100)}%' + (' · увеличьте масштаб для подписей' if not show_labels else ''))
+        title = tr('Весь проект') if self.focus_id is None else action_code(self.doc.action(self.focus_id))
+        scope = tr('глубина 2 + выходы альтернатив') if self.depth_limit == 2 else tr('вся структура')
+        hint = ' · ' + tr('Увеличьте масштаб для подписей') if not show_labels else ''
+        self.mode_label.configure(text=tr('{title} · {scope} · {zoom}%{hint}').format(title=title, scope=scope, zoom=round(s*100), hint=hint))
 
     def _tree_select(self, _event=None):
         selected = self.tree.selection()
@@ -746,8 +749,8 @@ class CourseworkPanel(ttk.Frame):
             self._navigate_scene(self.selected_id, 2)
 
     def _clear_properties(self):
-        self.property_code.configure(text='Выберите действие')
-        self.property_type.configure(text='Тип: —')
+        self.property_code.configure(text=tr('Выберите действие'))
+        self.property_type.configure(text=tr('Тип: —'))
         self.property_name.delete('1.0','end')
         self.property_formal.set(''); self.property_status.set(''); self.property_mark.delete(0,'end')
         self.link_tree.delete(*self.link_tree.get_children())
@@ -758,7 +761,7 @@ class CourseworkPanel(ttk.Frame):
             return
         node = self.doc.action(self.selected_id)
         self.property_code.configure(text=f'{action_code(node)} · XML ID {self.selected_id}')
-        self.property_type.configure(text='Тип: ' + KIND_TEXT.get(node.get('type',''),'неизвестен') + (' · ' + ' / '.join(x.get('text','') for x in node.findall('alts')) if node.get('type')=='1' else ''))
+        self.property_type.configure(text=tr('Тип: {kind}').format(kind=KIND_TEXT.get(node.get('type',''), tr('неизвестен'))) + (' · ' + ' / '.join(x.get('text','') for x in node.findall('alts')) if node.get('type')=='1' else ''))
         self.property_name.insert('1.0', node.get('name',''))
         self.property_formal.set(FORMAL_LABELS.get(node.get('formalization',''),''))
         self.property_status.set(STATUS_LABELS.get(node.get('status',''),''))
@@ -787,19 +790,19 @@ class CourseworkPanel(ttk.Frame):
         formal = next((code for code,label in FORMAL_LABELS.items() if label==self.property_formal.get()),None)
         status = next((code for code,label in STATUS_LABELS.items() if label==self.property_status.get()),None)
         if formal is None or status is None:
-            messagebox.showerror('Действие','Выберите степень формализации и статус',parent=self)
+            messagebox.showerror(tr('Действие'),tr('Выберите степень формализации и статус'),parent=self)
             return
         name = self.property_name.get('1.0','end-1c').strip()
         if not name:
-            messagebox.showerror('Действие','Наименование не может быть пустым',parent=self)
+            messagebox.showerror(tr('Действие'),tr('Наименование не может быть пустым'),parent=self)
             return
         try:
             self.doc.update_action(self.selected_id, name=name, formalization=formal,
                                    status=status, mark=self.property_mark.get())
-            self.app._mark_dirty('Изменены свойства действия '+self.selected_id)
+            self.app._mark_dirty(tr('Изменены свойства действия {action_id}').format(action_id=self.selected_id))
             self.app.refresh_all()
         except Exception as exc:
-            messagebox.showerror('Действие',str(exc),parent=self)
+            messagebox.showerror(tr('Действие'),str(exc),parent=self)
 
     def _sync(self):
         if self.selected_id and self.app.action_tree.exists(self.selected_id):
@@ -829,52 +832,52 @@ class CourseworkPanel(ttk.Frame):
             return
         node=self.doc.action(self.selected_id)
         if node.get('type') != '1':
-            messagebox.showinfo('Альтернатива', 'Выберите действие типа «Альтернатива».', parent=self)
+            messagebox.showinfo(tr('Альтернатива'), tr('Выберите действие типа «Альтернатива».'), parent=self)
             return
         old=[x.get('text','') for x in node.findall('alts')]
         from .gui import RecordDialog
-        dialog=RecordDialog(self,'Варианты альтернативы',[
-            ('first','Вариант 1',old[0] if len(old)>0 else 'Условие 1',None),
-            ('second','Вариант 2',old[1] if len(old)>1 else 'Условие 2',None),
+        dialog=RecordDialog(self,tr('Варианты альтернативы'),[
+            ('first',tr('Вариант 1'),old[0] if len(old)>0 else tr('Условие 1'),None),
+            ('second',tr('Вариант 2'),old[1] if len(old)>1 else tr('Условие 2'),None),
         ])
         self.wait_window(dialog)
         if dialog.result is None:
             return
         try:
             set_alternative_labels(self.doc,self.selected_id,[dialog.result['first'],dialog.result['second']])
-            self.app._mark_dirty('Подписи альтернативы '+self.selected_id)
+            self.app._mark_dirty(tr('Подписи альтернативы {action_id}').format(action_id=self.selected_id))
             self.app.refresh_all()
         except Exception as exc:
-            messagebox.showerror('Альтернатива',str(exc),parent=self)
+            messagebox.showerror(tr('Альтернатива'),str(exc),parent=self)
 
     def _renumber(self):
         if self.doc is None: return
-        if not messagebox.askyesno('Нумерация действий',
-                 'Назначить коды вида z11, z21, z3.10 по глубине дерева и порядку обхода?\n'
-                 'Существующие symbol/level/number будут изменены. Это алгоритм PzKpfw, НЕ подтверждённый native codeStructure().',
+        if not messagebox.askyesno(tr('Нумерация действий'),
+                 tr('Назначить коды вида z11, z21, z3.10 по глубине дерева и порядку обхода?\n'
+                 'Существующие symbol/level/number будут изменены. Это алгоритм PzKpfw, НЕ подтверждённый native codeStructure().'),
                  parent=self):
             return
         try:
             report=renumber_structure(self.doc)
-            self.app._mark_dirty('Коды действий перенумерованы (PzKpfw)')
+            self.app._mark_dirty(tr('Коды действий перенумерованы (PzKpfw)'))
             self.app.refresh_all()
-            messagebox.showinfo('Коды', f'Обработано действий: {report["action_count"]}\nИзменено: {len(report["reassigned"])}',parent=self)
+            messagebox.showinfo(tr('Коды'), tr('Обработано действий: {count}\nИзменено: {changed}').format(count=report['action_count'], changed=len(report['reassigned'])),parent=self)
         except Exception as exc:
-            messagebox.showerror('Коды действий',str(exc),parent=self)
+            messagebox.showerror(tr('Коды действий'),str(exc),parent=self)
 
     def _add_parameter_link(self,marker):
         if self.doc is None or not self.selected_id:
             return
         pid=self._param_options.get(self.parameter_var.get())
         if not pid:
-            messagebox.showinfo('Параметры','Создайте или выберите параметр',parent=self)
+            messagebox.showinfo(tr('Параметры'),tr('Создайте или выберите параметр'),parent=self)
             return
         try:
             add_primary_link(self.doc,self.selected_id,pid,marker)
-            self.app._mark_dirty('Привязан параметр к действию')
+            self.app._mark_dirty(tr('Привязан параметр к действию'))
             self.app.refresh_all()
         except Exception as exc:
-            messagebox.showerror('Матрица',str(exc),parent=self)
+            messagebox.showerror(tr('Матрица'),str(exc),parent=self)
 
     def _delete_parameter_link(self):
         if self.doc is None or not self.selected_id or not self.link_tree.selection():
@@ -883,10 +886,10 @@ class CourseworkPanel(ttk.Frame):
         pid,mark=self.link_tree.item(item,'tags')
         try:
             remove_primary_link(self.doc,self.selected_id,pid,mark)
-            self.app._mark_dirty('Удалена привязка параметра')
+            self.app._mark_dirty(tr('Удалена привязка параметра'))
             self.app.refresh_all()
         except Exception as exc:
-            messagebox.showerror('Матрица',str(exc),parent=self)
+            messagebox.showerror(tr('Матрица'),str(exc),parent=self)
 
     def _add_parameter(self):
         self.app.add_parameter()
@@ -906,22 +909,22 @@ class CourseworkPanel(ttk.Frame):
 
     def _export_svg(self):
         if self.doc is None:return
-        target=filedialog.asksaveasfilename(parent=self,title='Схема проекта SVG',defaultextension='.svg',filetypes=[('SVG','*.svg')])
+        target=filedialog.asksaveasfilename(parent=self,title=tr('Схема проекта SVG'),defaultextension='.svg',filetypes=[('SVG','*.svg')])
         if not target:return
         try:
             scene = self._display_scene()
             svg = is2_spd_svg(self.doc, scene, self.selected_id) if self._is2_view else scene_svg(scene, selected=self.selected_id)
             Path(target).write_text(svg,encoding='utf-8')
-            self.app.status.set('Схема SVG сохранена: '+target)
-        except OSError as exc: messagebox.showerror('Экспорт SVG',str(exc),parent=self)
+            self.app.status.set(tr('Схема SVG сохранена: {path}').format(path=target))
+        except OSError as exc: messagebox.showerror(tr('Экспорт SVG'),str(exc),parent=self)
 
     def _export_all(self):
         if self.doc is None:return
-        folder=filedialog.askdirectory(parent=self,title='Папка комплекта проекта')
+        folder=filedialog.askdirectory(parent=self,title=tr('Папка комплекта проекта'))
         if not folder:return
         path=Path(folder)
         destinations=[path/name for name in ('kursovoy_spd.svg','kursovoy_decomposition.svg','kursovoy_forms.html','kursovoy_report.html','kursovoy_check.json')]
-        if any(p.exists() for p in destinations) and not messagebox.askyesno('Экспорт','Некоторые файлы существуют. Перезаписать?',parent=self):
+        if any(p.exists() for p in destinations) and not messagebox.askyesno(tr('Экспорт'),tr('Некоторые файлы существуют. Перезаписать?'),parent=self):
             return
         try:
             documents=[
@@ -932,17 +935,18 @@ class CourseworkPanel(ttk.Frame):
             ]
             for path_item,data in zip(destinations,documents):
                 path_item.write_text(data,encoding='utf-8')
-            messagebox.showinfo('Комплект проекта','Готовы: схема СПД, декомпозиция, формы A/B/D/D1/D2, отчёт, проверка.\nПапка: '+str(path),parent=self)
-        except (OSError,ValueError) as exc: messagebox.showerror('Экспорт',str(exc),parent=self)
+            messagebox.showinfo(tr('Комплект проекта'),tr('Готовы: схема СПД, декомпозиция, формы A/B/D/D1/D2, отчёт, проверка.\nПапка: {path}').format(path=path),parent=self)
+        except (OSError,ValueError) as exc: messagebox.showerror(tr('Экспорт'),str(exc),parent=self)
 
     def _check(self):
         if self.doc is None:return
         report=course_checklist(self.doc)
-        notes=[f'Действий: {report["actions"]} (элементарных: {report["elementary_actions"]}); параметров: {report["parameters"]}; объектов: {report["objects"]}',
-               'Формы: '+', '.join(f'{k}={v}' for k,v in report['form_rows'].items())]
-        for key,title in [('errors','Ошибки XML'),('missing_codes','Действия без кода'),('missing_names','Без имени'),
-                          ('empty_composite_actions','Пустые составные действия'),('placeholder_actions','Заглушки')]:
+        notes=[tr('Действий: {actions} (элементарных: {elementary}); параметров: {parameters}; объектов: {objects}').format(
+                   actions=report['actions'], elementary=report['elementary_actions'], parameters=report['parameters'], objects=report['objects']),
+               tr('Формы: {forms}').format(forms=', '.join(f'{k}={v}' for k,v in report['form_rows'].items()))]
+        for key,title in [('errors',tr('Ошибки XML')),('missing_codes',tr('Действия без кода')),('missing_names',tr('Без имени')),
+                          ('empty_composite_actions',tr('Пустые составные действия')),('placeholder_actions',tr('Заглушки'))]:
             data=report[key]
-            notes.append(title+': '+(', '.join(map(str,data[:12]))+('…' if len(data)>12 else '') if data else 'нет'))
+            notes.append(title+': '+(', '.join(map(str,data[:12]))+('…' if len(data)>12 else '') if data else tr('нет')))
         notes.extend(report['remarks'])
-        messagebox.showinfo('Проверка модели','\n'.join(notes),parent=self)
+        messagebox.showinfo(tr('Проверка модели'),'\n'.join(notes),parent=self)

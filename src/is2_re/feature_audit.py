@@ -8,17 +8,17 @@ from collections import Counter
 from .document import ProjectDocument
 
 CAPABILITIES = (
-    ('xml_roundtrip', 'implemented_tested_locally', 'ProjectDocument round-trip + validation'),
-    ('decomposition_tree', 'implemented_tested_locally', 'type=2/3 composition and arrangement chains'),
-    ('decomposition_conversions', 'partially_reconstructed', 'native setter values and child counts observed; naming/codeStructure unknown'),
-    ('matrix_serialization', 'partially_reconstructed', 'AElement type=4; e1 action, e2 parameter, char/power'),
-    ('specifications_A_B_D_D1_D2', 'experimental', 'independent projections; native formulas/print parity unverified'),
-    ('native_codes', 'unknown', 'getCode, codeStructure, getStructureSymbols native rules incomplete'),
-    ('native_subject_operations', 'unknown', 'full SubjectOperationsStructure semantics unavailable'),
-    ('native_qt_plugins', 'not_implemented', 'Python/Tk cannot load proprietary Qt IsModule ABI'),
-    ('native_matrix_visual_rules', 'unknown', 'special structural symbols and UI algorithm unconfirmed'),
-    ('native_graphical_renderer', 'not_implemented', 'original Qt QPainter geometry/layout not reproduced'),
-    ('windows_acceptance', 'not_tested', 'no original IS.exe live open-save-reopen comparison'),
+    ('xml_roundtrip', 'implemented_tested_locally', 'Сохранение и повторная загрузка ProjectDocument с проверкой'),
+    ('decomposition_tree', 'implemented_tested_locally', 'Цепочки композиции и расположения type=2/3'),
+    ('decomposition_conversions', 'partially_reconstructed', 'Наблюдались значения native setter и число дочерних элементов; имена и codeStructure неизвестны'),
+    ('matrix_serialization', 'partially_reconstructed', 'AElement type=4; e1 — действие, e2 — параметр, char/power'),
+    ('specifications_A_B_D_D1_D2', 'experimental', 'Независимые представления; формулы и соответствие печатной форме оригинала не проверены'),
+    ('native_codes', 'unknown', 'Нативные правила getCode, codeStructure и getStructureSymbols восстановлены не полностью'),
+    ('native_subject_operations', 'unknown', 'Полная семантика SubjectOperationsStructure недоступна'),
+    ('native_qt_plugins', 'not_implemented', 'Python/Tk не загружает проприетарный ABI Qt IsModule'),
+    ('native_matrix_visual_rules', 'unknown', 'Специальные структурные символы и алгоритм интерфейса не подтверждены'),
+    ('native_graphical_renderer', 'not_implemented', 'Геометрия и компоновка исходного Qt QPainter не воспроизведены'),
+    ('windows_acceptance', 'not_tested', 'Нет проверки открытия, сохранения и повторного открытия в оригинальной ИС.exe'),
 )
 
 
@@ -40,17 +40,17 @@ def feature_audit(doc: ProjectDocument) -> dict[str, object]:
     conversion_candidates = [n.get('id', '') for n in doc.actions
                              if n.get('type') == '0' and not doc.composition_children(n.get('id', ''))]
     missing_data = [
-        {'item': 'native_populated_matrix', 'needed': 'IS-2-saved .is2 containing *, +, ., multiple powers, special structural symbols',
+        {'item': 'native_populated_matrix', 'needed': 'Файл .is2, сохранённый в ИС-2 и содержащий *, +, ., несколько значений power и специальные структурные символы',
          'observed_in_project': bool(records)},
-        {'item': 'native_decomposition_golden_samples', 'needed': 'Before/after IS.exe files for sequence, alternative, iteration and elementary conversions',
+        {'item': 'native_decomposition_golden_samples', 'needed': 'Файлы до и после преобразований в IS.exe для последовательности, альтернативы, цикла и элементарных действий',
          'observed_in_project': False},
-        {'item': 'native_code_generation', 'needed': 'Before/after XML with IDs, levels, symbols, codes and rearrangement; C++ decompiler output',
+        {'item': 'native_code_generation', 'needed': 'XML до и после с ID, уровнями, символами, кодами и перестановкой; результат декомпилятора C++',
          'observed_in_project': False},
-        {'item': 'native_specification_reference', 'needed': 'All original form outputs (HTML/PDF/screenshots) from same source project',
+        {'item': 'native_specification_reference', 'needed': 'Выводы всех исходных форм (HTML/PDF/скриншоты) для одного и того же проекта',
          'observed_in_project': False},
-        {'item': 'native_gui_behavior', 'needed': 'Original Qt application session for visual/drag/drop/print comparison',
+        {'item': 'native_gui_behavior', 'needed': 'Сеанс оригинального Qt-приложения для сравнения графики, перетаскивания и печати',
          'observed_in_project': False},
-        {'item': 'windows_native_acceptance', 'needed': 'IS.exe opens edited .is2, saves, then fork opens native output',
+        {'item': 'windows_native_acceptance', 'needed': 'IS.exe открывает изменённый .is2, сохраняет его, после чего PzKpfw открывает полученный файл',
          'observed_in_project': False},
     ]
     return {

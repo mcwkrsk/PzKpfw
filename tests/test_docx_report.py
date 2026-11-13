@@ -7,6 +7,7 @@ from docx import Document
 from is2_re.coursework import create_course_project
 from is2_re.docx_report import ReportOptions, _tile_ranges, write_docx_report
 from is2_re.specifications import add_primary_link
+from is2_re import i18n
 
 
 class DocxReportTests(unittest.TestCase):
@@ -34,6 +35,24 @@ class DocxReportTests(unittest.TestCase):
             self.assertTrue(any('Код ПД1' in table[0] for table in tables))
             self.assertIsNone(ZipFile(path).testzip())
         self.assertEqual(self.doc.to_bytes(), before)
+
+    def test_docx_static_text_uses_the_selected_language(self):
+        previous = i18n.get_language()
+        try:
+            i18n.set_language("en", persist=False)
+            with tempfile.TemporaryDirectory() as directory:
+                path = Path(directory) / "localized-report.docx"
+                write_docx_report(self.doc, path, ReportOptions(diagrams=False, forms=False, matrix=False, placeholders=True))
+                document = Document(path)
+                text = "\n".join(paragraph.text for paragraph in document.paragraphs)
+                self.assertIn("REPORT", text)
+                self.assertIn("COURSE PROJECT", text)
+                self.assertIn("TOPIC", text)
+                self.assertIn("Data schema", text)
+                self.assertNotIn("ОТЧЁТ О ВЫПОЛНЕНИИ", text)
+                self.assertNotIn("Схема данных", text)
+        finally:
+            i18n.set_language(previous, persist=False)
 
     def test_selection_and_cannot_overwrite_source(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -9,6 +9,7 @@ import os
 import tempfile
 from datetime import date
 
+from .i18n import tr
 from .decomposition_view import primitives
 from .gui_models import action_tree_rows
 from .matrix_view import grouped_matrix
@@ -31,7 +32,7 @@ def _dependencies():
         import docx
         from PIL import Image, ImageDraw, ImageFont
     except ImportError as exc:
-        raise RuntimeError('Для экспорта DOCX установите зависимости: python -m pip install -r requirements.txt') from exc
+        raise RuntimeError(tr('Для экспорта DOCX установите зависимости: python -m pip install -r requirements.txt')) from exc
     return docx, Image, ImageDraw, ImageFont
 
 
@@ -45,7 +46,7 @@ def _font(ImageFont, size):
     try:
         return ImageFont.truetype('arial.ttf', size=size)
     except OSError as exc:
-        raise RuntimeError('Не найден шрифт с поддержкой кириллицы для схем.') from exc
+        raise RuntimeError(tr('Не найден шрифт с поддержкой кириллицы для схем.')) from exc
 
 
 def _tile_ranges(extent, limit, intervals):
@@ -78,7 +79,7 @@ def diagram_tiles(doc, focus, *, max_width=1300, max_height=1450):
     y_ranges = _tile_ranges(height, max_height, [(y, y+h) for _,x,y,w,h,_ in rectangles])
     nx, ny = len(x_ranges), len(y_ranges)
     if nx * ny > 100:
-        raise ValueError('Схема слишком большая для отчёта. Выключите диаграммы в настройках экспорта.')
+        raise ValueError(tr('Схема слишком большая для отчёта. Выключите диаграммы в настройках экспорта.'))
     fonts = {}
     for ty, (oy, bottom) in enumerate(y_ranges):
         for tx, (ox, right) in enumerate(x_ranges):
@@ -183,17 +184,17 @@ def create_report(doc, options=ReportOptions()):
     center('ФГАОУ ВО «МГТУ «СТАНКИН»')
     center('Институт информационных технологий')
     for _ in range(4): document.add_paragraph()
-    center('ОТЧЁТ О ВЫПОЛНЕНИИ', 16, True)
-    center('КУРСОВОЙ РАБОТЫ', 16, True)
-    center('ПО ДИСЦИПЛИНЕ «БАЗЫ ДАННЫХ»', 13, True)
+    center(tr('ОТЧЁТ О ВЫПОЛНЕНИИ'), 16, True)
+    center(tr('КУРСОВОЙ РАБОТЫ'), 16, True)
+    center(tr('ПО ДИСЦИПЛИНЕ «БАЗЫ ДАННЫХ»'), 13, True)
     document.add_paragraph()
-    center('Студент: ' + (options.author.strip() or '________________________________'))
-    center('Группа: ' + options.group.strip())
+    center(tr('Студент: ') + (options.author.strip() or '________________________________'))
+    center(tr('Группа: ') + options.group.strip())
     document.add_paragraph()
-    center('НА ТЕМУ', 12, True)
+    center(tr('НА ТЕМУ'), 12, True)
     center(options.topic.strip() or doc.root.get('name', '') or '________________________________', 13, True)
     for _ in range(5): document.add_paragraph()
-    center(f'МОСКВА {date.today().year}')
+    center(tr('МОСКВА {year}').format(year=date.today().year))
     document.add_page_break()
     section = 0
     def heading(title):
@@ -201,50 +202,50 @@ def create_report(doc, options=ReportOptions()):
         section += 1
         document.add_heading(f'{section}. {title}', level=1)
     if options.diagrams:
-        heading('Функциональная диаграмма (декомпозиция)')
+        heading(tr('Функциональная диаграмма (декомпозиция)'))
         parent_ids = {link.get('afe1', '') for link in doc.links if link.get('type') == '2'}
         actions = {node.get('id', ''): node for node in doc.actions}
         sheets = [None] + [row.action_id for row in action_tree_rows(doc) if row.action_id in parent_ids]
         for ident in sheets:
-            label = 'Полная диаграмма' if ident is None else f'Лист {action_code(actions[ident])}: {actions[ident].get("name", "")}'
+            label = tr('Полная диаграмма') if ident is None else tr('Лист {code}: {name}').format(code=action_code(actions[ident]), name=actions[ident].get("name", ""))
             document.add_paragraph(label, style='Heading 2')
             for image, (x, y, nx, ny, tw, th) in diagram_tiles(doc, ident):
-                if nx * ny > 1: document.add_paragraph(f'Часть {y}.{x} из {ny} × {nx}')
+                if nx * ny > 1: document.add_paragraph(tr('Часть {part} из {rows} × {cols}').format(part=f'{y}.{x}', rows=ny, cols=nx))
                 scale_width = 15.8 * tw / 1300 if nx > 1 else 15.8
                 document.add_picture(image, width=Cm(min(scale_width, 23 * tw / th)))
     forms, warnings = project_forms(doc)
     if options.forms:
         for key in ('A', 'B', 'D', 'D1', 'D2'):
             if key == 'D' and options.placeholders:
-                heading('Форма C: классификация информации')
-                document.add_paragraph('Заполните по материалам работы и требованиям преподавателя.')
-            heading(FORM_NAMES[key])
+                heading(tr('Форма C: классификация информации'))
+                document.add_paragraph(tr('Заполните по материалам работы и требованиям преподавателя.'))
+            heading(tr(FORM_NAMES[key]))
             headers, rows = forms[key]
             if rows: _table(document, headers, rows)
-            else: document.add_paragraph('Данные для формы отсутствуют.')
+            else: document.add_paragraph(tr('Данные для формы отсутствуют.'))
     if options.matrix:
-        heading('Матричная диаграмма')
-        document.add_paragraph('Структурные обозначения рассчитаны по данным проекта; проверьте их соответствие ИС-2.')
+        heading(tr('Матричная диаграмма'))
+        document.add_paragraph(tr('Структурные обозначения рассчитаны по данным проекта; проверьте их соответствие ИС-2.'))
         headers, rows, _, matrix_warnings = grouped_matrix(doc)
         if not rows or len(headers) <= 2:
-            document.add_paragraph('Матрица пуста или слишком велика для отображения. Проверьте проект и экспорт CSV.')
+            document.add_paragraph(tr('Матрица пуста или слишком велика для отображения. Проверьте проект и экспорт CSV.'))
         else:
             for start in range(2, len(headers), 6):
                 indices = list(range(start, min(start + 6, len(headers))))
-                document.add_paragraph(f'Параметры {start-1}–{indices[-1]-1}')
+                document.add_paragraph(tr('Параметры {first}–{last}').format(first=start - 1, last=indices[-1] - 1))
                 _table(document, headers[:2] + [headers[i] for i in indices],
                        [row[:2] + [row[i] for i in indices] for row in rows], font_size=8)
     if options.placeholders:
-        heading('Схема данных')
-        document.add_paragraph('Связь объектов и параметров проекта. Схему базы данных дополните вручную.')
+        heading(tr('Схема данных'))
+        document.add_paragraph(tr('Связь объектов и параметров проекта. Схему базы данных дополните вручную.'))
         if forms['D1'][1]:
             _table(document, forms['D1'][0], forms['D1'][1])
         else:
-            document.add_paragraph('Объекты и параметры в проекте не заданы.')
+            document.add_paragraph(tr('Объекты и параметры в проекте не заданы.'))
         for title, body in (
-            ('Описание таблиц постоянной информации', 'Добавьте необходимые таблицы из исходных данных.'),
-            ('Программная реализация', 'Добавьте описание реализации и её изображения.'),
-            ('Приложение', 'Добавьте необходимые материалы.'),
+            (tr('Описание таблиц постоянной информации'), tr('Добавьте необходимые таблицы из исходных данных.')),
+            (tr('Программная реализация'), tr('Добавьте описание реализации и её изображения.')),
+            (tr('Приложение'), tr('Добавьте необходимые материалы.')),
         ):
             heading(title)
             document.add_paragraph(body)
@@ -255,7 +256,7 @@ def write_docx_report(doc, destination, options=ReportOptions(), *, source_path=
     destination = Path(destination)
     if source_path and (destination.resolve() == Path(source_path).resolve() or
                         (destination.exists() and Path(source_path).exists() and destination.samefile(source_path))):
-        raise ValueError('Нельзя сохранять отчёт поверх проекта .is2')
+        raise ValueError(tr('Нельзя сохранять отчёт поверх проекта .is2'))
     document = create_report(doc, options)
     destination.parent.mkdir(parents=True, exist_ok=True)
     tmp = None

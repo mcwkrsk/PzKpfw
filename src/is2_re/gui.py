@@ -4,6 +4,7 @@ The UI edits the recovered primary model, ConceptModel/cs, scalar AElement
 fields and conservatively decoded fields of existing dynamic relation records.
 """
 from __future__ import annotations
+from .i18n import (tr, tr_dynamic, available_languages, discover_languages, get_language, get_language_info, pack_errors, save_language_preference, user_locales_dir)
 
 import hashlib
 import json
@@ -55,25 +56,28 @@ from .parameter_dialog import ParameterDialog, group_label
 class RecordDialog(tk.Toplevel):
     def __init__(self, master, title: str, fields: list[tuple[str, str, str, tuple[str, ...] | None]]):
         super().__init__(master)
-        self.title(title)
+        self.title(tr(title))
         self.resizable(True, False)
         self.result = None
         self.vars: dict[str, tk.StringVar] = {}
+        self._choice_reverse: dict[str, dict[str, str]] = {}
         body = ttk.Frame(self, padding=12)
         body.grid(row=0, column=0, sticky="nsew")
         for row, (key, label, value, choices) in enumerate(fields):
-            ttk.Label(body, text=label).grid(row=row, column=0, sticky="w", padx=(0, 12), pady=4)
-            var = tk.StringVar(value=value)
+            ttk.Label(body, text=tr(label)).grid(row=row, column=0, sticky="w", padx=(0, 12), pady=4)
+            var = tk.StringVar(value=tr(value) if choices and value in choices else value)
             self.vars[key] = var
             if choices:
-                widget = ttk.Combobox(body, textvariable=var, values=choices, state="readonly", width=34)
+                translated_choices = tuple(tr(choice) for choice in choices)
+                self._choice_reverse[key] = {translated: original for original, translated in zip(choices, translated_choices)}
+                widget = ttk.Combobox(body, textvariable=var, values=translated_choices, state="readonly", width=34)
             else:
                 widget = ttk.Entry(body, textvariable=var, width=38)
             widget.grid(row=row, column=1, sticky="ew", pady=4)
         buttons = ttk.Frame(body)
         buttons.grid(row=len(fields), column=0, columnspan=2, sticky="e", pady=(10, 0))
-        ttk.Button(buttons, text="Отмена", command=self.destroy).pack(side="right", padx=(6, 0))
-        ttk.Button(buttons, text="Применить", command=self._accept).pack(side="right")
+        ttk.Button(buttons, text=tr("Отмена"), command=self.destroy).pack(side="right", padx=(6, 0))
+        ttk.Button(buttons, text=tr("Применить"), command=self._accept).pack(side="right")
         body.columnconfigure(1, weight=1)
         self.transient(master)
         self.grab_set()
@@ -83,19 +87,22 @@ class RecordDialog(tk.Toplevel):
         self.focus_set()
 
     def _accept(self):
-        self.result = {key: var.get() for key, var in self.vars.items()}
+        self.result = {
+            key: self._choice_reverse.get(key, {}).get(var.get(), var.get())
+            for key, var in self.vars.items()
+        }
         self.destroy()
 
 
 class ObjectDialog(RecordDialog):
     def __init__(self, master, name=None):
         super().__init__(master, 'Новый объект' if name is None else 'Изменить объект',
-                         [('name', 'Наименование объекта', name or '', None)])
+                         [('name', tr('Наименование объекта'), name or '', None)])
 
     def _accept(self):
         name = self.vars['name'].get().strip()
         if not name:
-            messagebox.showerror('Объект', 'Укажите наименование объекта.', parent=self)
+            messagebox.showerror(tr('Объект'), tr('Укажите наименование объекта.'), parent=self)
             return
         self.result = {'name': name}
         self.destroy()
@@ -104,7 +111,7 @@ class ObjectDialog(RecordDialog):
 class ReportOptionsDialog(tk.Toplevel):
     def __init__(self, master, topic):
         super().__init__(master)
-        self.title('Отчёт в DOCX')
+        self.title(tr('Отчёт в DOCX'))
         self.result = None
         self.resizable(True, False)
         self.author = tk.StringVar(value='')
@@ -113,19 +120,19 @@ class ReportOptionsDialog(tk.Toplevel):
         self.sections = {key: tk.BooleanVar(value=True) for key in ('diagrams', 'forms', 'matrix', 'placeholders')}
         body = ttk.Frame(self, padding=14)
         body.grid(sticky='nsew')
-        for row, (label, variable) in enumerate((('ФИО', self.author), ('Группа', self.group), ('Тема', self.topic))):
+        for row, (label, variable) in enumerate(((tr('ФИО'), self.author), (tr('Группа'), self.group), (tr('Тема'), self.topic))):
             ttk.Label(body, text=label).grid(row=row, column=0, sticky='w', padx=(0, 10), pady=4)
             ttk.Entry(body, textvariable=variable, width=52).grid(row=row, column=1, sticky='ew', pady=4)
-        for row, (key, label) in enumerate((('diagrams', 'Диаграммы декомпозиции'),
-                                            ('forms', 'Формы A, B, D, D1, D2'),
-                                            ('matrix', 'Матричная диаграмма'),
-                                            ('placeholders', 'Разделы для ручного заполнения')), start=3):
+        for row, (key, label) in enumerate((('diagrams', tr('Диаграммы декомпозиции')),
+                                            ('forms', tr('Формы A, B, D, D1, D2')),
+                                            ('matrix', tr('Матричная диаграмма')),
+                                            ('placeholders', tr('Разделы для ручного заполнения'))), start=3):
             ttk.Checkbutton(body, text=label, variable=self.sections[key]).grid(row=row, column=0, columnspan=2, sticky='w', pady=3)
-        ttk.Label(body, text='ФИО можно оставить пустым. Таблицы будут редактируемыми.', wraplength=440).grid(row=7, column=0, columnspan=2, sticky='w', pady=(8, 0))
+        ttk.Label(body, text=tr('ФИО можно оставить пустым. Таблицы будут редактируемыми.'), wraplength=440).grid(row=7, column=0, columnspan=2, sticky='w', pady=(8, 0))
         buttons = ttk.Frame(body)
         buttons.grid(row=8, column=0, columnspan=2, sticky='e', pady=(12, 0))
-        ttk.Button(buttons, text='Отмена', command=self.destroy).pack(side='right', padx=(6, 0))
-        ttk.Button(buttons, text='Продолжить', command=self._accept).pack(side='right')
+        ttk.Button(buttons, text=tr('Отмена'), command=self.destroy).pack(side='right', padx=(6, 0))
+        ttk.Button(buttons, text=tr('Продолжить'), command=self._accept).pack(side='right')
         body.columnconfigure(1, weight=1)
         self.transient(master)
         self.grab_set()
@@ -146,14 +153,14 @@ class JsonAttributesDialog(tk.Toplevel):
         self.title(title)
         self.geometry("560x420")
         self.result = None
-        ttk.Label(self, text="Атрибуты XML в формате JSON. Поле id менять нельзя.", padding=8).pack(anchor="w")
+        ttk.Label(self, text=tr("Атрибуты XML в формате JSON. Поле id менять нельзя."), padding=8).pack(anchor="w")
         self.text = tk.Text(self, wrap="none", undo=True)
         self.text.pack(fill="both", expand=True, padx=8)
         self.text.insert("1.0", json.dumps(attributes, ensure_ascii=False, indent=2))
         buttons = ttk.Frame(self, padding=8)
         buttons.pack(fill="x")
-        ttk.Button(buttons, text="Отмена", command=self.destroy).pack(side="right", padx=(6, 0))
-        ttk.Button(buttons, text="Применить", command=self._accept).pack(side="right")
+        ttk.Button(buttons, text=tr("Отмена"), command=self.destroy).pack(side="right", padx=(6, 0))
+        ttk.Button(buttons, text=tr("Применить"), command=self._accept).pack(side="right")
         self.transient(master)
         self.grab_set()
         self.wait_visibility()
@@ -171,17 +178,18 @@ class JsonAttributesDialog(tk.Toplevel):
             self.result = {k: "" if v is None else str(v) for k, v in data.items()}
             self.destroy()
         except Exception as exc:
-            messagebox.showerror("Некорректные атрибуты", str(exc), parent=self)
+            messagebox.showerror(tr("Некорректные атрибуты"), str(exc), parent=self)
 
 
 class Is2Studio(tk.Tk):
     def __init__(self):
         super().__init__()
-        self.title("PzKpfw — редактор проектов .is2")
+        self.title(tr("PzKpfw — редактор проектов .is2"))
         self.geometry("1320x820")
         self.minsize(1050, 650)
         self._install_app_icon()
         self.theme_name = tk.StringVar(value=load_theme())
+        self.language_code = tk.StringVar(value=get_language())
         self.tooltips_enabled = tk.BooleanVar(value=load_tooltips())
         self.tooltip_button_text = tk.StringVar(value=self._tooltip_label())
         apply_theme(self, self.theme_name.get())
@@ -206,6 +214,7 @@ class Is2Studio(tk.Tk):
         self.bind('<Escape>', self._escape_diagram_focus, add='+')
         self._build_menu()
         self._build_layout()
+        self._apply_language_direction()
         self.button_tooltips = ButtonTooltips(self, self.tooltips_enabled, self.theme_name)
         apply_theme(self, self.theme_name.get())
         self.course_panel._draw()
@@ -233,7 +242,7 @@ class Is2Studio(tk.Tk):
 
     def export_document(self, kind):
         if self.doc is None:
-            messagebox.showinfo("Экспорт", "Сначала откройте проект.", parent=self)
+            messagebox.showinfo(tr("Экспорт"), tr("Сначала откройте проект."), parent=self)
             return
         config = {"report": (".html", "HTML"), "diagram": (".svg", "SVG"), "relations": (".csv", "CSV"), "matrix": (".csv", "CSV"), "primary-matrix": (".csv", "CSV"), "specifications": (".html", "HTML")}
         extension, label = config[kind]
@@ -244,73 +253,77 @@ class Is2Studio(tk.Tk):
         try:
             write_export(self.doc, destination, kind, source_path=self.path, overwrite=True)
         except (OSError, ValueError, ProjectFormatError) as exc:
-            messagebox.showerror("Ошибка экспорта", str(exc), parent=self)
+            messagebox.showerror(tr("Ошибка экспорта"), str(exc), parent=self)
             return
-        messagebox.showinfo("Экспорт", "Файл создан. Это справочный экспорт PzKpfw; соответствие формам ИС-2 не проверено.", parent=self)
+        messagebox.showinfo(tr("Экспорт"), tr("Файл создан. Это справочный экспорт PzKpfw; соответствие формам ИС-2 не проверено."), parent=self)
 
     def export_docx_report(self):
         if self.doc is None:
-            messagebox.showinfo('Экспорт', 'Сначала откройте проект.', parent=self)
+            messagebox.showinfo(tr('Экспорт'), tr('Сначала откройте проект.'), parent=self)
             return
         dialog = ReportOptionsDialog(self, self.doc.root.get('name', ''))
         self.wait_window(dialog)
         if dialog.result is None:
             return
-        destination = filedialog.asksaveasfilename(parent=self, title='Сохранить отчёт',
-                                                    defaultextension='.docx', filetypes=[('Документ Word', '*.docx')])
+        destination = filedialog.asksaveasfilename(parent=self, title=tr('Сохранить отчёт'),
+                                                    defaultextension='.docx', filetypes=[(tr('Документ Word'), '*.docx')])
         if not destination:
             return
         try:
             from .docx_report import write_docx_report
             write_docx_report(self.doc, destination, dialog.result, source_path=self.path)
         except (OSError, ValueError, RuntimeError, ProjectFormatError) as exc:
-            messagebox.showerror('Ошибка экспорта DOCX', str(exc), parent=self)
+            messagebox.showerror(tr('Ошибка экспорта DOCX'), str(exc), parent=self)
             return
-        messagebox.showinfo('Экспорт DOCX', 'Отчёт создан. Проверьте схемы, формы и заполните оставленные разделы.', parent=self)
+        messagebox.showinfo(tr('Экспорт DOCX'), tr('Отчёт создан. Проверьте схемы, формы и заполните оставленные разделы.'), parent=self)
 
     def _build_menu(self):
         menu = tk.Menu(self)
         file_menu = tk.Menu(menu, tearoff=False)
-        file_menu.add_command(label="Новый проект…", accelerator="Ctrl+N", command=self.new_project)
-        file_menu.add_command(label="Новый проект с главным действием…", command=self.new_coursework)
-        file_menu.add_command(label="Открыть…", accelerator="Ctrl+O", command=self.open_file)
-        file_menu.add_command(label="Сохранить", accelerator="Ctrl+S", command=self.save)
-        file_menu.add_command(label="Сохранить как…", command=self.save_as)
-        file_menu.add_command(label="Резервные копии…", command=self.show_backups)
+        file_menu.add_command(label=tr("Новый проект…"), accelerator="Ctrl+N", command=self.new_project)
+        file_menu.add_command(label=tr("Новый проект с главным действием…"), command=self.new_coursework)
+        file_menu.add_command(label=tr("Открыть…"), accelerator="Ctrl+O", command=self.open_file)
+        file_menu.add_command(label=tr("Сохранить"), accelerator="Ctrl+S", command=self.save)
+        file_menu.add_command(label=tr("Сохранить как…"), command=self.save_as)
+        file_menu.add_command(label=tr("Резервные копии…"), command=self.show_backups)
         file_menu.add_separator()
-        file_menu.add_command(label="Экспорт обзора в HTML…", command=lambda: self.export_document("report"))
-        file_menu.add_command(label="Отчёт в DOCX…", command=self.export_docx_report)
-        file_menu.add_command(label="Экспорт схемы в SVG…", command=lambda: self.export_document("diagram"))
-        file_menu.add_command(label="Экспорт таблицы связей в CSV…", command=lambda: self.export_document("relations"))
-        file_menu.add_command(label="Экспорт матрицы состава в CSV…", command=lambda: self.export_document("matrix"))
+        file_menu.add_command(label=tr("Экспорт обзора в HTML…"), command=lambda: self.export_document("report"))
+        file_menu.add_command(label=tr("Отчёт в DOCX…"), command=self.export_docx_report)
+        file_menu.add_command(label=tr("Экспорт схемы в SVG…"), command=lambda: self.export_document("diagram"))
+        file_menu.add_command(label=tr("Экспорт таблицы связей в CSV…"), command=lambda: self.export_document("relations"))
+        file_menu.add_command(label=tr("Экспорт матрицы состава в CSV…"), command=lambda: self.export_document("matrix"))
         file_menu.add_separator()
-        file_menu.add_command(label="Выход", command=self._quit)
-        menu.add_cascade(label="Файл", menu=file_menu)
+        file_menu.add_command(label=tr("Выход"), command=self._quit)
+        menu.add_cascade(label=tr("Файл"), menu=file_menu)
         self.edit_menu = tk.Menu(menu, tearoff=False)
-        self.edit_menu.add_command(label="Отменить", accelerator="Ctrl+Z", command=self.undo, state="disabled")
-        self.edit_menu.add_command(label="Повторить", accelerator="Ctrl+Y", command=self.redo, state="disabled")
+        self.edit_menu.add_command(label=tr("Отменить"), accelerator="Ctrl+Z", command=self.undo, state="disabled")
+        self.edit_menu.add_command(label=tr("Повторить"), accelerator="Ctrl+Y", command=self.redo, state="disabled")
         self.edit_menu.add_separator()
-        self.edit_menu.add_command(label="История действий…", command=self.show_history)
-        menu.add_cascade(label="Правка", menu=self.edit_menu)
+        self.edit_menu.add_command(label=tr("История действий…"), command=self.show_history)
+        menu.add_cascade(label=tr("Правка"), menu=self.edit_menu)
         project_menu = tk.Menu(menu, tearoff=False)
-        project_menu.add_command(label="Проверить проект", command=self.validate_project)
-        project_menu.add_command(label="Проверить совместимость с ИС-2", command=self.check_compatibility)
-        project_menu.add_command(label="Обзор возможностей и ограничений…", command=self.show_feature_audit)
-        project_menu.add_command(label="Аудит зависимостей…", command=self.show_dependency_audit)
-        project_menu.add_command(label="Исправление повреждённых ссылок…", command=self.show_link_repair_dialog)
-        project_menu.add_command(label="Сравнить с другой версией…", command=self.show_project_diff)
-        project_menu.add_command(label="Сравнить графы связей…", command=self.show_relationship_graph_diff)
-        project_menu.add_command(label="Объединить три версии…", command=self.show_three_way_merge)
-        project_menu.add_command(label="Обзор ConceptModel…", command=self.show_concept_catalog)
-        project_menu.add_command(label="Обновить представления", command=self.refresh_all)
-        menu.add_cascade(label="Проект", menu=project_menu)
+        project_menu.add_command(label=tr("Проверить проект"), command=self.validate_project)
+        project_menu.add_command(label=tr("Проверить совместимость с ИС-2"), command=self.check_compatibility)
+        project_menu.add_command(label=tr("Обзор возможностей и ограничений…"), command=self.show_feature_audit)
+        project_menu.add_command(label=tr("Аудит зависимостей…"), command=self.show_dependency_audit)
+        project_menu.add_command(label=tr("Исправление повреждённых ссылок…"), command=self.show_link_repair_dialog)
+        project_menu.add_command(label=tr("Сравнить с другой версией…"), command=self.show_project_diff)
+        project_menu.add_command(label=tr("Сравнить графы связей…"), command=self.show_relationship_graph_diff)
+        project_menu.add_command(label=tr("Объединить три версии…"), command=self.show_three_way_merge)
+        project_menu.add_command(label=tr("Обзор ConceptModel…"), command=self.show_concept_catalog)
+        project_menu.add_command(label=tr("Обновить представления"), command=self.refresh_all)
+        menu.add_cascade(label=tr("Проект"), menu=project_menu)
         appearance = tk.Menu(menu, tearoff=False)
-        appearance.add_radiobutton(label="Тёмная", variable=self.theme_name, value="dark", command=self.change_theme)
-        appearance.add_radiobutton(label="Светлая", variable=self.theme_name, value="light", command=self.change_theme)
-        menu.add_cascade(label="Вид", menu=appearance)
+        appearance.add_radiobutton(label=tr("Тёмная"), variable=self.theme_name, value="dark", command=self.change_theme)
+        appearance.add_radiobutton(label=tr("Светлая"), variable=self.theme_name, value="light", command=self.change_theme)
+        appearance.add_separator()
+        self.language_menu = tk.Menu(appearance, tearoff=False)
+        self._populate_language_menu()
+        appearance.add_cascade(label=tr("Язык интерфейса"), menu=self.language_menu)
+        menu.add_cascade(label=tr("Вид"), menu=appearance)
         help_menu = tk.Menu(menu, tearoff=False)
-        help_menu.add_command(label="О программе", command=self._about)
-        menu.add_cascade(label="Справка", menu=help_menu)
+        help_menu.add_command(label=tr("О программе"), command=self._about)
+        menu.add_cascade(label=tr("Справка"), menu=help_menu)
         self.config(menu=menu)
         self.bind_all("<Control-n>", lambda _e: self.new_project())
         self.bind_all("<Control-o>", lambda _e: self.open_file())
@@ -333,34 +346,34 @@ class Is2Studio(tk.Tk):
         brand.pack(side='left')
         ttk.Label(brand, text='PzKpfw', style='AppTitle.TLabel').pack(side='left')
         ttk.Label(brand, text='()', style='AppAccent.TLabel').pack(side='left')
-        ttk.Label(header, text='// РЕДАКТОР МОДЕЛЕЙ ИС-2',
+        ttk.Label(header, text=tr('// РЕДАКТОР МОДЕЛЕЙ ИС-2'),
                   style='Eyebrow.TLabel').pack(side='left', padx=(20, 0), pady=(4, 0))
         self.theme_button = ttk.Button(header, style='Quiet.TButton', command=self.toggle_theme)
         self.theme_button.pack(side='right')
         tooltip_button = ttk.Button(header, textvariable=self.tooltip_button_text,
                                     command=self.toggle_tooltips, style='Quiet.TButton')
-        tooltip_button._tooltip_text = 'Включить или выключить пояснения к кнопкам при наведении.'
+        tooltip_button._tooltip_text = tr('Включить или выключить пояснения к кнопкам при наведении.')
         tooltip_button.pack(side='right', padx=(0, 8))
         self.tooltip_button = tooltip_button
-        self.file_label = ttk.Label(header, text='Файл не открыт', style='Muted.TLabel')
+        self.file_label = ttk.Label(header, text=tr('Файл не открыт'), style='Muted.TLabel')
         self.file_label.pack(side='right', padx=(0, 18))
         self._update_theme_button()
 
         ttk.Separator(self, orient='horizontal').pack(fill='x', padx=20, pady=(0, 2))
         toolbar = ttk.Frame(self, padding=(20, 9, 20, 10))
         toolbar.pack(fill='x')
-        ttk.Button(toolbar, text='+ Новый проект', command=self.new_coursework,
+        ttk.Button(toolbar, text=tr('+ Новый проект'), command=self.new_coursework,
                    style='Primary.TButton').pack(side='left')
-        ttk.Button(toolbar, text='Открыть .is2', command=self.open_file).pack(side='left', padx=(7, 0))
-        ttk.Button(toolbar, text='Сохранить', command=self.save).pack(side='left', padx=(7, 0))
+        ttk.Button(toolbar, text=tr('Открыть .is2'), command=self.open_file).pack(side='left', padx=(7, 0))
+        ttk.Button(toolbar, text=tr('Сохранить'), command=self.save).pack(side='left', padx=(7, 0))
         ttk.Separator(toolbar, orient='vertical').pack(side='left', fill='y', padx=12)
-        self.undo_button = ttk.Button(toolbar, text='Отменить', compound='left', command=self.undo, state='disabled')
+        self.undo_button = ttk.Button(toolbar, text=tr('Отменить'), compound='left', command=self.undo, state='disabled')
         self.undo_button.pack(side='left', padx=(0, 4))
-        self.redo_button = ttk.Button(toolbar, text='Повторить', compound='left', command=self.redo, state='disabled')
+        self.redo_button = ttk.Button(toolbar, text=tr('Повторить'), compound='left', command=self.redo, state='disabled')
         self.redo_button.pack(side='left')
         self._update_history_icons()
-        ttk.Button(toolbar, text='Проверить проект', command=self.validate_project).pack(side='left', padx=(14, 0))
-        ttk.Button(toolbar, text='Экспорт…', command=self._show_export_menu).pack(side='left', padx=(7, 0))
+        ttk.Button(toolbar, text=tr('Проверить проект'), command=self.validate_project).pack(side='left', padx=(14, 0))
+        ttk.Button(toolbar, text=tr('Экспорт…'), command=self._show_export_menu).pack(side='left', padx=(7, 0))
 
         nav = ttk.Frame(self, padding=(20, 0, 20, 5))
         nav.pack(fill='x')
@@ -375,13 +388,13 @@ class Is2Studio(tk.Tk):
         self.matrix_page = ttk.Frame(self.notebook)
         self.service_page = ttk.Frame(self.notebook)
         for frame, name in (
-            (self.course_page, 'Формирование СПД'),
-            (self.action_page, 'Декомпозиция'),
-            (self.param_page, 'Параметры'),
-            (self.object_page, 'Объекты'),
-            (self.forms_page, 'Спецификации'),
-            (self.matrix_page, 'Матричная диаграмма'),
-            (self.service_page, 'Дополнительно'),
+            (self.course_page, tr('Формирование СПД')),
+            (self.action_page, tr('Декомпозиция')),
+            (self.param_page, tr('Параметры')),
+            (self.object_page, tr('Объекты')),
+            (self.forms_page, tr('Спецификации')),
+            (self.matrix_page, tr('Матричная диаграмма')),
+            (self.service_page, tr('Дополнительно')),
         ):
             self.notebook.add(frame, text=name)
             button = ttk.Button(nav, text=name, style='MainNav.TButton',
@@ -399,10 +412,10 @@ class Is2Studio(tk.Tk):
         self.graph_page = ttk.Frame(self.advanced_tabs)
         self.xml_page = ttk.Frame(self.advanced_tabs)
         for frame, name in (
-            (self.metadata_page, 'Паспорт'), (self.action_editor_page, 'Дерево и редактирование'),
-            (self.diagram_page, 'Техническая схема'),
-            (self.concept_page, 'Категории (cs)'), (self.link_page, 'Связи (cs)'),
-            (self.other_page, 'spz / content'), (self.graph_page, 'Граф связей'),
+            (self.metadata_page, tr('Паспорт')), (self.action_editor_page, tr('Дерево и редактирование')),
+            (self.diagram_page, tr('Техническая схема')),
+            (self.concept_page, tr('Категории (cs)')), (self.link_page, tr('Связи (cs)')),
+            (self.other_page, 'spz / content'), (self.graph_page, tr('Граф связей')),
             (self.xml_page, 'XML'),
         ):
             self.advanced_tabs.add(frame, text=name)
@@ -422,11 +435,11 @@ class Is2Studio(tk.Tk):
         self.xml_text = tk.Text(self.xml_page, wrap='none', font=('Consolas', 10),
                                 state='disabled', bg=SURFACE, fg=INK)
         self.xml_text.pack(fill='both', expand=True)
-        self.status = tk.StringVar(value='Готово · откройте .is2 или создайте проект')
+        self.status = tk.StringVar(value=tr('Готово · откройте .is2 или создайте проект'))
         status_bar = ttk.Frame(self, padding=(12, 6))
         status_bar.pack(fill='x', side='bottom')
         ttk.Label(status_bar, textvariable=self.status, style='Muted.TLabel').pack(side='left')
-        ttk.Label(status_bar, text='Ctrl+S · сохранить    Ctrl+Z · отменить    F1 · помощь',
+        ttk.Label(status_bar, text=tr('Ctrl+S · сохранить    Ctrl+Z · отменить    F1 · помощь'),
                   style='Muted.TLabel').pack(side='right')
         self.bind_all('<F1>', lambda _event: self._show_shortcuts())
 
@@ -459,26 +472,26 @@ class Is2Studio(tk.Tk):
         return None
 
     def _show_shortcuts(self):
-        messagebox.showinfo('Работа в PzKpfw',
-            'Формирование СПД — схема, создание и изменение действий, свойства справа.\n'
+        messagebox.showinfo(tr('Работа в PzKpfw'),
+            tr('Формирование СПД — схема, создание и изменение действий, свойства справа.\n'
             'Декомпозиция — диаграмма и листы действий.\n'
             'Параметры и Объекты — редактирование данных модели.\n'
             'Спецификации — формы A, B, D, D1, D2.\n'
             'Матричная диаграмма — связи действий с параметрами; двойной щелчок по ячейке — редактирование.\n'
             'Дополнительно — дерево и редактирование действий, паспорт, графы, XML.\n\n'
             'Ctrl+N — новый пустой проект, Ctrl+O — открыть, Ctrl+S — сохранить.\n'
-            'Ctrl+Z / Ctrl+Y — история правок. В СПД: F2 — имя, Ctrl+Enter — применить свойства.',
+            'Ctrl+Z / Ctrl+Y — история правок. В СПД: F2 — имя, Ctrl+Enter — применить свойства.'),
             parent=self)
 
     def _show_export_menu(self):
         """Keep rarely used exports off the permanent primary toolbar."""
         menu = persistent_menu(self, '_export_popup', (
-            ('Комплект проекта (схемы, формы, проверка)…', self.course_panel._export_all),
-            ('Отчёт в DOCX…', self.export_docx_report),
-            ('Схема СПД в SVG…', self.course_panel._export_svg),
-            ('Спецификации в HTML…', lambda: self.export_document('specifications')),
-            ('Матрица в CSV…', lambda: self.export_document('primary-matrix')),
-            ('Отчёт в HTML…', lambda: self.export_document('report')),
+            (tr('Комплект проекта (схемы, формы, проверка)…'), self.course_panel._export_all),
+            (tr('Отчёт в DOCX…'), self.export_docx_report),
+            (tr('Схема СПД в SVG…'), self.course_panel._export_svg),
+            (tr('Спецификации в HTML…'), lambda: self.export_document('specifications')),
+            (tr('Матрица в CSV…'), lambda: self.export_document('primary-matrix')),
+            (tr('Отчёт в HTML…'), lambda: self.export_document('report')),
         ))
         try:
             x, y = self.winfo_pointerxy()
@@ -511,11 +524,11 @@ class Is2Studio(tk.Tk):
     def _build_metadata_page(self):
         bar = ttk.Frame(self.metadata_page, padding=6)
         bar.pack(fill="x")
-        ttk.Button(bar, text="Изменить паспорт", command=self.edit_metadata).pack(side="left")
-        ttk.Button(bar, text="Обновить", command=self._refresh_metadata).pack(side="left", padx=5)
+        ttk.Button(bar, text=tr("Изменить паспорт"), command=self.edit_metadata).pack(side="left")
+        ttk.Button(bar, text=tr("Обновить"), command=self._refresh_metadata).pack(side="left", padx=5)
         self.metadata_text = tk.Text(self.metadata_page, wrap="word", height=12, state="disabled")
         self.metadata_text.pack(fill="both", expand=True, padx=6, pady=(0, 6))
-        ttk.Label(self.metadata_page, text="Неизвестные атрибуты project/user сохраняются.", padding=6).pack(anchor="w")
+        ttk.Label(self.metadata_page, text=tr("Неизвестные атрибуты project/user сохраняются."), padding=6).pack(anchor="w")
 
     def _build_forms_page(self):
         bar = ttk.Frame(self.forms_page, padding=6)
@@ -525,11 +538,11 @@ class Is2Studio(tk.Tk):
         self.form_combo.pack(side="left")
         self.form_combo.bind("<<ComboboxSelected>>", lambda event: self._refresh_form())
         for form_key in ('A', 'B', 'D', 'D1', 'D2'):
-            ttk.Button(bar, text='Форма ' + form_key,
+            ttk.Button(bar, text=tr('Форма') + ' ' + form_key,
                        command=lambda key=form_key: self._select_spec_form(key)).pack(side='left', padx=(6, 0))
-        ttk.Button(bar, text="Обновить", command=self._refresh_form).pack(side="left", padx=4)
-        ttk.Button(bar, text="Печатать все формы…", command=lambda: self.export_document('specifications')).pack(side="left", padx=4)
-        ttk.Label(self.forms_page, text="Реконструкция по XML и исследованию ИС-2; соответствие оригиналу не проверено.", padding=(6, 3)).pack(anchor="w")
+        ttk.Button(bar, text=tr("Обновить"), command=self._refresh_form).pack(side="left", padx=4)
+        ttk.Button(bar, text=tr("Печатать все формы…"), command=lambda: self.export_document('specifications')).pack(side="left", padx=4)
+        ttk.Label(self.forms_page, text=tr("Реконструкция по XML и исследованию ИС-2; соответствие оригиналу не проверено."), padding=(6, 3)).pack(anchor="w")
         container=ttk.Frame(self.forms_page, padding=6)
         container.pack(fill="both", expand=True)
         self.forms_tree=GridTreeview(container, show="headings")
@@ -538,27 +551,27 @@ class Is2Studio(tk.Tk):
         self.forms_tree.configure(yscrollcommand=y.set,xscrollcommand=x.set)
         self.forms_tree.grid(row=0,column=0,sticky="nsew"); y.grid(row=0,column=1,sticky="ns"); x.grid(row=1,column=0,sticky="ew")
         container.columnconfigure(0,weight=1); container.rowconfigure(0,weight=1)
-        self.form_cell_text = tk.StringVar(value='Щёлкните по ячейке, чтобы увидеть её содержимое полностью.')
+        self.form_cell_text = tk.StringVar(value=tr('Щёлкните по ячейке, чтобы увидеть её содержимое полностью.'))
         ttk.Label(self.forms_page, textvariable=self.form_cell_text, wraplength=1300, padding=(8, 4)).pack(anchor='w', fill='x')
         self.forms_tree.bind('<ButtonRelease-1>', self._show_form_cell, add='+')
-        self.form_status=tk.StringVar(value="Откройте проект и нажмите «Обновить».")
+        self.form_status=tk.StringVar(value=tr('Откройте проект и нажмите «Обновить».'))
         ttk.Label(self.forms_page,textvariable=self.form_status,wraplength=1150,padding=6).pack(anchor="w")
 
     def _build_matrix_page(self):
         bar = ttk.Frame(self.matrix_page, padding=(8, 10))
         bar.pack(fill='x')
-        ttk.Label(bar, text='Действия × параметры', font=('TkDefaultFont', 12, 'bold')).pack(side='left', padx=(0, 15))
-        ttk.Button(bar, text='+ Связь…', command=lambda: self.edit_primary_link(False)).pack(side='left', padx=(0, 4))
-        ttk.Button(bar, text='− Связь…', command=lambda: self.edit_primary_link(True)).pack(side='left', padx=(0, 4))
-        ttk.Button(bar, text='Кратность…', command=self.edit_primary_link_power).pack(side='left', padx=(0, 4))
+        ttk.Label(bar, text=tr('Действия × параметры'), font=('TkDefaultFont', 12, 'bold')).pack(side='left', padx=(0, 15))
+        ttk.Button(bar, text=tr('+ Связь…'), command=lambda: self.edit_primary_link(False)).pack(side='left', padx=(0, 4))
+        ttk.Button(bar, text=tr('− Связь…'), command=lambda: self.edit_primary_link(True)).pack(side='left', padx=(0, 4))
+        ttk.Button(bar, text=tr('Кратность…'), command=self.edit_primary_link_power).pack(side='left', padx=(0, 4))
         ttk.Button(bar, text='CSV…', command=lambda: self.export_document('primary-matrix')).pack(side='left', padx=(0, 4))
-        ttk.Button(bar, text='Обновить', command=self._refresh_matrix).pack(side='left')
+        ttk.Button(bar, text=tr('Обновить'), command=self._refresh_matrix).pack(side='left')
         self._matrix_zoom = 1.0
         self._matrix_zoom_text = tk.StringVar(value='100%')
         ttk.Button(bar, text='−', width=3, command=lambda: self._scale_matrix(-1)).pack(side='left', padx=(14, 2))
         ttk.Label(bar, textvariable=self._matrix_zoom_text, width=5, anchor='center').pack(side='left')
         ttk.Button(bar, text='+', width=3, command=lambda: self._scale_matrix(1)).pack(side='left', padx=(2, 0))
-        ttk.Label(self.matrix_page, text='Щелчок — выделить строку и столбец; двойной щелчок — изменить связь.',
+        ttk.Label(self.matrix_page, text=tr('Щелчок — выделить строку и столбец; двойной щелчок — изменить связь.'),
                   padding=(12, 0), style='Muted.TLabel').pack(anchor='w')
         box = ttk.Frame(self.matrix_page, padding=9)
         box.pack(fill='both', expand=True)
@@ -591,7 +604,7 @@ class Is2Studio(tk.Tk):
         self._matrix_hover_cell = None
         self.matrix_tree.bind('<Motion>', self._matrix_motion, add='+')
         self.matrix_tree.bind('<Leave>', self._matrix_hide_tooltip, add='+')
-        self.matrix_status = tk.StringVar(value='Создайте или откройте проект.')
+        self.matrix_status = tk.StringVar(value=tr('Создайте или откройте проект.'))
         ttk.Label(self.matrix_page, textvariable=self.matrix_status,
                   style='Muted.TLabel', padding=(12, 7)).pack(anchor='w')
         self._matrix_action_ids: list[str] = []
@@ -615,17 +628,18 @@ class Is2Studio(tk.Tk):
                 self._matrix_group_labels = []
                 self.matrix_tree.set_data([], [], [])
                 self._draw_matrix_groups()
-                self.matrix_status.set('Матрица очень широкая: используйте CSV-экспорт.')
+                self.matrix_status.set(tr('Матрица очень широкая: используйте CSV-экспорт.'))
                 return
             self._matrix_group_labels = [caption.split('\n', 1)[0] for caption in headers[2:]]
             widths = [round((72 if i == 0 else 90 if i == 1 else 66) * self._matrix_zoom) for i in range(len(headers))]
             self.matrix_tree.set_data([caption.split('\n', 1)[-1] for caption in headers], rows, widths)
             self.matrix_tree._sync_scrollbars()
-            self.matrix_status.set(f'{len(rows)} действий · {len(self._matrix_parameter_ids)} параметров · * функция, + аргумент, . по умолчанию. '
-                                   f'Неоднозначных записей: {sum(1 for w in warnings if w.startswith("Запись matrix"))}. [ / ] — начало / конец последовательности; структурные знаки рассчитаны для просмотра.')
+            self.matrix_status.set(tr('{actions} действий · {parameters} параметров · * функция, + аргумент, . значение по умолчанию. Неоднозначных записей: {ambiguous}. [ / ] — начало / конец последовательности; структурные отметки выводятся для отображения.').format(
+                actions=len(rows), parameters=len(self._matrix_parameter_ids),
+                ambiguous=sum(1 for w in warnings if w.startswith("Запись matrix"))))
             self.after_idle(self._draw_matrix_groups)
         except (ValueError, ProjectFormatError, KeyError) as exc:
-            messagebox.showerror('Матричная диаграмма', str(exc), parent=self)
+            messagebox.showerror(tr('Матричная диаграмма'), str(exc), parent=self)
 
     def _matrix_xscroll(self, scrollbar, first, last):
         scrollbar.set(first, last)
@@ -727,20 +741,20 @@ class Is2Studio(tk.Tk):
             pid = self._matrix_parameter_ids[pidx]
             code = self.doc.action(aid)
             if code.get('type') != '0':
-                messagebox.showinfo('Матричная диаграмма', 'Функции и аргументы можно назначать только элементарным действиям.', parent=self)
+                messagebox.showinfo(tr('Матричная диаграмма'), tr('Функции и аргументы можно назначать только элементарным действиям.'), parent=self)
                 return
             from .specifications import primary_links
             existing = [(mark, power) for a, p, mark, power in primary_links(self.doc)[0]
                         if a == aid and p == pid]
             if len(existing) > 1:
-                messagebox.showinfo('Матричная диаграмма', 'В ячейке несколько записей. Используйте команды «Связь» и «Кратность».', parent=self)
+                messagebox.showinfo(tr('Матричная диаграмма'), tr('В ячейке несколько записей. Используйте команды «Связь» и «Кратность».'), parent=self)
                 return
             if not existing and (aid, pid) in inferred_structural_marks(self.doc):
-                messagebox.showinfo('Матричная диаграмма', 'Эта ячейка содержит только предполагаемый структурный знак (~). Он вычислен для просмотра и не является сохранённой связью; редактирование здесь недоступно.', parent=self)
+                messagebox.showinfo(tr('Матричная диаграмма'), tr('Эта ячейка содержит только предполагаемый структурный знак (~). Он вычислен для просмотра и не является сохранённой связью; редактирование здесь недоступно.'), parent=self)
                 return
             old_mark, old_power = existing[0] if existing else ('+', '1')
             if old_mark not in ('*', '+', '.'):
-                messagebox.showwarning('Матричная диаграмма', 'Роль не распознана — правка заблокирована.', parent=self)
+                messagebox.showwarning(tr('Матричная диаграмма'), tr('Роль не распознана — правка заблокирована.'), parent=self)
                 return
             dialog = RecordDialog(self, 'Связь действия и параметра', [
                 ('marker', 'Роль связи', old_mark, ('*', '+', '.')),
@@ -766,7 +780,7 @@ class Is2Studio(tk.Tk):
             self._mark_dirty('Изменена ячейка матричной диаграммы')
             self.refresh_all()
         except (ValueError, KeyError, IndexError, ProjectFormatError) as exc:
-            messagebox.showerror('Матрица', str(exc), parent=self)
+            messagebox.showerror(tr('Матрица'), str(exc), parent=self)
 
     def _select_spec_form(self, key):
         self.form_selection.set(FORM_NAMES[key])
@@ -779,7 +793,7 @@ class Is2Studio(tk.Tk):
                 ("marker", "Роль: * функция, + аргумент, . по умолчанию", "+", ("*", "+", "."))]
         if not remove:
             fields.append(("power", "Кратность (записывается как @power)", "1", None))
-        dialog=RecordDialog(self,"Удалить связь" if remove else "Добавить связь",fields)
+        dialog=RecordDialog(self, tr("Удалить связь") if remove else tr("Добавить связь"), fields)
         self.wait_window(dialog)
         if dialog.result is None: return
         data=dialog.result
@@ -792,7 +806,7 @@ class Is2Studio(tk.Tk):
             self.refresh_all()
             self._refresh_form()
         except (ValueError, KeyError, ProjectFormatError) as exc:
-            messagebox.showerror("Связь действия и параметра",str(exc),parent=self)
+            messagebox.showerror(tr("Связь действия и параметра"),str(exc),parent=self)
 
     def edit_primary_link_power(self):
         if self.doc is None: return
@@ -809,7 +823,7 @@ class Is2Studio(tk.Tk):
             self._mark_dirty("Изменена кратность связи действия и параметра")
             self.refresh_all()
         except (ValueError, KeyError, ProjectFormatError) as exc:
-            messagebox.showerror("Кратность связи", str(exc), parent=self)
+            messagebox.showerror(tr("Кратность связи"), str(exc), parent=self)
 
     def _refresh_form(self):
         if self.doc is None:
@@ -819,7 +833,7 @@ class Is2Studio(tk.Tk):
             key=next((k for k,v in FORM_NAMES.items() if v==self.form_selection.get()),"A")
             headers,rows=forms[key]
             if len(headers)>300:
-                self.form_status.set("Слишком много столбцов для просмотра. Используйте HTML-экспорт.")
+                self.form_status.set(tr("Слишком много столбцов для просмотра. Используйте HTML-экспорт."))
                 return
             self.forms_tree.delete(*self.forms_tree.get_children())
             cols=[f"c{i}" for i in range(len(headers))]
@@ -834,9 +848,9 @@ class Is2Studio(tk.Tk):
             for row in rows:
                 self.forms_tree.insert("", "end", values=row)
             self.form_status.set(f"Строк: {len(rows)}. " + " ".join(warnings))
-            self.form_cell_text.set('Щёлкните по ячейке, чтобы увидеть её содержимое полностью.')
+            self.form_cell_text.set(tr('Щёлкните по ячейке, чтобы увидеть её содержимое полностью.'))
         except (ValueError, ProjectFormatError, KeyError) as exc:
-            messagebox.showerror("Формы",str(exc),parent=self)
+            messagebox.showerror(tr("Формы"),str(exc),parent=self)
 
     def _show_form_cell(self, event):
         row = self.forms_tree.identify_row(event.y)
@@ -856,10 +870,10 @@ class Is2Studio(tk.Tk):
         bar = ttk.Frame(editor_page, padding=6)
         bar.pack(fill="x")
         for text, command in (("Новый корень", self.add_root_action), ("Добавить дочерний", self.add_child_action), ("↑", lambda: self.move_action(-1)), ("↓", lambda: self.move_action(1)), ("Изменить", self.edit_action), ("Удалить", self.delete_action), ("Обновить", self._refresh_actions)):
-            ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 5))
-        ttk.Button(bar, text="Преобразовать…", command=self.convert_selected_action).pack(side="left", padx=(0, 5))
-        ttk.Button(bar, text="Вставить до…", command=lambda: self.insert_selected_action(False)).pack(side="left", padx=(0, 5))
-        ttk.Button(bar, text="Вставить после…", command=lambda: self.insert_selected_action(True)).pack(side="left", padx=(0, 5))
+            ttk.Button(bar, text=tr(text), command=command).pack(side="left", padx=(0, 5))
+        ttk.Button(bar, text=tr("Преобразовать…"), command=self.convert_selected_action).pack(side="left", padx=(0, 5))
+        ttk.Button(bar, text=tr("Вставить до…"), command=lambda: self.insert_selected_action(False)).pack(side="left", padx=(0, 5))
+        ttk.Button(bar, text=tr("Вставить после…"), command=lambda: self.insert_selected_action(True)).pack(side="left", padx=(0, 5))
         split = ttk.Panedwindow(editor_page, orient="horizontal")
         split.pack(fill="both", expand=True, padx=6, pady=(0, 6))
         left = ttk.Frame(split)
@@ -867,9 +881,9 @@ class Is2Studio(tk.Tk):
         split.add(left, weight=3)
         split.add(right, weight=2)
         self.action_tree = GridTreeview(left, columns=("type", "level"), show="tree headings", selectmode="browse")
-        self.action_tree.heading("#0", text="Действие")
-        self.action_tree.heading("type", text="Тип")
-        self.action_tree.heading("level", text="Уровень")
+        self.action_tree.heading("#0", text=tr("Действие"))
+        self.action_tree.heading("type", text=tr("Тип"))
+        self.action_tree.heading("level", text=tr("Уровень"))
         self.action_tree.column("type", width=70, anchor="center")
         self.action_tree.column("level", width=80, anchor="center")
         y = ttk.Scrollbar(left, orient="vertical", command=self.action_tree.yview)
@@ -878,7 +892,7 @@ class Is2Studio(tk.Tk):
         y.pack(side="right", fill="y")
         self.action_tree.bind("<<TreeviewSelect>>", self._show_action_details)
         self.action_tree.bind("<<TreeviewSelect>>", self._on_tree_selection_changed, add="+")
-        ttk.Label(right, text="Выбранное действие", font=("TkDefaultFont", 11, "bold")).pack(anchor="w")
+        ttk.Label(right, text=tr("Выбранное действие"), font=("TkDefaultFont", 11, "bold")).pack(anchor="w")
         self.action_details = tk.Text(right, wrap="word", height=20, state="disabled")
         self.action_details.pack(fill="both", expand=True, pady=(8, 0))
 
@@ -887,11 +901,11 @@ class Is2Studio(tk.Tk):
             return
         ident = self._selected_id(self.action_tree)
         if not ident:
-            messagebox.showinfo("Порядок действий", "Выберите дочернее действие.", parent=self)
+            messagebox.showinfo(tr("Порядок действий"), tr("Выберите дочернее действие."), parent=self)
             return
         parents = [n.get("afe1") for n in self.doc.links if n.get("type") == "2" and n.get("afe2") == ident]
         if len(parents) != 1:
-            messagebox.showinfo("Порядок действий", "Выберите действие с одним родителем; корневые действия не переставляются.", parent=self)
+            messagebox.showinfo(tr("Порядок действий"), tr("Выберите действие с одним родителем; корневые действия не переставляются."), parent=self)
             return
         try:
             order = self.doc.sibling_order(parents[0])
@@ -906,18 +920,18 @@ class Is2Studio(tk.Tk):
             self.action_tree.selection_set(ident)
             self.action_tree.see(ident)
         except (ValueError, ProjectFormatError) as exc:
-            messagebox.showerror("Порядок действий", str(exc), parent=self)
+            messagebox.showerror(tr("Порядок действий"), str(exc), parent=self)
 
     def _build_diagram_page(self):
         bar = ttk.Frame(self.diagram_page, padding=6)
         bar.pack(fill="x")
-        ttk.Button(bar, text="Обновить схему", command=self._refresh_diagram).pack(side="left")
-        ttk.Button(bar, text="Изменить выбранное действие", command=self.edit_action).pack(side="left", padx=5)
+        ttk.Button(bar, text=tr("Обновить схему"), command=self._refresh_diagram).pack(side="left")
+        ttk.Button(bar, text=tr("Изменить выбранное действие"), command=self.edit_action).pack(side="left", padx=5)
         self.diagram_zoom = 1.0
         ttk.Button(bar, text='−', width=3, command=lambda: self._diagram_scale(.8)).pack(side='left')
         ttk.Button(bar, text='+', width=3, command=lambda: self._diagram_scale(1.25)).pack(side='left', padx=3)
         ttk.Button(bar, text='100%', command=self._diagram_reset_zoom).pack(side='left')
-        ttk.Label(bar, text="Сплошная стрелка — состав (type=2); пунктир — порядок соседей (type=3).", padding=(8, 0)).pack(side="left")
+        ttk.Label(bar, text=tr("Сплошная стрелка — состав (type=2); пунктир — порядок соседей (type=3)."), padding=(8, 0)).pack(side="left")
         holder = ttk.Frame(self.diagram_page)
         holder.pack(fill="both", expand=True, padx=6, pady=(0, 6))
         self.diagram_canvas = tk.Canvas(holder, background="white", highlightthickness=0,
@@ -925,7 +939,7 @@ class Is2Studio(tk.Tk):
         self.diagram_canvas.bind('<Map>', lambda _e: self._flush_deferred_view('diagram'), add='+')
         self._diagram_zoom_redraw = CoalescedCallback(self.diagram_canvas, self._refresh_diagram, interval_ms=30)
         self.diagram_canvas._theme_course_canvas = True
-        self.diagram_caption = tk.StringVar(value='Выберите действие для просмотра полного названия.')
+        self.diagram_caption = tk.StringVar(value=tr('Выберите действие для просмотра полного названия.'))
         ttk.Label(self.diagram_page, textvariable=self.diagram_caption, wraplength=1200, padding=(8, 2)).pack(anchor='w', fill='x')
         xscroll = ttk.Scrollbar(holder, orient="horizontal", command=self.diagram_canvas.xview)
         yscroll = ttk.Scrollbar(holder, orient="vertical", command=self.diagram_canvas.yview)
@@ -1005,7 +1019,7 @@ class Is2Studio(tk.Tk):
         max_y = max((y for _, y in positions.values()), default=0) + node_height + 80
         canvas.configure(scrollregion=(0, 0, max(800, max_x), max(600, max_y)))
         if not rows:
-            canvas.create_text(30, 30, anchor="nw", text="В проекте пока нет действий.",
+            canvas.create_text(30, 30, anchor="nw", text=tr("В проекте пока нет действий."),
                                font=("TkDefaultFont", 12), fill=palette['muted'])
 
     def _diagram_click(self, event):
@@ -1020,7 +1034,7 @@ class Is2Studio(tk.Tk):
                     self.action_tree.selection_set(ident)
                     self.action_tree.see(ident)
                     self.diagram_caption.set(f"{ident}: {self.doc.action(ident).get('name', '')}")
-                    self.status.set(f"Выбрано действие {ident}")
+                    self.status.set(tr_dynamic(f"Выбрано действие {ident}"))
                     return ident
                 break
         return None
@@ -1034,7 +1048,7 @@ class Is2Studio(tk.Tk):
         bar = ttk.Frame(page, padding=6)
         bar.pack(fill="x")
         for text, command in (("Добавить", add), ("Изменить", edit), ("Удалить", delete), ("Обновить", refresh)):
-            ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 5))
+            ttk.Button(bar, text=tr(text), command=command).pack(side="left", padx=(0, 5))
         tree = GridTreeview(page, show="headings", selectmode="browse")
         tree.pack(fill="both", expand=True, padx=6, pady=(0, 6))
         if title == "Параметры":
@@ -1046,20 +1060,20 @@ class Is2Studio(tk.Tk):
                     "codingType": "Тип кодирования", "number": "Номер", "sign": "Обозначение",
                     "object": "Объект", "attributes": "Атрибуты XML"}
         for column in columns:
-            tree.heading(column, text=captions.get(column, column))
+            tree.heading(column, text=tr(captions.get(column, column)))
             width = {"row": 45, "group": 180, "codingType": 130, "number": 70,
                      "object": 180, "sign": 120, "name": 400, "id": 65, "attributes": 500}[column]
             tree.column(column, width=width, minwidth=40, stretch=column in ("name", "attributes"), anchor="w")
         if title == "Параметры":
             self.param_tree = tree
-            ttk.Button(bar, text="Доп. XML…", command=self.edit_parameter_advanced).pack(side="left", padx=(6, 0))
-            ttk.Button(bar, text="Назначить объект…", command=self.assign_parameter_object).pack(side="left", padx=(6, 0))
-            ttk.Button(bar, text="Снять объект", command=self.clear_parameter_object).pack(side="left", padx=(4, 0))
+            ttk.Button(bar, text=tr("Доп. XML…"), command=self.edit_parameter_advanced).pack(side="left", padx=(6, 0))
+            ttk.Button(bar, text=tr("Назначить объект…"), command=self.assign_parameter_object).pack(side="left", padx=(6, 0))
+            ttk.Button(bar, text=tr("Снять объект"), command=self.clear_parameter_object).pack(side="left", padx=(4, 0))
             tree.bind("<<TreeviewSelect>>", self._on_tree_selection_changed, add="+")
             tree.bind('<Double-1>', lambda event: self._edit_record_at(tree, event, edit))
         else:
             self.object_tree = tree
-            ttk.Button(bar, text='Доп. XML…', command=self.edit_object_advanced).pack(side='left', padx=(6, 0))
+            ttk.Button(bar, text=tr('Доп. XML…'), command=self.edit_object_advanced).pack(side='left', padx=(6, 0))
             tree.bind("<<TreeviewSelect>>", self._on_tree_selection_changed, add="+")
             tree.bind('<Double-1>', lambda event: self._edit_record_at(tree, event, edit))
 
@@ -1075,29 +1089,30 @@ class Is2Studio(tk.Tk):
             ("Обзор ConceptModel…", self.show_concept_catalog),
             ("Обновить", self._refresh_categories),
         ):
-            ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 5))
+            ttk.Button(bar, text=tr(text), command=command).pack(side="left", padx=(0, 5))
         filters = ttk.Frame(self.concept_page, padding=(6, 0, 6, 4))
         filters.pack(fill="x")
-        ttk.Label(filters, text="Поиск:").pack(side="left")
+        ttk.Label(filters, text=tr("Поиск:")).pack(side="left")
         self.concept_search_var = tk.StringVar(value="")
         concept_search = ttk.Entry(filters, textvariable=self.concept_search_var, width=26)
         concept_search.pack(side="left", padx=(4, 12))
         concept_search.bind("<KeyRelease>", lambda _e: self._refresh_categories())
-        ttk.Label(filters, text="Класс:").pack(side="left")
-        self.concept_class_filter = tk.StringVar(value="Все")
+        ttk.Label(filters, text=tr("Класс:")).pack(side="left")
+        all_label = tr("Все")
+        self.concept_class_filter = tk.StringVar(value=all_label)
         class_filter = ttk.Combobox(
             filters, textvariable=self.concept_class_filter, state="readonly", width=12,
-            values=("Все", "S", "P", "Z", "K", "O", "R", "C"),
+            values=(all_label, "S", "P", "Z", "K", "O", "R", "C"),
         )
         class_filter.pack(side="left", padx=4)
         class_filter.bind("<<ComboboxSelected>>", lambda _e: self._refresh_categories())
-        ttk.Label(filters, text="Группа:").pack(side="left", padx=(8, 0))
-        self.concept_group_filter = tk.StringVar(value="Все")
+        ttk.Label(filters, text=tr("Группа:")).pack(side="left", padx=(8, 0))
+        self.concept_group_filter = tk.StringVar(value=all_label)
         self.concept_group_combo = ttk.Combobox(filters, textvariable=self.concept_group_filter,
-                                                state="readonly", width=9, values=("Все",))
+                                                state="readonly", width=9, values=(all_label,))
         self.concept_group_combo.pack(side="left", padx=4)
         self.concept_group_combo.bind("<<ComboboxSelected>>", lambda _e: self._refresh_categories())
-        self.concept_summary_var = tk.StringVar(value="ConceptModel ещё не загружен")
+        self.concept_summary_var = tk.StringVar(value=tr("ConceptModel ещё не загружен"))
         ttk.Label(self.concept_page, textvariable=self.concept_summary_var, padding=(8, 2)).pack(anchor="w")
         self.category_tree = GridTreeview(
             self.concept_page,
@@ -1105,14 +1120,14 @@ class Is2Studio(tk.Tk):
             show="headings", selectmode="extended",
         )
         for c in self.category_tree["columns"]:
-            self.category_tree.heading(c, text={"id":"ID", "name":"Название", "class":"Класс", "group":"Группа", "number":"Номер", "status":"Статус", "codingType":"CodingType", "autoRange":"AutoRange"}.get(c, c))
+            self.category_tree.heading(c, text={"id":"ID", "name":tr("Название"), "class":tr("Класс"), "group":tr("Группа"), "number":tr("Номер"), "status":tr("Статус"), "codingType":"CodingType", "autoRange":"AutoRange"}.get(c, c))
             self.category_tree.column(c, width=130 if c == "name" else 85, anchor="w" if c == "name" else "center")
         self.category_tree.pack(fill="both", expand=True, padx=6, pady=(0, 6))
         self.category_tree.bind("<Double-1>", lambda _e: self.edit_category())
         self.category_tree.bind("<<TreeviewSelect>>", self._on_tree_selection_changed, add="+")
         ttk.Label(
             self.concept_page,
-            text="Классы S/P/Z/K/O/R/C. Можно выбрать несколько категорий для группового изменения group и number; неизвестные атрибуты сохраняются.",
+            text=tr("Классы S/P/Z/K/O/R/C. Можно выбрать несколько категорий для группового изменения group и number; неизвестные атрибуты сохраняются."),
             padding=6,
         ).pack(anchor="w")
 
@@ -1120,11 +1135,11 @@ class Is2Studio(tk.Tk):
         bar = ttk.Frame(self.link_page, padding=6)
         bar.pack(fill="x")
         for text, command in (("Добавить связь", self.add_concept_link), ("Изменить", self.edit_concept_link), ("Доп. атрибуты…", self.edit_concept_link_attributes), ("Удалить", self.delete_concept_link), ("Пересчитать AutoRange", self.recompute_auto_ranges), ("Обновить", self._refresh_links)):
-            ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 5))
-        self.concept_links_summary = tk.StringVar(value='Откройте проект.')
+            ttk.Button(bar, text=tr(text), command=command).pack(side="left", padx=(0, 5))
+        self.concept_links_summary = tk.StringVar(value=tr('Откройте проект.'))
         ttk.Label(self.link_page, textvariable=self.concept_links_summary, padding=(8, 3)).pack(anchor='w')
         self.link_tree = GridTreeview(self.link_page, columns=("id", "type", "label", "e1", "e2", "e3", "range"), show="headings", selectmode="browse")
-        labels = {"id":"ID", "type":"Тип", "label":"Связь", "e1":"E1", "e2":"E2", "e3":"E3", "range":"Range"}
+        labels = {"id":"ID", "type":tr("Тип"), "label":tr("Связь"), "e1":"E1", "e2":"E2", "e3":"E3", "range":"Range"}
         for c in self.link_tree["columns"]:
             self.link_tree.heading(c, text=labels[c])
             self.link_tree.column(c, width=100 if c != "label" else 200, anchor="w")
@@ -1138,8 +1153,8 @@ class Is2Studio(tk.Tk):
                               ("Изменить", self.edit_spz_element),
                               ("Удалить", self.delete_spz_element),
                               ("Обновить", self._refresh_other)):
-            ttk.Button(bar, text=text, command=command).pack(side="left", padx=(0, 5))
-        self.dynamic_summary = tk.StringVar(value='Откройте проект.')
+            ttk.Button(bar, text=tr(text), command=command).pack(side="left", padx=(0, 5))
+        self.dynamic_summary = tk.StringVar(value=tr('Откройте проект.'))
         ttk.Label(self.other_page, textvariable=self.dynamic_summary, padding=(8, 3)).pack(anchor='w')
         split = ttk.Panedwindow(self.other_page, orient="vertical")
         split.pack(fill="both", expand=True, padx=6, pady=(0, 6))
@@ -1147,12 +1162,12 @@ class Is2Studio(tk.Tk):
         lower = ttk.Frame(split)
         split.add(upper, weight=3)
         split.add(lower, weight=2)
-        ttk.Label(upper, text="ConceptModel / spz / elemets — AElement", padding=(2, 2)).pack(anchor="w")
+        ttk.Label(upper, text=tr("Структуры ConceptModel / spz / elements — AElement"), padding=(2, 2)).pack(anchor="w")
         self.spz_tree = GridTreeview(
             upper, columns=("id", "name", "type", "status", "formalization", "level", "number", "symbol"),
             show="headings", selectmode="browse", height=8,
         )
-        labels = {"id": "ID", "name": "Название", "type": "Type", "status": "Status",
+        labels = {"id": "ID", "name": tr("Название"), "type": "Type", "status": "Status",
                   "formalization": "Formalization", "level": "Level", "number": "Number", "symbol": "Symbol"}
         for col in self.spz_tree["columns"]:
             self.spz_tree.heading(col, text=labels[col])
@@ -1169,18 +1184,18 @@ class Is2Studio(tk.Tk):
         self.dynamic_tabs.add(self.content_page, text="content")
         spz_link_bar = ttk.Frame(self.spz_links_page, padding=(2, 2))
         spz_link_bar.pack(fill="x")
-        ttk.Button(spz_link_bar, text="Добавить…", command=self.add_spz_link).pack(side="left", padx=(0, 4))
-        ttk.Button(spz_link_bar, text="Изменить endpoints…", command=self.edit_spz_link).pack(side="left", padx=(0, 4))
-        ttk.Button(spz_link_bar, text="Удалить", command=self.delete_spz_link).pack(side="left")
+        ttk.Button(spz_link_bar, text=tr("Добавить…"), command=self.add_spz_link).pack(side="left", padx=(0, 4))
+        ttk.Button(spz_link_bar, text=tr("Изменить endpoints…"), command=self.edit_spz_link).pack(side="left", padx=(0, 4))
+        ttk.Button(spz_link_bar, text=tr("Удалить"), command=self.delete_spz_link).pack(side="left")
         ttk.Label(spz_link_bar,
-                  text="e1/e2/e3 — AIElement из spz/elemets; 0 = пустой endpoint.",
+                  text=tr("e1/e2/e3 — AIElement из spz/elemets; 0 = пустой endpoint."),
                   padding=(8, 0)).pack(side="left")
         self.spz_links_tree = GridTreeview(
             self.spz_links_page, columns=("index", "tag", "e1", "e2", "e3", "children", "attributes"),
             show="headings", selectmode="browse", height=5,
         )
-        spz_labels = {"index": "№", "tag": "XML-узел", "e1": "E1", "e2": "E2", "e3": "E3",
-                      "children": "Вложено", "attributes": "Атрибуты"}
+        spz_labels = {"index": "№", "tag": tr("XML-узел"), "e1": "E1", "e2": "E2", "e3": "E3",
+                      "children": tr("Вложено"), "attributes": tr("Атрибуты")}
         for col in self.spz_links_tree["columns"]:
             self.spz_links_tree.heading(col, text=spz_labels[col])
             self.spz_links_tree.column(col, width=75 if col in {"index", "e1", "e2", "e3", "children"} else (110 if col == "tag" else 280), anchor="w")
@@ -1193,18 +1208,18 @@ class Is2Studio(tk.Tk):
 
         content_bar = ttk.Frame(self.content_page, padding=(2, 2))
         content_bar.pack(fill="x")
-        ttk.Button(content_bar, text="Добавить связь…", command=self.add_content_link).pack(side="left", padx=(0, 4))
-        ttk.Button(content_bar, text="Изменить…", command=self.edit_content_record).pack(side="left", padx=(0, 4))
-        ttk.Button(content_bar, text="Удалить", command=self.delete_content_link).pack(side="left")
+        ttk.Button(content_bar, text=tr("Добавить связь…"), command=self.add_content_link).pack(side="left", padx=(0, 4))
+        ttk.Button(content_bar, text=tr("Изменить…"), command=self.edit_content_record).pack(side="left", padx=(0, 4))
+        ttk.Button(content_bar, text=tr("Удалить"), command=self.delete_content_link).pack(side="left")
         ttk.Label(content_bar,
-                  text="AEContentLink type=4: e1 = действие (AFElement), e2 = категория (AIElement).",
+                  text=tr("AEContentLink type=4: e1 = действие (AFElement), e2 = категория (AIElement)."),
                   padding=(8, 0)).pack(side="left")
         self.content_tree = GridTreeview(
             self.content_page, columns=("index", "tag", "e1", "e2", "char", "power", "children", "attributes"),
             show="headings", selectmode="browse", height=5,
         )
-        content_labels = {"index": "№", "tag": "XML-узел", "e1": "E1", "e2": "E2", "char": "Char", "power": "Power",
-                          "children": "Вложено", "attributes": "Атрибуты"}
+        content_labels = {"index": "№", "tag": tr("XML-узел"), "e1": "E1", "e2": "E2", "char": "Char", "power": "Power",
+                          "children": tr("Вложено"), "attributes": tr("Атрибуты")}
         for col in self.content_tree["columns"]:
             self.content_tree.heading(col, text=content_labels[col])
             self.content_tree.column(col, width=75 if col in {"index", "e1", "e2", "char", "power", "children"} else (110 if col == "tag" else 260), anchor="w")
@@ -1218,47 +1233,47 @@ class Is2Studio(tk.Tk):
     def _build_graph_page(self):
         bar = ttk.Frame(self.graph_page, padding=6)
         bar.pack(fill="x")
-        ttk.Label(bar, text="Тип:").pack(side="left")
-        self.graph_filter_var = tk.StringVar(value="Все")
+        ttk.Label(bar, text=tr("Тип:")).pack(side="left")
+        self.graph_filter_var = tk.StringVar(value=tr("Все"))
         self.graph_filter_combo = ttk.Combobox(
             bar, textvariable=self.graph_filter_var, state="readonly", width=24,
-            values=("Все", "SCBinaryLink (cs)", "AIEBinaryLink (spz)", "AEContentLink (content)", "Parameter → Object"),
+            values=(tr("Все"), "SCBinaryLink (cs)", "AIEBinaryLink (spz)", "AEContentLink (content)", "Parameter → Object"),
         )
         self.graph_filter_combo.pack(side="left", padx=(4, 8))
         self.graph_filter_combo.bind("<<ComboboxSelected>>", lambda _e: self._refresh_graph())
-        ttk.Label(bar, text="Поиск:").pack(side="left")
+        ttk.Label(bar, text=tr("Поиск:")).pack(side="left")
         self.graph_search_var = tk.StringVar(value="")
         search = ttk.Entry(bar, textvariable=self.graph_search_var, width=22)
         search.pack(side="left", padx=4)
         search.bind("<Return>", lambda _e: self._refresh_graph())
-        ttk.Button(bar, text="Показать", command=self._refresh_graph).pack(side="left", padx=(2, 6))
-        ttk.Button(bar, text="Сбросить", command=self._reset_graph_filter).pack(side="left")
-        ttk.Button(bar, text="Развернуть всё", command=self._expand_all_graph_groups).pack(side="left", padx=(8, 0))
+        ttk.Button(bar, text=tr("Показать"), command=self._refresh_graph).pack(side="left", padx=(2, 6))
+        ttk.Button(bar, text=tr("Сбросить"), command=self._reset_graph_filter).pack(side="left")
+        ttk.Button(bar, text=tr("Развернуть всё"), command=self._expand_all_graph_groups).pack(side="left", padx=(8, 0))
 
         edit_bar = ttk.Frame(self.graph_page, padding=(6, 0, 6, 4))
         edit_bar.pack(fill="x")
-        ttk.Label(edit_bar, text="Новая связь:").pack(side="left")
+        ttk.Label(edit_bar, text=tr("Новая связь:")).pack(side="left")
         self.graph_new_kind = tk.StringVar(value="AEContentLink (content)")
         ttk.Combobox(
             edit_bar, textvariable=self.graph_new_kind, state="readonly", width=25,
             values=("SCBinaryLink (cs)", "AIEBinaryLink (spz)", "AEContentLink (content)"),
         ).pack(side="left", padx=(4, 6))
-        ttk.Button(edit_bar, text="＋ Создать на графе", command=self.graph_add_relation).pack(side="left", padx=2)
-        self.graph_edit_button = ttk.Button(edit_bar, text="Изменить выбранную", command=self.graph_edit_relation, state="disabled")
+        ttk.Button(edit_bar, text=tr("＋ Создать на графе"), command=self.graph_add_relation).pack(side="left", padx=2)
+        self.graph_edit_button = ttk.Button(edit_bar, text=tr("Изменить выбранную"), command=self.graph_edit_relation, state="disabled")
         self.graph_edit_button.pack(side="left", padx=2)
-        self.graph_delete_button = ttk.Button(edit_bar, text="Удалить выбранную", command=self.graph_delete_relation, state="disabled")
+        self.graph_delete_button = ttk.Button(edit_bar, text=tr("Удалить выбранную"), command=self.graph_delete_relation, state="disabled")
         self.graph_delete_button.pack(side="left", padx=2)
         ttk.Separator(edit_bar, orient="vertical").pack(side="left", fill="y", padx=7)
         ttk.Button(edit_bar, text="−", width=3, command=lambda: self._graph_zoom_step(0.8)).pack(side="left", padx=1)
         ttk.Button(edit_bar, text="＋", width=3, command=lambda: self._graph_zoom_step(1.25)).pack(side="left", padx=1)
-        ttk.Button(edit_bar, text="Автораскладка", command=self._graph_auto_layout).pack(side="left", padx=3)
-        ttk.Button(edit_bar, text="Вписать", command=self._graph_fit).pack(side="left", padx=3)
+        ttk.Button(edit_bar, text=tr("Автораскладка"), command=self._graph_auto_layout).pack(side="left", padx=3)
+        ttk.Button(edit_bar, text=tr("Вписать"), command=self._graph_fit).pack(side="left", padx=3)
         self.graph_zoom_label = ttk.Label(edit_bar, text="100%")
         self.graph_zoom_label.pack(side="left", padx=(2, 0))
-        self.graph_layout_hint_var = tk.StringVar(value="Группы связей: cs · spz · content")
+        self.graph_layout_hint_var = tk.StringVar(value=tr("Группы связей: cs · spz · content"))
         ttk.Label(edit_bar, textvariable=self.graph_layout_hint_var).pack(side="right", padx=(8, 2))
 
-        self.graph_summary_var = tk.StringVar(value="Граф ещё не построен")
+        self.graph_summary_var = tk.StringVar(value=tr("Граф ещё не построен"))
         ttk.Label(self.graph_page, textvariable=self.graph_summary_var, padding=(8, 0)).pack(anchor="w")
         split = ttk.Panedwindow(self.graph_page, orient="vertical")
         split.pack(fill="both", expand=True, padx=6, pady=6)
@@ -1290,7 +1305,7 @@ class Is2Studio(tk.Tk):
         self.graph_canvas.bind("<Control-MouseWheel>", self._graph_wheel_zoom)
         self.graph_canvas.bind("<Control-Button-4>", lambda e: self._graph_zoom_step(1.08))
         self.graph_canvas.bind("<Control-Button-5>", lambda e: self._graph_zoom_step(1/1.08))
-        ttk.Label(detail_holder, text="Сведения о выбранном узле", padding=(2, 4)).pack(anchor="w")
+        ttk.Label(detail_holder, text=tr("Сведения о выбранном узле"), padding=(2, 4)).pack(anchor="w")
         self.graph_detail = tk.Text(detail_holder, wrap="word", height=7, state="disabled", font=("Consolas", 9))
         self.graph_detail.pack(fill="both", expand=True)
         self.graph_nodes_by_key: dict[str, dict] = {}
@@ -1355,7 +1370,7 @@ class Is2Studio(tk.Tk):
             }
             self._pending_editor_state = state
             if hasattr(self, "graph_filter_var"):
-                self.graph_filter_var.set(state.get("graph_filter", "Все"))
+                self.graph_filter_var.set(tr("Все") if state.get("graph_filter", "Все") == "Все" else state.get("graph_filter"))
                 self.graph_search_var.set(state.get("graph_search", ""))
             geometry = state.get("window_geometry")
             if geometry:
@@ -1417,9 +1432,9 @@ class Is2Studio(tk.Tk):
             return True
         except Exception as exc:
             if not silent:
-                messagebox.showwarning("Состояние редактора", f"Не удалось сохранить настройки редактора отдельно от .is2:\n{exc}", parent=self)
+                messagebox.showwarning(tr("Состояние редактора"), tr("Не удалось сохранить настройки редактора отдельно от .is2:\n{error}").format(error=exc), parent=self)
             else:
-                self.status.set(f"Не удалось сохранить sidecar редактора: {exc}")
+                self.status.set(tr_dynamic(f"Не удалось сохранить sidecar редактора: {exc}"))
             return False
 
     def _on_notebook_tab_changed(self, _event=None):
@@ -1455,7 +1470,7 @@ class Is2Studio(tk.Tk):
         self.graph_zoom = 1.0
         self._refresh_graph()
         self._save_graph_view_state()
-        self.status.set("Выполнена автоматическая раскладка графа; координаты сохранены отдельно от .is2")
+        self.status.set(tr("Выполнена автоматическая раскладка графа; координаты сохранены отдельно от .is2"))
 
     def _toggle_graph_group(self, group_key: str):
         """Collapse/expand a graph column without changing the native project."""
@@ -1478,23 +1493,23 @@ class Is2Studio(tk.Tk):
         self._save_graph_view_state()
 
     def _reset_graph_filter(self):
-        self.graph_filter_var.set("Все")
+        self.graph_filter_var.set(tr("Все"))
         self.graph_search_var.set("")
         self._refresh_graph()
 
     def _graph_default_layout(self, nodes):
         """Create a readable view with a separate column per relation family."""
         columns = {
-            "action": (20, "ДЕЙСТВИЯ · AFElement", "#eaf2ff", "#2455a4"),
-            "category": (370, "КАТЕГОРИИ · SubjectCategory", "#eaf8ef", "#28734a"),
-            "spz_element": (720, "ЭЛЕМЕНТЫ · spz/AElement", "#fff6e7", "#996018"),
-            "parameter": (1070, "ПАРАМЕТРЫ · PrimaryModel", "#e0f2fe", "#0369a1"),
-            "object": (1430, "ОБЪЕКТЫ · PrimaryModel", "#fef3c7", "#a16207"),
+            "action": (20, tr("ДЕЙСТВИЯ · AFElement"), "#eaf2ff", "#2455a4"),
+            "category": (370, tr("КАТЕГОРИИ · SubjectCategory"), "#eaf8ef", "#28734a"),
+            "spz_element": (720, tr("ЭЛЕМЕНТЫ · spz/AElement"), "#fff6e7", "#996018"),
+            "parameter": (1070, tr("ПАРАМЕТРЫ · PrimaryModel"), "#e0f2fe", "#0369a1"),
+            "object": (1430, tr("ОБЪЕКТЫ · PrimaryModel"), "#fef3c7", "#a16207"),
             "relation:scbinarylink": (1790, "SCBinaryLink · cs", "#f2edff", "#6941a5"),
             "relation:aie_binary_link": (2150, "AIEBinaryLink · spz", "#e6fffb", "#0f766e"),
             "relation:ae_content_link": (2510, "AEContentLink · content", "#f5f0ff", "#7c3aed"),
             "relation:parameter_object": (2870, "Parameter → Object", "#ecfccb", "#4d7c0f"),
-            "relation": (3230, "НЕИЗВЕСТНЫЕ ЗАПИСИ", "#f1f5f9", "#64748b"),
+            "relation": (3230, tr("НЕИЗВЕСТНЫЕ ЗАПИСИ"), "#f1f5f9", "#64748b"),
         }
         grouped = {key: [] for key in columns}
         for node in nodes:
@@ -1529,12 +1544,12 @@ class Is2Studio(tk.Tk):
         self.graph_item_ids = {}
         if self.doc is None:
             canvas.configure(scrollregion=(0, 0, 800, 480))
-            self.graph_summary_var.set("Файл не открыт")
-            self._set_inspector_text(self.graph_detail, "Откройте проект для построения графа.")
+            self.graph_summary_var.set(tr("Файл не открыт"))
+            self._set_inspector_text(self.graph_detail, tr("Откройте проект для построения графа."))
             self._update_graph_edit_controls()
             return
 
-        kind_map = {"Все": "all", "SCBinaryLink (cs)": "scbinarylink", "AIEBinaryLink (spz)": "aie_binary_link", "AEContentLink (content)": "ae_content_link", "Parameter → Object": "parameter_object"}
+        kind_map = {tr("Все"): "all", "SCBinaryLink (cs)": "scbinarylink", "AIEBinaryLink (spz)": "aie_binary_link", "AEContentLink (content)": "ae_content_link", "Parameter → Object": "parameter_object"}
         graph = build_relationship_graph(self.doc)
         visible = filter_relationship_graph(graph, relation_kind=kind_map.get(self.graph_filter_var.get(), "all"), query=self.graph_search_var.get())
         nodes, edges = visible["nodes"], visible["edges"]
@@ -1626,22 +1641,23 @@ class Is2Studio(tk.Tk):
             f"{label} {relation_groups.get(kind, 0)}"
             for kind, label in (("scbinarylink", "cs"), ("aie_binary_link", "spz"), ("ae_content_link", "content"))
         )
-        self.graph_layout_hint_var.set(f"Группы: {group_summary or 'нет записей'}")
+        self.graph_layout_hint_var.set(tr("Группы: {groups}").format(groups=group_summary or tr("нет записей")))
         self.graph_summary_var.set(
-            f"Показано: {summary['relation_count']} связей, {summary['endpoint_count']} endpoint-ов; "
-            f"всего записей связей/привязок: {all_summary['relation_node_count']}. "
-            f"Неразрешённых ссылок: {len(graph['dangling_references'])}; "
-            f"непрозрачных записей: {all_summary['opaque_record_count']}. "
-            "Перетаскивайте узлы; Ctrl+колесо — масштаб; средняя кнопка — панорама. "
-            "Семейства связей показаны отдельными колонками; вид хранится отдельно от .is2."
+            tr("Показано: {relations} связей, {endpoints} endpoint-ов; всего записей связей/привязок: {total}. "
+               "Неразрешённых ссылок: {dangling}; непрозрачных записей: {opaque}.").format(
+                relations=summary['relation_count'], endpoints=summary['endpoint_count'],
+                total=all_summary['relation_node_count'], dangling=len(graph['dangling_references']),
+                opaque=all_summary['opaque_record_count']) + " " +
+            tr("Перетаскивайте узлы; Ctrl+колесо — масштаб; средняя кнопка — панорама. "
+               "Семейства связей показаны отдельными колонками; вид хранится отдельно от .is2.")
         )
         if not nodes:
-            canvas.create_text(30, 45, anchor="nw", text="По заданному фильтру узлы не найдены.", font=("TkDefaultFont", 11), fill=palette['muted'])
+            canvas.create_text(30, 45, anchor="nw", text=tr("По заданному фильтру узлы не найдены."), font=("TkDefaultFont", 11), fill=palette['muted'])
         elif not edges:
-            canvas.create_text(30, 45, anchor="nw", text="Записи связей не найдены. Изолированные элементы показаны в своих колонках.", font=("TkDefaultFont", 10), fill=palette['muted'])
-        details = "Выберите узел. Двойной щелчок открывает его таблицу; связь можно изменить или удалить кнопками выше."
+            canvas.create_text(30, 45, anchor="nw", text=tr("Записи связей не найдены. Изолированные элементы показаны в своих колонках."), font=("TkDefaultFont", 10), fill=palette['muted'])
+        details = tr("Выберите узел. Двойной щелчок открывает его таблицу; связь можно изменить или удалить кнопками выше.")
         if graph["dangling_references"]:
-            details += "\n\nНеразрешённые endpoint-ы:\n" + "\n".join(
+            details += "\n\n" + tr("Неразрешённые endpoint-ы:") + "\n" + "\n".join(
                 f"{item['relation_kind']}[{item['record_index']}].{item['slot']} → {item['endpoint_id']} ({item['expected_domain']})"
                 for item in graph["dangling_references"][:30]
             )
@@ -1668,7 +1684,7 @@ class Is2Studio(tk.Tk):
                                             width=3 if key == node_key else 1.4)
         node = self.graph_nodes_by_key[node_key]
         self._set_inspector_text(self.graph_detail, json.dumps(node, ensure_ascii=False, indent=2))
-        self.status.set(f"Граф: выбран узел {node.get('label', node_key)}")
+        self.status.set(tr("Граф: выбран узел {label}").format(label=node.get('label', node_key)))
         self._update_graph_edit_controls()
         if self.path is not None:
             self._save_graph_view_state()
@@ -1719,7 +1735,7 @@ class Is2Studio(tk.Tk):
             self._graph_drag_redraw.cancel()
             self._refresh_graph()
             self._save_graph_view_state()
-            self.status.set("Положение узла изменено (только sidecar представления, XML проекта не менялся)")
+            self.status.set(tr("Положение узла изменено (только sidecar представления, XML проекта не менялся)"))
         return "break"
 
     def _graph_double_click(self, _event):
@@ -1842,13 +1858,13 @@ class Is2Studio(tk.Tk):
             self._graph_select_node(new_key)
             self._save_graph_view_state()
         except Exception as exc:
-            messagebox.showerror("Создание связи на графе", str(exc), parent=self)
+            messagebox.showerror(tr("Создание связи на графе"), str(exc), parent=self)
 
     def graph_edit_relation(self):
         if self.doc is None: return
         node = self.graph_nodes_by_key.get(self.graph_selected_key) if self.graph_selected_key else None
         if not node or node.get("kind") != "relation":
-            messagebox.showinfo("Граф связей", "Выберите узел записи связи.", parent=self); return
+            messagebox.showinfo(tr("Граф связей"), tr("Выберите узел записи связи."), parent=self); return
         kind, index = node.get("relation_kind"), int(node.get("record_index", -1))
         try:
             if kind == "parameter_object":
@@ -1859,7 +1875,7 @@ class Is2Studio(tk.Tk):
                     raise ValueError("В проекте нет объектов PrimaryModel.")
                 current_id = current.get("o", "")
                 fields = [("object_id", "Объект", current_id if current_id in objects else objects[0], tuple(objects))]
-                dialog = RecordDialog(self, f"Привязка Parameter {parameter_id} → Object", fields)
+                dialog = RecordDialog(self, tr("Привязка Parameter {parameter_id} → Object").format(parameter_id=parameter_id), fields)
                 self.wait_window(dialog)
                 if dialog.result is None:
                     return
@@ -1869,7 +1885,7 @@ class Is2Studio(tk.Tk):
                 ident = str(node.get("attributes", {}).get("id", "")); current = self.doc.concept_structure.link(ident)
                 ids = [n.get("id", "") for n in self.doc.concept_structure.categories if n.get("id")]
                 fields = [("type", "Тип", current.get("type", "2"), ("1", "2", "3")), ("e1", "E1", current.get("e1", "0"), tuple(["0"] + ids)), ("e2", "E2", current.get("e2", "0"), tuple(["0"] + ids)), ("e3", "E3", current.get("e3", "0"), tuple(["0"] + ids)), ("name", "Название", current.get("name", ""), None), ("range", "Range", current.get("range", "99"), None)]
-                dialog = RecordDialog(self, f"SCBinaryLink {ident}", fields); self.wait_window(dialog)
+                dialog = RecordDialog(self, tr("Связь SCBinaryLink {ident}").format(ident=ident), fields); self.wait_window(dialog)
                 if dialog.result is None: return
                 d = dialog.result
                 self.doc.concept_structure.update_link(ident, type=int(d["type"]), e1=d["e1"], e2=d["e2"], e3=d["e3"], name=d["name"], range=int(d["range"]))
@@ -1881,7 +1897,7 @@ class Is2Studio(tk.Tk):
                 ids = [str(n.get("id")) for n in self.doc.dynamic_structure.elements if n.get("id")]; choices = tuple(["0"] + ids)
                 fields = [(slot, slot.upper(), current.get(slot, "0"), choices) for slot in ("e1", "e2", "e3")]
                 fields += [("name", "Name", current.get("name", ""), None)] + [(k, k, current.get(k, "0"), None) for k in ("type", "status", "formalization", "level", "number", "symbol")]
-                dialog = RecordDialog(self, f"AIEBinaryLink spz/links[{index+1}]", fields); self.wait_window(dialog)
+                dialog = RecordDialog(self, tr("Связь AIEBinaryLink spz/links[{index}]").format(index=index + 1), fields); self.wait_window(dialog)
                 if dialog.result is None: return
                 d = dialog.result; changes = {k: (v if k == "name" else int(v)) for k, v in d.items() if v != current.get(k, "0" if k != "name" else "")}
                 self.doc.dynamic_structure.update_spz_link(index, **changes); new_key = self.graph_selected_key
@@ -1890,7 +1906,7 @@ class Is2Studio(tk.Tk):
                 if current.tag != "AElement" or current.get("type") != "4": raise ValueError("Непрозрачная или неподдерживаемая запись защищена от изменения.")
                 actions = [str(n.get("id")) for n in self.doc.actions if n.get("id")]; categories = [str(n.get("id")) for n in self.doc.concept_structure.categories if n.get("id")]
                 fields = [("e1", "E1 — AFElement", current.get("e1", ""), tuple(actions)), ("e2", "E2 — AIElement", current.get("e2", ""), tuple(categories)), ("char", "Char (int8)", current.get("char", "0"), None), ("power", "Power (int32)", current.get("power", "1"), None)]
-                dialog = RecordDialog(self, f"AEContentLink content[{index+1}]", fields); self.wait_window(dialog)
+                dialog = RecordDialog(self, tr("Связь AEContentLink content[{index}]").format(index=index + 1), fields); self.wait_window(dialog)
                 if dialog.result is None: return
                 d = dialog.result; self.doc.dynamic_structure.update_content_record(index, e1=d["e1"], e2=d["e2"], char=int(d["char"]), power=int(d["power"])); new_key = self.graph_selected_key
             else:
@@ -1899,15 +1915,15 @@ class Is2Studio(tk.Tk):
             self.refresh_all()
             if new_key in self.graph_nodes_by_key: self._graph_select_node(new_key)
         except Exception as exc:
-            messagebox.showerror("Редактирование связи на графе", str(exc), parent=self)
+            messagebox.showerror(tr("Редактирование связи на графе"), str(exc), parent=self)
 
     def graph_delete_relation(self):
         if self.doc is None: return
         node = self.graph_nodes_by_key.get(self.graph_selected_key) if self.graph_selected_key else None
         if not node or node.get("kind") != "relation":
-            messagebox.showinfo("Граф связей", "Выберите узел записи связи.", parent=self); return
+            messagebox.showinfo(tr("Граф связей"), tr("Выберите узел записи связи."), parent=self); return
         kind, index = node.get("relation_kind"), int(node.get("record_index", -1))
-        if not messagebox.askyesno("Удаление связи", f"Удалить выбранную запись {kind} [{index+1}]?", parent=self): return
+        if not messagebox.askyesno(tr("Удаление связи"), tr("Удалить выбранную запись {kind} [{index}]?").format(kind=kind, index=index + 1), parent=self): return
         try:
             if kind == "parameter_object":
                 parameter_id = str(node.get("attributes", {}).get("parameter_id", ""))
@@ -1922,7 +1938,7 @@ class Is2Studio(tk.Tk):
             self.refresh_all()
             self._save_graph_view_state()
         except Exception as exc:
-            messagebox.showerror("Удаление связи на графе", str(exc), parent=self)
+            messagebox.showerror(tr("Удаление связи на графе"), str(exc), parent=self)
 
     def _graph_click(self, event):
         """Compatibility wrapper retained for smoke tests and older bindings."""
@@ -1969,7 +1985,7 @@ class Is2Studio(tk.Tk):
             return
         selected = self.spz_links_tree.selection()
         if not selected:
-            messagebox.showinfo("Выбор связи", "Сначала выберите запись в таблице spz/links.", parent=self)
+            messagebox.showinfo(tr("Выбор связи"), tr("Сначала выберите запись в таблице spz/links."), parent=self)
             return
         try:
             index = int(selected[0])
@@ -1992,7 +2008,7 @@ class Is2Studio(tk.Tk):
                 ("number", "Number (signed int32)", node.get("number", "0"), None),
                 ("symbol", "Symbol (uint16)", node.get("symbol", "0"), None),
             ])
-            dialog = RecordDialog(self, f"spz/links — запись {index + 1}", fields)
+            dialog = RecordDialog(self, tr("spz/links — запись {index}").format(index=index + 1), fields)
             self.wait_window(dialog)
             if dialog.result is None:
                 return
@@ -2007,7 +2023,7 @@ class Is2Studio(tk.Tk):
             self.refresh_all()
             self.spz_links_tree.selection_set(str(index))
         except Exception as exc:
-            messagebox.showerror("Редактирование spz/links", str(exc), parent=self)
+            messagebox.showerror(tr("Редактирование spz/links"), str(exc), parent=self)
 
     def add_spz_link(self):
         if self.doc is None:
@@ -2049,9 +2065,9 @@ class Is2Studio(tk.Tk):
             return
         selected = self.spz_links_tree.selection()
         if not selected:
-            return messagebox.showinfo("spz/links", "Выберите связь.", parent=self)
+            return messagebox.showinfo("spz/links", tr("Выберите связь."), parent=self)
         index = int(selected[0])
-        if not messagebox.askyesno("Удаление spz-связи", f"Удалить запись spz/links[{index + 1}]?", parent=self):
+        if not messagebox.askyesno(tr("Удаление spz-связи"), tr("Удалить запись spz/links[{index}]?").format(index=index + 1), parent=self):
             return
         try:
             self.doc.dynamic_structure.delete_spz_link(index)
@@ -2066,7 +2082,7 @@ class Is2Studio(tk.Tk):
         actions = sorted((str(n.get("id")) for n in self.doc.actions if n.get("id")), key=lambda x: (0, int(x)) if x.isdigit() else (1, x.casefold()))
         categories = sorted((str(n.get("id")) for n in self.doc.concept_structure.categories if n.get("id")), key=lambda x: (0, int(x)) if x.isdigit() else (1, x.casefold()))
         if not actions or not categories:
-            return messagebox.showinfo("AEContentLink", "Для создания связи нужны хотя бы одно действие и одна категория ConceptModel/cs.", parent=self)
+            return messagebox.showinfo("AEContentLink", tr("Для создания связи нужны хотя бы одно действие и одна категория ConceptModel/cs."), parent=self)
         fields = [
             ("e1", "E1 — действие AFElement", actions[0], tuple(actions)),
             ("e2", "E2 — категория AIElement", categories[0], tuple(categories)),
@@ -2094,9 +2110,9 @@ class Is2Studio(tk.Tk):
             return
         selected = self.content_tree.selection()
         if not selected:
-            return messagebox.showinfo("ConceptModel/content", "Выберите связь.", parent=self)
+            return messagebox.showinfo("ConceptModel/content", tr("Выберите связь."), parent=self)
         index = int(selected[0])
-        if not messagebox.askyesno("Удаление AEContentLink", f"Удалить запись content[{index + 1}]?", parent=self):
+        if not messagebox.askyesno(tr("Удаление AEContentLink"), tr("Удалить запись content[{index}]?").format(index=index + 1), parent=self):
             return
         try:
             self.doc.dynamic_structure.delete_content_link(index)
@@ -2110,7 +2126,7 @@ class Is2Studio(tk.Tk):
             return
         selected = self.content_tree.selection()
         if not selected:
-            messagebox.showinfo("Выбор записи", "Сначала выберите запись в ConceptModel/content.", parent=self)
+            messagebox.showinfo(tr("Выбор записи"), tr("Сначала выберите запись в ConceptModel/content."), parent=self)
             return
         try:
             index = int(selected[0])
@@ -2125,7 +2141,7 @@ class Is2Studio(tk.Tk):
                 ("char", "Char (signed 8-bit)", node.get("char", "0"), None),
                 ("power", "Power (signed 32-bit)", node.get("power", "1"), None),
             ]
-            dialog = RecordDialog(self, f"AEContentLink — запись {index + 1}", fields)
+            dialog = RecordDialog(self, tr("AEContentLink — запись {index}").format(index=index + 1), fields)
             self.wait_window(dialog)
             if dialog.result is None:
                 return
@@ -2140,7 +2156,7 @@ class Is2Studio(tk.Tk):
             self.refresh_all()
             self.content_tree.selection_set(str(index))
         except Exception as exc:
-            messagebox.showerror("Редактирование AEContentLink", str(exc), parent=self)
+            messagebox.showerror(tr("Редактирование AEContentLink"), str(exc), parent=self)
 
     def add_spz_element(self):
         if self.doc is None:
@@ -2172,7 +2188,7 @@ class Is2Studio(tk.Tk):
                 formalization=int(d["formalization"]), level=int(d["level"]),
                 number=int(d["number"]), symbol=int(d["symbol"]),
             )
-            self._mark_dirty(f"Создан spz AElement {ident}")
+            self._mark_dirty(f"Создан Элемент AElement в spz {ident}")
             self.refresh_all()
         except Exception as exc:
             messagebox.showerror("spz AElement", str(exc), parent=self)
@@ -2182,7 +2198,7 @@ class Is2Studio(tk.Tk):
             return
         ident = self._selected_id(self.spz_tree)
         if not ident:
-            messagebox.showinfo("Выбор записи", "Сначала выберите AElement.", parent=self)
+            messagebox.showinfo(tr("Выбор записи"), tr("Сначала выберите AElement."), parent=self)
             return
         try:
             node = self.doc.dynamic_structure.element(ident)
@@ -2195,7 +2211,7 @@ class Is2Studio(tk.Tk):
                 ("number", "Number", node.get("number", ident), None),
                 ("symbol", "Symbol (0..65535)", node.get("symbol", "99"), None),
             ]
-            dialog = RecordDialog(self, f"spz AElement {ident}", fields)
+            dialog = RecordDialog(self, tr("Элемент AElement в spz {ident}").format(ident=ident), fields)
             self.wait_window(dialog)
             if dialog.result is None:
                 return
@@ -2205,7 +2221,7 @@ class Is2Studio(tk.Tk):
                 formalization=int(d["formalization"]), level=int(d["level"]),
                 number=int(d["number"]), symbol=int(d["symbol"]),
             )
-            self._mark_dirty(f"Изменён spz AElement {ident}")
+            self._mark_dirty(f"Изменён Элемент AElement в spz {ident}")
             self.refresh_all()
         except Exception as exc:
             messagebox.showerror("spz AElement", str(exc), parent=self)
@@ -2215,18 +2231,18 @@ class Is2Studio(tk.Tk):
             return
         ident = self._selected_id(self.spz_tree)
         if not ident:
-            messagebox.showinfo("Выбор записи", "Сначала выберите AElement.", parent=self)
+            messagebox.showinfo(tr("Выбор записи"), tr("Сначала выберите AElement."), parent=self)
             return
         touching = [n for n in self.doc.dynamic_structure.links if ident in {n.get("e1"), n.get("e2"), n.get("e3")}]
         cascade_links = False
         if touching:
-            cascade_links = messagebox.askyesno("Удалить AElement", f"AElement {ident} используется в {len(touching)} spz-связях. Удалить также эти связи?\n\n{self._dependency_note(self._dependency_entry('spz_element', ident))}", parent=self)
+            cascade_links = messagebox.askyesno(tr("Удаление AElement"), tr("AElement {ident} используется в {count} spz-связях. Удалить также эти связи?\n\n{dependency_note}").format(ident=ident, count=len(touching), dependency_note=self._dependency_note(self._dependency_entry('spz_element', ident))), parent=self)
             if not cascade_links: return
-        elif not messagebox.askyesno("Удалить AElement", f"Удалить AElement {ident}?\n\n{self._dependency_note(self._dependency_entry('spz_element', ident))}", parent=self):
+        elif not messagebox.askyesno(tr("Удаление AElement"), tr("Удалить AElement {ident}?\n\n{dependency_note}").format(ident=ident, dependency_note=self._dependency_note(self._dependency_entry('spz_element', ident))), parent=self):
             return
         try:
             self.doc.dynamic_structure.delete_element(ident, cascade_links=cascade_links)
-            self._mark_dirty(f"Удалён spz AElement {ident}")
+            self._mark_dirty(f"Удалён Элемент AElement в spz {ident}")
             self.refresh_all()
         except Exception as exc:
             messagebox.showerror("spz AElement", str(exc), parent=self)
@@ -2260,9 +2276,9 @@ class Is2Studio(tk.Tk):
             undo_label = self.history.undo_label
             redo_label = self.history.redo_label
             self.edit_menu.entryconfigure(0, state="normal" if can_undo else "disabled",
-                                          label=(f"Отменить: {undo_label}" if can_undo else "Отменить"))
+                                          label=(tr("Отменить: {label}").format(label=tr(undo_label)) if can_undo else tr("Отменить")))
             self.edit_menu.entryconfigure(1, state="normal" if can_redo else "disabled",
-                                          label=(f"Повторить: {redo_label}" if can_redo else "Повторить"))
+                                          label=(tr("Повторить: {label}").format(label=tr(redo_label)) if can_redo else tr("Повторить")))
         self._refresh_history_window()
 
     def show_history(self):
@@ -2273,20 +2289,20 @@ class Is2Studio(tk.Tk):
             self._refresh_history_window()
             return
         window = tk.Toplevel(self)
-        window.title("История изменений — PzKpfw")
+        window.title(tr("История изменений — PzKpfw"))
         window.geometry("900x520")
         self.history_window = window
-        ttk.Label(window, text="История текущей сессии документа. Снимки остаются в памяти; журнал содержит только метаданные.", padding=8).pack(anchor="w")
+        ttk.Label(window, text=tr("История текущей сессии документа. Снимки остаются в памяти; журнал содержит только метаданные."), padding=8).pack(anchor="w")
         tabs = ttk.Notebook(window)
         tabs.pack(fill="both", expand=True, padx=8, pady=4)
         timeline_page = ttk.Frame(tabs, padding=4)
         journal_page = ttk.Frame(tabs, padding=4)
-        tabs.add(timeline_page, text="Undo / Redo")
-        tabs.add(journal_page, text="Журнал операций")
+        tabs.add(timeline_page, text=tr("Отменить / повторить"))
+        tabs.add(journal_page, text=tr("Журнал операций"))
 
         tree = GridTreeview(timeline_page, columns=("stack", "index", "operation", "when", "size"), show="headings", selectmode="browse")
         for key, title, width in (("stack", "Стек", 105), ("index", "№", 45), ("operation", "Операция", 390), ("when", "Время", 190), ("size", "Снимок", 90)):
-            tree.heading(key, text=title)
+            tree.heading(key, text=tr(title))
             tree.column(key, width=width, anchor="w" if key in {"operation", "when"} else "center")
         tree.pack(fill="both", expand=True)
         tree.bind("<<TreeviewSelect>>", self._history_selection_changed)
@@ -2294,19 +2310,19 @@ class Is2Studio(tk.Tk):
 
         journal = GridTreeview(journal_page, columns=("seq", "when", "action", "operation", "details"), show="headings")
         for key, title, width in (("seq", "№", 55), ("when", "Время UTC", 190), ("action", "Действие", 100), ("operation", "Операция", 245), ("details", "Подробности", 420)):
-            journal.heading(key, text=title)
+            journal.heading(key, text=tr(title))
             journal.column(key, width=width, anchor="w" if key not in {"seq"} else "center")
         journal.pack(fill="both", expand=True)
         self.history_journal_tree = journal
 
         buttons = ttk.Frame(window, padding=8)
         buttons.pack(fill="x")
-        ttk.Button(buttons, text="↶ Отменить", command=self.undo).pack(side="left")
-        ttk.Button(buttons, text="↷ Повторить", command=self.redo).pack(side="left", padx=6)
-        self.history_jump_button = ttk.Button(buttons, text="Перейти к состоянию…", command=self._jump_history_selection, state="disabled")
+        ttk.Button(buttons, text=tr("↶ Отменить"), command=self.undo).pack(side="left")
+        ttk.Button(buttons, text=tr("↷ Повторить"), command=self.redo).pack(side="left", padx=6)
+        self.history_jump_button = ttk.Button(buttons, text=tr("Перейти к состоянию…"), command=self._jump_history_selection, state="disabled")
         self.history_jump_button.pack(side="left", padx=6)
-        ttk.Button(buttons, text="Экспорт журнала…", command=self.export_history_journal).pack(side="left", padx=6)
-        ttk.Button(buttons, text="Закрыть", command=window.destroy).pack(side="right")
+        ttk.Button(buttons, text=tr("Экспорт журнала…"), command=self.export_history_journal).pack(side="left", padx=6)
+        ttk.Button(buttons, text=tr("Закрыть"), command=window.destroy).pack(side="right")
         window.bind("<Escape>", lambda _e: window.destroy())
         window.protocol("WM_DELETE_WINDOW", window.destroy)
         window.bind("<Destroy>", self._history_window_destroyed, add="+")
@@ -2314,9 +2330,9 @@ class Is2Studio(tk.Tk):
 
     def export_history_journal(self):
         if not self.history.journal:
-            messagebox.showinfo("Журнал операций", "В журнале пока нет записей.", parent=self)
+            messagebox.showinfo(tr("Журнал операций"), tr("В журнале пока нет записей."), parent=self)
             return
-        target = filedialog.asksaveasfilename(parent=self, title="Экспорт журнала операций", defaultextension=".json", filetypes=[("JSON", "*.json")])
+        target = filedialog.asksaveasfilename(parent=self, title=tr("Экспорт журнала операций"), defaultextension=".json", filetypes=[("JSON", "*.json")])
         if not target:
             return
         payload = {
@@ -2326,9 +2342,9 @@ class Is2Studio(tk.Tk):
         }
         try:
             Path(target).write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
-            messagebox.showinfo("Журнал операций", f"Журнал сохранён: {target}", parent=self)
+            messagebox.showinfo(tr("Журнал операций"), tr("Журнал сохранён: {path}").format(path=target), parent=self)
         except Exception as exc:
-            messagebox.showerror("Экспорт журнала", str(exc), parent=self)
+            messagebox.showerror(tr("Экспорт журнала"), str(exc), parent=self)
 
     def _history_window_destroyed(self, event):
         if event.widget is self.history_window:
@@ -2347,13 +2363,13 @@ class Is2Studio(tk.Tk):
                 selected = tree.selection()
                 selected_iid = selected[0] if selected else None
                 tree.delete(*tree.get_children())
-                tree.insert("", "end", iid="current", values=("Текущее", "—", "Текущее состояние документа", "—", "—"))
+                tree.insert("", "end", iid="current", values=(tr("Текущее"), "—", tr("Текущее состояние документа"), "—", "—"))
                 for stack, label, ordinal in self.history.timeline:
                     info = self.history.entry_info(stack, ordinal) or {}
                     created = str(info.get("created_at", "")).replace("T", " ").replace("Z", " UTC")
                     size = info.get("compressed_size", 0)
                     tree.insert("", "end", iid=f"{stack}:{ordinal}", values=(
-                        "До операции" if stack == "undo" else "После операции", ordinal, label,
+                        tr("До операции") if stack == "undo" else tr("После операции"), ordinal, tr(label),
                         created, f"{size} B" if size else "—",
                     ))
                 if selected_iid and tree.exists(selected_iid):
@@ -2382,15 +2398,15 @@ class Is2Studio(tk.Tk):
             return
         selected = tree.selection()
         if not selected or selected[0] == "current":
-            button.configure(state="disabled", text="Перейти к состоянию…")
+            button.configure(state="disabled", text=tr("Перейти к состоянию…"))
             return
         stack = selected[0].split(":", 1)[0]
         if stack == "undo":
-            button.configure(state="normal", text="Перейти до операции")
+            button.configure(state="normal", text=tr("Перейти до операции"))
         elif stack == "redo":
-            button.configure(state="normal", text="Перейти после операции")
+            button.configure(state="normal", text=tr("Перейти после операции"))
         else:
-            button.configure(state="disabled", text="Перейти к состоянию…")
+            button.configure(state="disabled", text=tr("Перейти к состоянию…"))
 
     def _jump_history_selection(self):
         if self.doc is None or self.history_tree is None:
@@ -2404,10 +2420,10 @@ class Is2Studio(tk.Tk):
             current = self._document_snapshot() or b""
             snapshot, labels = self.history.jump_to(current, stack=stack, ordinal=ordinal)
             label = " → ".join(labels)
-            operation = "Переход к состоянию до операции" if stack == "undo" else "Переход к состоянию после операции"
+            operation = tr("Переход к состоянию до операции") if stack == "undo" else tr("Переход к состоянию после операции")
             self._restore_history_snapshot(snapshot, label, operation)
         except Exception as exc:
-            messagebox.showerror("История действий", str(exc), parent=self)
+            messagebox.showerror(tr("История действий"), str(exc), parent=self)
 
     def _commit_link_repairs_batch(self, replacements: dict[str, str], clears: list[str]) -> dict:
         """Apply a validated multi-endpoint repair as one undoable transaction."""
@@ -2434,11 +2450,11 @@ class Is2Studio(tk.Tk):
             return
         issues = link_integrity_report(self.doc)["issues"]
         if not issues:
-            messagebox.showinfo("Исправление ссылок", "Неразрешённых типизированных ссылок не обнаружено.", parent=self)
+            messagebox.showinfo(tr("Исправление ссылок"), tr("Неразрешённых типизированных ссылок не обнаружено."), parent=self)
             return
 
         dialog = tk.Toplevel(self)
-        dialog.title("Диагностика и пакетное восстановление ссылок")
+        dialog.title(tr("Диагностика и пакетное восстановление ссылок"))
         dialog.geometry("980x650")
         dialog.minsize(780, 520)
         dialog.transient(self)
@@ -2446,9 +2462,7 @@ class Is2Studio(tk.Tk):
         outer.pack(fill="both", expand=True)
         ttk.Label(
             outer,
-            text=(f"Найдено неразрешённых endpoint-ов: {len(issues)}. "
-                  "Соберите пакет исправлений, проверьте его и примените одной операцией. "
-                  "PzKpfw не угадывает исходные ID."),
+            text=tr("Найдены неразрешённые конечные точки: {count}. Сформируйте пакет исправлений, просмотрите его и примените одной операцией. PzKpfw не угадывает исходные ID.").format(count=len(issues)),
             wraplength=900,
         ).pack(anchor="w", pady=(0, 8))
 
@@ -2457,7 +2471,7 @@ class Is2Studio(tk.Tk):
             ("selector", "Запись / поле", 255), ("old", "Повреждённый ID", 125),
             ("domain", "Ожидаемый тип объекта", 245), ("policy", "Снятие", 145),
         ):
-            tree.heading(key, text=title)
+            tree.heading(key, text=tr(title))
             tree.column(key, width=width, anchor="w")
         tree.pack(fill="both", expand=True)
         by_selector = {item["selector"]: item for item in issues}
@@ -2465,41 +2479,41 @@ class Is2Studio(tk.Tk):
         clears: set[str] = set()
         prepared: dict[str, object] = {}
 
-        controls = ttk.LabelFrame(outer, text="Подготовка исправления выбранного endpoint-а", padding=8)
+        controls = ttk.LabelFrame(outer, text=tr("Подготовка исправления выбранного endpoint-а"), padding=8)
         controls.pack(fill="x", pady=(8, 0))
-        ttk.Label(controls, text="Новый ID:").grid(row=0, column=0, sticky="w")
+        ttk.Label(controls, text=tr("Новый ID:")).grid(row=0, column=0, sticky="w")
         target_var = tk.StringVar(value="")
         target_combo = ttk.Combobox(controls, textvariable=target_var, state="readonly", width=28, values=())
         target_combo.grid(row=0, column=1, sticky="w", padx=6)
-        policy_var = tk.StringVar(value="Выберите повреждённую ссылку выше.")
-        ttk.Label(controls, textvariable=policy_var, wraplength=820).grid(row=1, column=0, columnspan=4, sticky="w", pady=(5, 0))
+        policy_var = tk.StringVar(value=tr("Выберите повреждённую ссылку выше."))
+        ttk.Label(controls, textvariable=policy_var, wraplength=820).grid(row=1, column=0, columnspan=2, sticky="w", pady=(5, 0))
 
-        queued = ttk.LabelFrame(outer, text="Пакет исправлений — все операции будут одной записью Undo", padding=6)
+        queued = ttk.LabelFrame(outer, text=tr("Пакет исправлений — все операции будут одной записью Undo"), padding=6)
         queued.pack(fill="both", expand=True, pady=(8, 0))
         staged_tree = GridTreeview(queued, columns=("selector", "operation", "target"), show="headings", height=5)
-        for key, title, width in (("selector", "Endpoint", 390), ("operation", "Операция", 150), ("target", "Новый ID", 140)):
-            staged_tree.heading(key, text=title)
+        for key, title, width in (("selector", "Конечная точка", 390), ("operation", "Операция", 150), ("target", "Новый ID", 140)):
+            staged_tree.heading(key, text=tr(title))
             staged_tree.column(key, width=width, anchor="w")
         staged_tree.pack(fill="both", expand=True)
 
         action_bar = ttk.Frame(outer)
         action_bar.pack(fill="x", pady=(8, 0))
-        add_button = ttk.Button(action_bar, text="Добавить переназначение", state="disabled")
-        clear_button = ttk.Button(action_bar, text="Добавить снятие", state="disabled")
-        preview_button = ttk.Button(action_bar, text="Предпросмотр пакета", state="disabled")
-        apply_button = ttk.Button(action_bar, text="Применить пакет", state="disabled")
+        add_button = ttk.Button(action_bar, text=tr("Добавить переназначение"), state="disabled")
+        clear_button = ttk.Button(action_bar, text=tr("Добавить снятие"), state="disabled")
+        preview_button = ttk.Button(action_bar, text=tr("Предпросмотр пакета"), state="disabled")
+        apply_button = ttk.Button(action_bar, text=tr("Применить пакет"), state="disabled")
         add_button.pack(side="left")
         clear_button.pack(side="left", padx=5)
         preview_button.pack(side="left", padx=(12, 5))
         apply_button.pack(side="left")
-        ttk.Button(action_bar, text="Закрыть", command=dialog.destroy).pack(side="right")
+        ttk.Button(action_bar, text=tr("Закрыть"), command=dialog.destroy).pack(side="right")
 
         def render_queue():
             staged_tree.delete(*staged_tree.get_children(""))
             for selector, target in replacements.items():
-                staged_tree.insert("", "end", iid=selector, values=(selector, "Переназначить", target))
+                staged_tree.insert("", "end", iid=selector, values=(selector, tr("Переназначить"), target))
             for selector in sorted(clears):
-                staged_tree.insert("", "end", iid=selector, values=(selector, "Снять endpoint", "—"))
+                staged_tree.insert("", "end", iid=selector, values=(selector, tr("Снять endpoint"), "—"))
             prepared.clear()
             preview_button.configure(state="normal" if replacements or clears else "disabled")
             apply_button.configure(state="disabled")
@@ -2521,13 +2535,13 @@ class Is2Studio(tk.Tk):
             target_var.set("")
             add_button.configure(state="normal" if targets else "disabled")
             clear_button.configure(state="normal" if item["can_clear"] else "disabled")
-            policy_var.set(item["clear_reason"] + f" Доступно целевых ID: {len(targets)}.")
+            policy_var.set(tr(item["clear_reason"]) + " " + tr("Доступно целевых ID: {count}.").format(count=len(targets)))
 
         def stage_remap():
             selection = tree.selection()
             target = target_var.get().strip()
             if not selection or not target:
-                messagebox.showwarning("Пакет исправлений", "Выберите endpoint и существующий ID.", parent=dialog)
+                messagebox.showwarning(tr("Пакет исправлений"), tr("Выберите endpoint и существующий ID."), parent=dialog)
                 return
             selector = selection[0]
             replacements[selector] = target
@@ -2550,46 +2564,47 @@ class Is2Studio(tk.Tk):
             try:
                 candidate, result = apply_link_repairs(self.doc, replacements, clears=sorted(clears))
                 if candidate.semantic_snapshot() == self.doc.semantic_snapshot():
-                    raise ValueError("Пакет не изменяет документ")
+                    raise ValueError(tr("Пакет исправлений не изменяет документ."))
                 prepared["source"] = self._document_snapshot()
                 prepared["report"] = result
                 lines = [
-                    f"Исправлений в пакете: {result['summary']['applied_count']}",
-                    f"Осталось неразрешённых endpoint-ов: {result['summary']['remaining_dangling_count']}",
-                    f"Ошибок глубокой проверки: {result['summary']['validation_issue_count']}",
+                    tr("Исправлений в пакете: {count}").format(count=result['summary']['applied_count']),
+                    tr("Осталось неразрешённых endpoint-ов: {count}").format(count=result['summary']['remaining_dangling_count']),
+                    tr("Ошибок глубокой проверки: {count}").format(count=result['summary']['validation_issue_count']),
                     "",
                 ]
                 for item in result["applied"]:
-                    new_value = item["new_id"] if item["new_id"] is not None else "снятие"
-                    lines.append(f"{item['selector']}: {item['old_id']} → {new_value}")
-                messagebox.showinfo("Предварительный просмотр пакета", "\n".join(lines), parent=dialog)
+                    new_value = item["new_id"] if item["new_id"] is not None else tr("снятие")
+                    lines.append(tr("{selector}: {old_id} → {new_id}").format(
+                        selector=item['selector'], old_id=item['old_id'], new_id=new_value
+                    ))
+                messagebox.showinfo(tr("Предварительный просмотр пакета"), "\n".join(lines), parent=dialog)
                 apply_button.configure(state="normal" if result["summary"]["validation_issue_count"] == 0 else "disabled")
             except Exception as exc:
                 prepared.clear()
                 apply_button.configure(state="disabled")
-                messagebox.showerror("Пакет исправлений отклонён", str(exc), parent=dialog)
+                messagebox.showerror(tr("Пакет исправлений отклонён"), str(exc), parent=dialog)
 
         def apply_batch():
             if not prepared or prepared.get("source") != self._document_snapshot():
-                messagebox.showwarning("Пакет исправлений", "Сначала выполните предварительный просмотр пакета.", parent=dialog)
+                messagebox.showwarning(tr("Пакет исправлений"), tr("Сначала выполните предварительный просмотр пакета."), parent=dialog)
                 return
             result = prepared.get("report")
             if not isinstance(result, dict):
                 return
             count = result["summary"]["applied_count"]
             if not messagebox.askyesno(
-                "Применить пакет",
-                f"Применить {count} исправлений одной операцией?\n\n"
-                "Документ изменится только в памяти редактора. Файл на диске не перезаписывается.",
+                tr("Применить пакет"),
+                tr("Применить {count} исправлений одной операцией?\n\nДокумент изменится только в памяти редактора. Файл на диске не перезаписывается.").format(count=count),
                 parent=dialog,
             ):
                 return
             try:
                 self._commit_link_repairs_batch(replacements, sorted(clears))
-                self.status.set(f"Пакет исправлений применён: {count} операций")
+                self.status.set(tr_dynamic(f"Пакет исправлений применён: {count} операций"))
                 dialog.destroy()
             except Exception as exc:
-                messagebox.showerror("Пакет исправлений", str(exc), parent=dialog)
+                messagebox.showerror(tr("Пакет исправлений"), str(exc), parent=dialog)
 
         add_button.configure(command=stage_remap)
         clear_button.configure(command=stage_clear)
@@ -2599,8 +2614,8 @@ class Is2Studio(tk.Tk):
         for item in issues:
             selector = item["selector"]
             tree.insert("", "end", iid=selector, values=(
-                selector, item["endpoint_id"], item["expected_domain_label"],
-                "Разрешено" if item["can_clear"] else "Запрещено",
+                selector, item["endpoint_id"], tr(item["expected_domain_label"]),
+                tr("Разрешено") if item["can_clear"] else tr("Запрещено"),
             ))
         if issues:
             tree.selection_set(issues[0]["selector"])
@@ -2612,7 +2627,7 @@ class Is2Studio(tk.Tk):
         if self.doc is None:
             return
         reference_name = filedialog.askopenfilename(
-            parent=self, title="Выберите старую версию проекта для сравнения",
+            parent=self, title=tr("Выберите старую версию проекта для сравнения"),
             filetypes=[("IS-2 project", "*.is2 *.xml"), ("All files", "*.*")],
         )
         if not reference_name:
@@ -2621,26 +2636,26 @@ class Is2Studio(tk.Tk):
             reference = ProjectDocument.load(reference_name)
             diff = compare_documents(reference, self.doc)
         except Exception as exc:
-            messagebox.showerror("Сравнение проектов", str(exc), parent=self)
+            messagebox.showerror(tr("Сравнение проектов"), str(exc), parent=self)
             return
         if not diff.operations:
-            messagebox.showinfo("Сравнение проектов", "Семантических различий не обнаружено.", parent=self)
-            self.status.set("Сравнение версий: различий нет")
+            messagebox.showinfo(tr("Сравнение проектов"), tr("Семантических различий не обнаружено."), parent=self)
+            self.status.set(tr("Сравнение версий: различий нет"))
             return
 
         dialog = tk.Toplevel(self)
-        dialog.title("Сравнение версий .is2 — выборочное восстановление")
+        dialog.title(tr("Сравнение версий .is2 — выборочное восстановление"))
         dialog.geometry("1160x700")
         dialog.minsize(900, 540)
         dialog.transient(self)
         summary = diff.summary
         ttk.Label(
             dialog,
-            text=(f"Старая версия: {Path(reference_name).name}    |    "
-                  f"Текущая: {self.path.name if self.path else 'несохранённый проект'}\n"
-                  f"Всего изменений: {summary['total']} · удалено: {summary['removed_in_current']} · "
-                  f"добавлено: {summary['added_in_current']} · атрибуты: {summary['modified_attributes']} · "
-                  f"текст: {summary['modified_text']} · неоднозначных: {summary['ambiguous']}"),
+            text=tr("Сравниваемая версия: {reference}    |    Текущая: {current}\nИзменений: {total} · удалено: {removed} · добавлено: {added} · атрибуты: {attributes} · текст: {text} · неоднозначных: {ambiguous}").format(
+                reference=Path(reference_name).name,
+                current=self.path.name if self.path else tr("несохранённый проект"),
+                total=summary['total'], removed=summary['removed_in_current'], added=summary['added_in_current'],
+                attributes=summary['modified_attributes'], text=summary['modified_text'], ambiguous=summary['ambiguous']),
             padding=8, justify="left",
         ).pack(fill="x")
         if diff.warnings:
@@ -2656,8 +2671,8 @@ class Is2Studio(tk.Tk):
         columns = ("kind", "path", "description", "reference", "current", "risk")
         tree = GridTreeview(table_frame, columns=columns, show="headings", selectmode="extended")
         headings = {
-            "kind": "Изменение", "path": "XML-путь", "description": "Описание",
-            "reference": "Старая версия", "current": "Текущая версия", "risk": "Сопоставление",
+            "kind": tr("Изменение"), "path": tr("XML-путь"), "description": tr("Описание"),
+            "reference": tr("Старая версия"), "current": tr("Текущая версия"), "risk": tr("Сопоставление"),
         }
         widths = {"kind": 150, "path": 300, "description": 260, "reference": 150, "current": 150, "risk": 130}
         for column in columns:
@@ -2672,10 +2687,10 @@ class Is2Studio(tk.Tk):
         table_frame.rowconfigure(0, weight=1); table_frame.columnconfigure(0, weight=1)
 
         kind_labels = {
-            "removed": "Удалено в текущей",
-            "added": "Добавлено в текущей",
-            "modified_attribute": "Изменён атрибут",
-            "modified_text": "Изменён текст",
+            "removed": tr("Удалено в текущей"),
+            "added": tr("Добавлено в текущей"),
+            "modified_attribute": tr("Изменён атрибут"),
+            "modified_text": tr("Изменён текст"),
         }
         operations = {item.operation_id: item for item in diff.operations}
         for operation in diff.operations:
@@ -2684,9 +2699,9 @@ class Is2Studio(tk.Tk):
             old_display = "∅" if old_value is None else str(old_value).replace("\n", " ")[:140]
             new_display = "∅" if new_value is None else str(new_value).replace("\n", " ")[:140]
             if operation.kind == "removed":
-                old_display, new_display = f"XML-фрагмент <{operation.tag}>", "отсутствует"
+                old_display, new_display = tr("Фрагмент XML <{tag}>").format(tag=operation.tag), tr("отсутствует")
             elif operation.kind == "added":
-                old_display, new_display = "отсутствует", f"XML-фрагмент <{operation.tag}>"
+                old_display, new_display = tr("отсутствует"), tr("Фрагмент XML <{tag}>").format(tag=operation.tag)
             tree.insert("", "end", iid=operation.operation_id, values=(
                 kind_labels.get(operation.kind, operation.kind),
                 operation.path and "/" + "/".join(
@@ -2694,7 +2709,7 @@ class Is2Studio(tk.Tk):
                     else f"{part['tag']}[{part['index']}]" for part in operation.path
                 ) or "/project",
                 operation.description, old_display, new_display,
-                "ПОЗИЦИОННО" if operation.ambiguous else ("Восстановимо" if operation.can_restore else "Только просмотр"),
+                tr("ПОЗИЦИОННЫЙ") if operation.ambiguous else (tr("Можно восстановить") if operation.can_restore else tr("Только чтение")),
             ))
         detail = tk.Text(detail_frame, height=8, wrap="word", font=("Consolas", 9), state="disabled")
         detail.pack(fill="both", expand=True)
@@ -2714,9 +2729,9 @@ class Is2Studio(tk.Tk):
         allow_ambiguous = tk.BooleanVar(value=False)
         revert_additions = tk.BooleanVar(value=False)
         include_related = tk.BooleanVar(value=False)
-        ttk.Checkbutton(controls, text="Разрешить позиционное восстановление неоднозначных узлов", variable=allow_ambiguous).pack(side="left")
-        ttk.Checkbutton(controls, text="Удалять добавленные узлы", variable=revert_additions).pack(side="left", padx=(12, 0))
-        ttk.Checkbutton(controls, text="Включать связанные записи", variable=include_related).pack(side="left", padx=(12, 0))
+        ttk.Checkbutton(controls, text=tr("Разрешить позиционное восстановление неоднозначных узлов"), variable=allow_ambiguous).pack(side="left")
+        ttk.Checkbutton(controls, text=tr("Удалять добавленные узлы"), variable=revert_additions).pack(side="left", padx=(12, 0))
+        ttk.Checkbutton(controls, text=tr("Включать связанные записи"), variable=include_related).pack(side="left", padx=(12, 0))
 
         def select_safe():
             safe = [item.operation_id for item in diff.operations if item.can_restore and not item.ambiguous]
@@ -2727,7 +2742,7 @@ class Is2Studio(tk.Tk):
         def restore_selected():
             selected = list(tree.selection())
             if not selected:
-                messagebox.showinfo("Выборочное восстановление", "Выберите одну или несколько строк.", parent=dialog)
+                messagebox.showinfo(tr("Выборочное восстановление"), tr("Выберите одну или несколько строк."), parent=dialog)
                 return
             bundle_report = None
             effective_selection = selected
@@ -2737,15 +2752,15 @@ class Is2Studio(tk.Tk):
                         reference, self.doc, selected,
                     )
             except Exception as exc:
-                messagebox.showerror("Анализ связанных записей", str(exc), parent=dialog)
+                messagebox.showerror(tr("Анализ связанных записей"), str(exc), parent=dialog)
                 return
             added_count = len(effective_selection) - len(selected)
             question = (
-                f"Применить {len(effective_selection)} операций к текущему проекту?"
-                + (f"\n\nАвтоматически включено связанных операций: {added_count}." if added_count else "")
-                + "\n\nИзменится только документ в памяти. Запись в .is2 выполняется отдельно кнопкой «Сохранить»."
+                tr("Применить {count} операций к текущему проекту?").format(count=len(effective_selection))
+                + ("\n\n" + tr("Автоматически включено связанных операций: {count}.").format(count=added_count) if added_count else "")
+                + "\n\n" + tr("Изменится только документ в памяти. Запись в .is2 выполняется отдельно кнопкой «Сохранить».")
             )
-            if not messagebox.askyesno("Подтверждение восстановления", question, parent=dialog):
+            if not messagebox.askyesno(tr("Подтверждение восстановления"), question, parent=dialog):
                 return
             try:
                 candidate, report = apply_selected_restores(
@@ -2763,36 +2778,36 @@ class Is2Studio(tk.Tk):
                 self.refresh_all()
                 dialog.destroy()
                 validation_note = (
-                    "Проверка структуры: PASS"
+                    tr("Проверка структуры: PASS")
                     if report["validation_issue_count_after"] == 0
-                    else f"Новых ошибок не добавлено; прежних замечаний остаётся: {report['validation_issue_count_after']}"
+                    else tr("Новых ошибок не добавлено; прежних замечаний остаётся: {count}").format(count=report['validation_issue_count_after'])
                 )
-                bundle_note = f"\nСвязанных операций включено автоматически: {added_count}." if bundle_report else ""
+                bundle_note = ("\n" + tr("Связанных операций включено автоматически: {count}.").format(count=added_count)) if bundle_report else ""
                 if bundle_report and bundle_report.get("warnings"):
-                    bundle_note += "\nВнимание: есть непрозрачные записи; проверьте их вручную."
+                    bundle_note += "\n" + tr("Внимание: есть непрозрачные записи; проверьте их вручную.")
                 messagebox.showinfo(
-                    "Выборочное восстановление",
-                    f"Восстановлено операций: {report['restored_count']}{bundle_note}\n"
-                    f"{validation_note}\nПроверка XML writer: PASS\n\n"
-                    "Изменения находятся в памяти. Сохраните проект, чтобы записать результат в отдельный .is2 файл.",
+                    tr("Выборочное восстановление"),
+                    tr("Восстановлено операций: {count}{bundle_note}\n{validation_note}\nПроверка XML writer: PASS\n\nИзменения находятся в памяти. Сохраните проект, чтобы записать результат в отдельный .is2 файл.").format(
+                        count=report['restored_count'], bundle_note=bundle_note, validation_note=validation_note
+                    ),
                     parent=self,
                 )
             except Exception as exc:
-                messagebox.showerror("Восстановление заблокировано", str(exc), parent=dialog)
+                messagebox.showerror(tr("Восстановление заблокировано"), str(exc), parent=dialog)
 
-        ttk.Button(controls, text="Выбрать безопасные", command=select_safe).pack(side="right", padx=(6, 0))
-        ttk.Button(controls, text="Восстановить выбранное", command=restore_selected).pack(side="right", padx=(6, 0))
-        ttk.Button(controls, text="Закрыть", command=dialog.destroy).pack(side="right", padx=(6, 0))
+        ttk.Button(controls, text=tr("Выбрать безопасные"), command=select_safe).pack(side="right", padx=(6, 0))
+        ttk.Button(controls, text=tr("Восстановить выбранное"), command=restore_selected).pack(side="right", padx=(6, 0))
+        ttk.Button(controls, text=tr("Закрыть"), command=dialog.destroy).pack(side="right", padx=(6, 0))
         dialog.bind("<Escape>", lambda _event: dialog.destroy())
         dialog.grab_set()
-        self.status.set(f"Сравнение версий: {summary['total']} изменений")
+        self.status.set(tr("Сравнение версий: {count} изменений").format(count=summary['total']))
 
     def show_relationship_graph_diff(self):
         """Open a side-by-side visual comparison of recovered relationship graphs."""
         if self.doc is None:
             return
         reference_name = filedialog.askopenfilename(
-            parent=self, title="Выберите версию проекта для сравнения графов",
+            parent=self, title=tr("Выберите версию проекта для сравнения графов"),
             filetypes=[("IS-2 project", "*.is2 *.xml"), ("All files", "*.*")],
         )
         if not reference_name:
@@ -2803,20 +2818,18 @@ class Is2Studio(tk.Tk):
             new_graph = build_relationship_graph(self.doc)
             report = compare_relationship_graphs(reference, self.doc)
         except Exception as exc:
-            messagebox.showerror("Сравнение графов", str(exc), parent=self)
+            messagebox.showerror(tr("Сравнение графов"), str(exc), parent=self)
             return
 
         dialog = tk.Toplevel(self)
-        dialog.title("Сопоставление графов связей — PzKpfw")
+        dialog.title(tr("Сопоставление графов связей — PzKpfw"))
         dialog.geometry("1420x820")
         dialog.minsize(1000, 620)
         dialog.transient(self)
         summary = report["summary"]
         ttk.Label(
             dialog,
-            text=(f"Добавлено узлов: {summary['added_nodes']} · удалено: {summary['removed_nodes']} · "
-                  f"изменено: {summary['changed_nodes']} · новых связей: {summary['added_edges']} · "
-                  f"удалено связей: {summary['removed_edges']} · перенаправлено конечных точек: {summary['rewired_edges']}"),
+            text=tr("Добавлено узлов: {added_nodes} · удалено: {removed_nodes} · изменено: {changed_nodes} · добавлено связей: {added_edges} · удалено связей: {removed_edges} · переназначено конечных точек: {rewired_edges}").format(**summary),
             padding=8, justify="left",
         ).pack(fill="x")
         if report["warnings"]:
@@ -2909,33 +2922,31 @@ class Is2Studio(tk.Tk):
                 canvas.create_text(x, y + 16, text=label, font=("TkDefaultFont", 8), width=width - 8)
             return frame
 
-        add_graph_panel(f"СТАРАЯ ВЕРСИЯ · {Path(reference_name).name}", old_graph, "reference")
-        add_graph_panel(f"ТЕКУЩАЯ ВЕРСИЯ · {self.path.name if self.path else 'без файла'}", new_graph, "current")
+        add_graph_panel(tr("Старая версия · {name}").format(name=Path(reference_name).name), old_graph, "reference")
+        add_graph_panel(tr("Текущая версия · {name}").format(name=self.path.name if self.path else tr("нет файла")), new_graph, "current")
 
         footer = ttk.Frame(dialog, padding=8)
         footer.pack(fill="x")
         details = (
-            "Оранжевый — изменённый узел/конечная точка; красный — удалённое из текущей версии; "
-            "зелёный — добавленное в текущей версии. Рёбра показывают слоты конечных точек и не задают "
-            "дополнительную семантику направления.\n"
-            + "\n".join(report["warnings"])
+            tr("Оранжевый — изменённый узел/конечная точка; красный — удалённое из текущей версии; зелёный — добавленное в текущей версии. Рёбра показывают слоты конечных точек и не задают дополнительную семантику направления.")
+            + "\n" + "\n".join(report["warnings"])
         )
         ttk.Label(footer, text=details, wraplength=1200, justify="left").pack(side="left", fill="x", expand=True)
-        ttk.Button(footer, text="Закрыть", command=dialog.destroy).pack(side="right")
-        self.status.set("Сравнение графов связей завершено")
+        ttk.Button(footer, text=tr("Закрыть"), command=dialog.destroy).pack(side="right")
+        self.status.set(tr("Сравнение графов связей завершено"))
 
     def show_three_way_merge(self):
         """Resolve a three-way merge against the open local project."""
         if self.doc is None:
             return
         base_name = filedialog.askopenfilename(
-            parent=self, title="Выберите общий базовый проект",
+            parent=self, title=tr("Выберите общий базовый проект"),
             filetypes=[("IS-2 project", "*.is2 *.xml"), ("All files", "*.*")],
         )
         if not base_name:
             return
         theirs_name = filedialog.askopenfilename(
-            parent=self, title="Выберите входящую версию проекта",
+            parent=self, title=tr("Выберите входящую версию проекта"),
             filetypes=[("IS-2 project", "*.is2 *.xml"), ("All files", "*.*")],
         )
         if not theirs_name:
@@ -2945,23 +2956,23 @@ class Is2Studio(tk.Tk):
             theirs = ProjectDocument.load(theirs_name)
             preview, report = merge_documents(base, self.doc, theirs)
         except Exception as exc:
-            messagebox.showerror("Трёхстороннее объединение", str(exc), parent=self)
+            messagebox.showerror(tr("Трёхстороннее объединение"), str(exc), parent=self)
             return
 
         dialog = tk.Toplevel(self)
-        dialog.title("Трёхстороннее объединение .is2")
+        dialog.title(tr("Трёхстороннее объединение .is2"))
         dialog.geometry("1120x700")
         dialog.minsize(860, 520)
         dialog.transient(self)
         ttk.Label(
             dialog,
-            text=(f"База: {Path(base_name).name} · локальная версия: {self.path.name if self.path else 'без файла'} · "
-                  f"входящая: {Path(theirs_name).name}\n"
-                  f"Конфликтов: {report['conflict_count']} · не разрешено: {report['unresolved_conflict_count']}"),
+            text=tr("База: {base} · локальная версия: {local} · входящая версия: {incoming}\nКонфликтов: {conflicts} · неразрешённых: {unresolved}").format(
+                base=Path(base_name).name, local=self.path.name if self.path else tr("нет файла"),
+                incoming=Path(theirs_name).name, conflicts=report['conflict_count'], unresolved=report['unresolved_conflict_count']),
             padding=8, justify="left",
         ).pack(fill="x")
         ttk.Label(dialog,
-                  text="Независимые изменения объединяются автоматически. Неразрешённые конфликты сохраняют локальное значение в предварительном просмотре и блокируют применение.",
+                  text=tr("Независимые изменения объединяются автоматически. Неразрешённые конфликты сохраняют локальное значение в предварительном просмотре и блокируют применение."),
                   foreground="#9a3412", wraplength=1060, padding=(8, 0, 8, 6)).pack(fill="x")
 
         split = ttk.Panedwindow(dialog, orient="vertical")
@@ -2972,7 +2983,7 @@ class Is2Studio(tk.Tk):
         split.add(detail_frame, weight=2)
         columns = ("kind", "path", "field", "resolution")
         tree = GridTreeview(list_frame, columns=columns, show="headings", selectmode="browse")
-        headings = {"kind": "Конфликт", "path": "XML-путь", "field": "Поле", "resolution": "Решение"}
+        headings = {"kind": tr("Конфликт"), "path": tr("XML-путь"), "field": tr("Поле"), "resolution": tr("Решение")}
         widths = {"kind": 180, "path": 490, "field": 150, "resolution": 150}
         for column in columns:
             tree.heading(column, text=headings[column])
@@ -2987,7 +2998,7 @@ class Is2Studio(tk.Tk):
         resolutions: dict[str, str] = {}
         for conflict in report["conflicts"]:
             tree.insert("", "end", iid=conflict["conflict_id"], values=(
-                conflict["kind"], conflict["path"], conflict.get("field") or "—", "Не разрешено",
+                conflict["kind"], conflict["path"], conflict.get("field") or "—", tr("Неразрешённое"),
             ))
 
         def show_conflict(_event=None):
@@ -3012,12 +3023,12 @@ class Is2Studio(tk.Tk):
             conflict_id = chosen[0]
             resolutions[conflict_id] = choice
             values = list(tree.item(conflict_id, "values"))
-            values[-1] = {"ours": "Локальная", "theirs": "Входящая", "base": "Базовая"}[choice]
+            values[-1] = {"ours": tr("Локальная"), "theirs": tr("Входящая"), "base": tr("Базовая")}[choice]
             tree.item(conflict_id, values=values)
 
-        ttk.Button(choice_bar, text="Оставить локальную", command=lambda: set_choice("ours")).pack(side="left")
-        ttk.Button(choice_bar, text="Принять входящую", command=lambda: set_choice("theirs")).pack(side="left", padx=6)
-        ttk.Button(choice_bar, text="Вернуться к базе", command=lambda: set_choice("base")).pack(side="left")
+        ttk.Button(choice_bar, text=tr("Оставить локальную"), command=lambda: set_choice("ours")).pack(side="left")
+        ttk.Button(choice_bar, text=tr("Принять входящую"), command=lambda: set_choice("theirs")).pack(side="left", padx=6)
+        ttk.Button(choice_bar, text=tr("Вернуться к базе"), command=lambda: set_choice("base")).pack(side="left")
 
         actions = ttk.Frame(dialog, padding=8)
         actions.pack(fill="x")
@@ -3027,8 +3038,8 @@ class Is2Studio(tk.Tk):
                 if not merge_report["ready_to_write"]:
                     unresolved = [item["conflict_id"] for item in merge_report["conflicts"] if item["resolution"] is None]
                     messagebox.showwarning(
-                        "Есть неразрешённые конфликты",
-                        "Перед применением выберите сторону для каждого конфликта: " + ", ".join(unresolved),
+                        tr("Есть неразрешённые конфликты"),
+                        tr("Перед применением выберите сторону для каждого конфликта: {conflicts}").format(conflicts=", ".join(unresolved)),
                         parent=dialog,
                     )
                     return
@@ -3041,20 +3052,18 @@ class Is2Studio(tk.Tk):
                 self.refresh_all()
                 dialog.destroy()
                 messagebox.showinfo(
-                    "Объединение завершено",
-                    f"Конфликтов разрешено: {merge_report['conflict_count']}\n"
-                    f"Проверка структуры: PASS\nПроверка XML writer: PASS\n\n"
-                    "Изменения находятся в памяти. Сохраните проект отдельно, чтобы записать результат.",
+                    tr("Объединение завершено"),
+                    tr("Конфликтов разрешено: {count}\nПроверка структуры: PASS\nПроверка XML writer: PASS\n\nИзменения находятся в памяти. Сохраните проект отдельно, чтобы записать результат.").format(count=merge_report['conflict_count']),
                     parent=self,
                 )
             except Exception as exc:
-                messagebox.showerror("Объединение заблокировано", str(exc), parent=dialog)
-        ttk.Button(actions, text="Применить объединение", command=apply_merge).pack(side="right")
-        ttk.Button(actions, text="Закрыть", command=dialog.destroy).pack(side="right", padx=(0, 6))
+                messagebox.showerror(tr("Объединение заблокировано"), str(exc), parent=dialog)
+        ttk.Button(actions, text=tr("Применить объединение"), command=apply_merge).pack(side="right")
+        ttk.Button(actions, text=tr("Закрыть"), command=dialog.destroy).pack(side="right", padx=(0, 6))
         if report["conflicts"]:
             tree.selection_set(report["conflicts"][0]["conflict_id"])
             show_conflict()
-        self.status.set(f"Предварительный просмотр объединения: {report['conflict_count']} конфликтов")
+        self.status.set(tr("Предварительный просмотр объединения: {count} конфликтов").format(count=report['conflict_count']))
         dialog.bind("<Escape>", lambda _event: dialog.destroy())
         dialog.grab_set()
 
@@ -3062,31 +3071,45 @@ class Is2Studio(tk.Tk):
         if self.doc is None:
             return
         report = dependency_report(self.doc)
-        lines = [f"Узлов проекта: {report['entity_count']}", f"Известных ссылок: {report['reference_count']}", f"Неразрешённых ссылок: {report['dangling_count']}", f"Непрозрачных записей: {report['opaque_count']}", ""]
+        lines = [
+            tr("Узлов проекта: {count}").format(count=report['entity_count']),
+            tr("Известных ссылок: {count}").format(count=report['reference_count']),
+            tr("Неразрешённых ссылок: {count}").format(count=report['dangling_count']),
+            tr("Непрозрачных записей: {count}").format(count=report['opaque_count']),
+            "",
+        ]
         for item in report["entities"]:
             if item["references"] or item["opaque_risk"]:
-                risk = "BLOCKED/UNKNOWN" if item["opaque_risk"] else "REFERENCED"
-                lines.append(f"{item['domain']} #{item['id']} — {item['label']} [{risk}]")
+                risk = tr("ЗАБЛОКИРОВАНО/НЕИЗВЕСТНО") if item["opaque_risk"] else tr("ЕСТЬ ССЫЛКИ")
+                domain_labels = {
+                    "action": tr("Действие"), "category": tr("Категория"),
+                    "spz_element": tr("Элемент spz"), "parameter": tr("Параметр"),
+                    "object": tr("Объект"),
+                }
+                lines.append(f"{domain_labels.get(item['domain'], item['domain'])} #{item['id']} — {item['label']} [{risk}]")
                 for reference in item["references"]:
                     lines.append(f"  • {reference['relation_kind']}[{reference['record_index']}].{reference['slot']}")
                 if item["opaque_risk"]:
-                    lines.append("  • Есть непрозрачные записи: операция требует дополнительной проверки")
+                    lines.append("  • " + tr("Есть непрозрачные записи: операция требует дополнительной проверки"))
                 else:
-                    lines.append("  • Удаление возможно только через проверенный каскад, если модель подтвердит его безопасность")
+                    lines.append("  • " + tr("Удаление возможно только через проверенный каскад, если модель подтвердит его безопасность"))
         if len(lines) == 5:
-            lines.append("Видимых зависимостей не найдено.")
-        dialog = tk.Toplevel(self); dialog.title("Аудит зависимостей проекта"); dialog.geometry("760x520")
+            lines.append(tr("Видимых зависимостей не найдено."))
+        dialog = tk.Toplevel(self); dialog.title(tr("Аудит зависимостей проекта")); dialog.geometry("760x520")
         text = tk.Text(dialog, wrap="none", font=("Consolas", 9)); text.pack(fill="both", expand=True, padx=8, pady=8)
         text.insert("1.0", "\n".join(lines)); text.configure(state="disabled")
-        ttk.Button(dialog, text="Закрыть", command=dialog.destroy).pack(anchor="e", padx=8, pady=(0, 8))
+        ttk.Button(dialog, text=tr("Закрыть"), command=dialog.destroy).pack(anchor="e", padx=8, pady=(0, 8))
 
     def _set_title(self):
         name = self.path.name if self.path else "без проекта"
         dirty = " *" if self.dirty else ""
         self.title(f"PzKpfw — {name}{dirty}")
-        self.file_label.configure(text=(self.path.name + dirty) if self.path else "Файл не открыт")
+        self.file_label.configure(text=(self.path.name + dirty) if self.path else tr("Файл не открыт"))
 
     def _mark_dirty(self, message="Изменения не сохранены", *, operation_group=None):
+        # Localize controlled status/history templates after their IDs and
+        # counters have been formatted by the operation handler.
+        message = tr_dynamic(message)
         current = self._document_snapshot()
         previous = self._last_history_snapshot
         if current is not None:
@@ -3112,7 +3135,7 @@ class Is2Studio(tk.Tk):
         self._last_history_snapshot = snapshot
         self.dirty = self._saved_fingerprint is None or self._fingerprint(snapshot) != self._saved_fingerprint
         self.refresh_all()
-        self.status.set(f"{operation}: {label}")
+        self.status.set(f"{tr(operation)}: {label}")
         self._set_title()
         self._update_history_controls()
 
@@ -3159,7 +3182,7 @@ class Is2Studio(tk.Tk):
         return "break"
 
     def _ask_discard(self) -> bool:
-        return not self.dirty or messagebox.askyesno("Несохранённые изменения", "Сохранить изменения перед продолжением?", parent=self)
+        return not self.dirty or messagebox.askyesno(tr("Несохранённые изменения"), tr("Сохранить изменения перед продолжением?"), parent=self)
 
     def new_coursework(self):
         """Create a coursework-ready XML scaffold with one coded root action."""
@@ -3186,9 +3209,9 @@ class Is2Studio(tk.Tk):
             self.notebook.select(self.course_page)
             self.after_idle(self.course_panel._fit_scene)
             self._set_title()
-            self.status.set("Проект создан. Добавляйте действия, параметры и сохраняйте .is2 через Ctrl+S")
+            self.status.set(tr("Проект создан. Добавляйте действия, параметры и сохраняйте .is2 через Ctrl+S"))
         except Exception as exc:
-            messagebox.showerror("Новый проект", str(exc), parent=self)
+            messagebox.showerror(tr("Новый проект"), str(exc), parent=self)
 
     def new_project(self):
         if self.dirty and not self._save_prompt():
@@ -3215,12 +3238,12 @@ class Is2Studio(tk.Tk):
             self.refresh_all()
             self._set_enabled(True)
             self._set_title()
-            self.status.set("Создан новый проект. Используйте «Сохранить как…» для записи .is2")
+            self.status.set(tr("Создан новый проект. Используйте «Сохранить как…» для записи .is2"))
         except Exception as exc:
-            messagebox.showerror("Новый проект", str(exc), parent=self)
+            messagebox.showerror(tr("Новый проект"), str(exc), parent=self)
 
     def open_file(self):
-        target = filedialog.askopenfilename(parent=self, title="Открыть проект IS-2", filetypes=[("IS-2 project", "*.is2 *.xml"), ("All files", "*.*")])
+        target = filedialog.askopenfilename(parent=self, title=tr("Открыть проект IS-2"), filetypes=[("IS-2 project", "*.is2 *.xml"), ("All files", "*.*")])
         if not target:
             return
         if self.dirty and not self._save_prompt():
@@ -3239,16 +3262,19 @@ class Is2Studio(tk.Tk):
             if self.notebook.select() == str(self.course_page):
                 self.after_idle(self.course_panel._fit_scene)
             issues = doc.validate()
-            status_text = f"Открыт: {self.path.name} — {len(doc.actions)} действий, {len(doc.concept_structure.categories)} категорий; замечаний: {len(issues)}"
+            status_text = tr_dynamic(
+                f"Открыт: {self.path.name} — {len(doc.actions)} действий, "
+                f"{len(doc.concept_structure.categories)} категорий; замечаний: {len(issues)}"
+            )
             if view_warning:
-                status_text += f"; настройки графа не загружены: {view_warning}"
+                status_text += " · " + tr_dynamic(f"Настройки графа не загружены: {view_warning}")
             self.status.set(status_text)
             self._set_title()
         except Exception as exc:
-            messagebox.showerror("Ошибка открытия", str(exc), parent=self)
+            messagebox.showerror(tr("Ошибка открытия"), str(exc), parent=self)
 
     def _save_prompt(self) -> bool:
-        answer = messagebox.askyesnocancel("Несохранённые изменения", "Сохранить изменения?", parent=self)
+        answer = messagebox.askyesnocancel(tr("Несохранённые изменения"), tr("Сохранить изменения?"), parent=self)
         if answer is None:
             return False
         if answer:
@@ -3262,7 +3288,7 @@ class Is2Studio(tk.Tk):
             return self.save_as()
         issues = self.doc.validate()
         if issues:
-            messagebox.showerror("Проверка не пройдена", "Сохранение остановлено:\n\n" + "\n".join(issues[:30]), parent=self)
+            messagebox.showerror(tr("Проверка не пройдена"), tr("Сохранение остановлено:\n\n{issues}").format(issues="\n".join(issues[:30])), parent=self)
             return False
         try:
             backup_info = None
@@ -3283,18 +3309,20 @@ class Is2Studio(tk.Tk):
             self._update_history_controls()
             self.refresh_all()
             self._save_graph_view_state()
-            suffix = f"; резервная копия: {backup_info.path.name}" if backup_info else ""
-            self.status.set(f"Сохранено: {self.path}{suffix}")
+            status_text = tr_dynamic(f"Сохранено: {self.path}")
+            if backup_info:
+                status_text += tr_dynamic(f"; резервная копия: {backup_info.path.name}")
+            self.status.set(status_text)
             self._set_title()
             return True
         except Exception as exc:
-            messagebox.showerror("Ошибка сохранения", str(exc), parent=self)
+            messagebox.showerror(tr("Ошибка сохранения"), str(exc), parent=self)
             return False
 
     def save_as(self):
         if self.doc is None:
             return False
-        target = filedialog.asksaveasfilename(parent=self, title="Сохранить проект", defaultextension=".is2", filetypes=[("IS-2 project", "*.is2"), ("XML", "*.xml")])
+        target = filedialog.asksaveasfilename(parent=self, title=tr("Сохранить проект"), defaultextension=".is2", filetypes=[("IS-2 project", "*.is2"), ("XML", "*.xml")])
         if not target:
             return False
         previous = self.path
@@ -3307,14 +3335,14 @@ class Is2Studio(tk.Tk):
 
     def show_backups(self):
         if self.path is None or not self.path.exists():
-            messagebox.showinfo("Резервные копии", "Сначала сохраните проект в файл .is2.", parent=self)
+            messagebox.showinfo(tr("Резервные копии"), tr("Сначала сохраните проект в файл .is2."), parent=self)
             return
         records = list_project_backups(self.path)
         window = tk.Toplevel(self)
         window.title(f"Резервные копии — {self.path.name}")
         window.geometry("900x430")
         window.transient(self)
-        ttk.Label(window, text="Резервные копии хранятся отдельно от .is2 в .pzkpfw-backups. Восстановление текущего файла сначала создаёт rollback-копию.", padding=8, wraplength=850).pack(anchor="w")
+        ttk.Label(window, text=tr("Резервные копии хранятся отдельно от .is2 в .pzkpfw-backups. Восстановление текущего файла сначала создаёт rollback-копию."), padding=8, wraplength=850).pack(anchor="w")
         tree = GridTreeview(window, columns=("created", "size", "valid", "hash"), show="headings", selectmode="browse")
         for key, title, width in (("created", "Создана (UTC)", 220), ("size", "Размер", 90), ("valid", "XML", 90), ("hash", "SHA-256", 420)):
             tree.heading(key, text=title); tree.column(key, width=width, anchor="w")
@@ -3327,11 +3355,11 @@ class Is2Studio(tk.Tk):
         if records:
             tree.selection_set("0")
         buttons = ttk.Frame(window, padding=8); buttons.pack(fill="x")
-        backup_button = ttk.Button(buttons, text="Создать резервную копию сейчас")
+        backup_button = ttk.Button(buttons, text=tr("Создать резервную копию сейчас"))
         backup_button.pack(side="left")
-        restore_button = ttk.Button(buttons, text="Восстановить выбранную копию", state="normal" if records else "disabled")
+        restore_button = ttk.Button(buttons, text=tr("Восстановить выбранную копию"), state="normal" if records else "disabled")
         restore_button.pack(side="left", padx=6)
-        ttk.Button(buttons, text="Закрыть", command=window.destroy).pack(side="right")
+        ttk.Button(buttons, text=tr("Закрыть"), command=window.destroy).pack(side="right")
 
         def refresh_backup_rows():
             nonlocal records
@@ -3352,9 +3380,9 @@ class Is2Studio(tk.Tk):
                 self.history.note("backup", "Создана резервная копия", details=[str(info.path), info.sha256], state=self._document_snapshot())
                 self._refresh_history_window()
                 refresh_backup_rows()
-                messagebox.showinfo("Резервная копия", f"Копия проверена и сохранена:\n{info.path}", parent=window)
+                messagebox.showinfo(tr("Резервная копия"), tr("Копия проверена и сохранена:\n{path}").format(path=info.path), parent=window)
             except Exception as exc:
-                messagebox.showerror("Резервная копия", str(exc), parent=window)
+                messagebox.showerror(tr("Резервная копия"), str(exc), parent=window)
 
         def restore_selected():
             selection = tree.selection()
@@ -3362,18 +3390,17 @@ class Is2Studio(tk.Tk):
                 return
             record = by_iid[selection[0]]
             if not record.valid_xml:
-                messagebox.showerror("Восстановление", "Эта резервная копия не прошла проверку XML.", parent=window)
+                messagebox.showerror(tr("Восстановление"), tr("Эта резервная копия не прошла проверку XML."), parent=window)
                 return
             if self.dirty:
-                answer = messagebox.askyesnocancel("Несохранённые изменения", "Сохранить текущие изменения перед восстановлением?", parent=window)
+                answer = messagebox.askyesnocancel(tr("Несохранённые изменения"), tr("Сохранить текущие изменения перед восстановлением?"), parent=window)
                 if answer is None:
                     return
                 if answer and not self.save():
                     return
             if not messagebox.askyesno(
-                "Подтверждение восстановления",
-                f"Заменить текущий проект копией от {record.created_at}?\\n\\n"
-                "Текущий файл будет автоматически сохранён в отдельную rollback-копию.",
+                tr("Подтверждение восстановления"),
+                tr("Заменить текущий проект копией от {created_at}?\n\nТекущий файл будет автоматически сохранён в отдельную rollback-копию.").format(created_at=record.created_at),
                 parent=window,
             ):
                 return
@@ -3390,12 +3417,20 @@ class Is2Studio(tk.Tk):
                 self._restore_editor_state()
                 self._save_graph_view_state()
                 self._set_title()
-                self.status.set(f"Восстановлено из {record.path.name}; rollback: {rollback.path.name if rollback else 'не создавался'}")
+                self.status.set(tr("Восстановлено из {backup}; rollback: {rollback}").format(
+                    backup=record.path.name,
+                    rollback=rollback.path.name if rollback else tr("не создавался"),
+                ))
                 self._update_history_controls()
                 window.destroy()
-                messagebox.showinfo("Восстановление завершено", f"Проект восстановлен.\\nRollback-копия: {rollback.path if rollback else 'не требовалась'}", parent=self)
+                messagebox.showinfo(
+                    tr("Восстановление завершено"),
+                    tr("Проект восстановлен.\nRollback-копия: {path}").format(
+                        path=rollback.path if rollback else tr("не требовалась")
+                    ), parent=self,
+                )
             except Exception as exc:
-                messagebox.showerror("Ошибка восстановления", str(exc), parent=window)
+                messagebox.showerror(tr("Ошибка восстановления"), str(exc), parent=window)
 
         backup_button.configure(command=create_backup_now)
         restore_button.configure(command=restore_selected)
@@ -3415,7 +3450,7 @@ class Is2Studio(tk.Tk):
         self.redo_button.configure(image=(self._history_icons[2], 'disabled', self._history_icons[3]))
 
     def _tooltip_label(self):
-        return 'Подсказки: вкл' if self.tooltips_enabled.get() else 'Подсказки: выкл'
+        return tr('Подсказки: вкл') if self.tooltips_enabled.get() else tr('Подсказки: выкл')
 
     def toggle_tooltips(self):
         enabled = not self.tooltips_enabled.get()
@@ -3423,10 +3458,139 @@ class Is2Studio(tk.Tk):
         self.tooltip_button_text.set(self._tooltip_label())
         self.button_tooltips.hide()
         if not save_tooltips(enabled):
-            messagebox.showwarning('Настройки', 'Подсказки переключены, но сохранить настройку не удалось.', parent=self)
+            messagebox.showwarning(tr('Настройки'), tr('Подсказки переключены, но сохранить настройку не удалось.'), parent=self)
+
+    def _populate_language_menu(self):
+        self.language_menu.delete(0, "end")
+        for language in available_languages():
+            self.language_menu.add_radiobutton(
+                label=language.menu_label,
+                variable=self.language_code,
+                value=language.locale,
+                command=lambda code=language.locale: self.change_language(code),
+            )
+        self.language_menu.add_separator()
+        self.language_menu.add_command(label=tr("Открыть папку языков…"), command=self.open_language_folder)
+        self.language_menu.add_command(label=tr("Обновить список языков"), command=self.refresh_language_menu)
+
+    def refresh_language_menu(self):
+        """Rescan external language folders without restarting the application."""
+        discover_languages()
+        if self.language_code.get() not in {item.locale for item in available_languages()}:
+            self.language_code.set(get_language())
+        self._populate_language_menu()
+        errors = pack_errors()
+        self.status.set(tr("Список языковых пакетов обновлён."))
+        if errors:
+            messagebox.showwarning(
+                tr("Языковые пакеты"),
+                tr("Некоторые языковые пакеты не загружены:") + "\n\n" + "\n".join(errors),
+                parent=self,
+            )
+
+    def open_language_folder(self):
+        """Open the per-user locale directory and place a non-loadable template inside it."""
+        import os
+        import shutil
+        import subprocess
+        folder = user_locales_dir()
+        folder.mkdir(parents=True, exist_ok=True)
+        source = Path(__file__).resolve().parent / "locales" / "_template"
+        target = folder / "_template"
+        target.mkdir(exist_ok=True)
+        for name in ("language.json", "messages.json"):
+            src = source / name
+            dst = target / name
+            if src.exists() and not dst.exists():
+                shutil.copy2(src, dst)
+        try:
+            if sys.platform == "win32":
+                os.startfile(str(folder))
+            elif sys.platform == "darwin":
+                subprocess.Popen(["open", str(folder)])
+            else:
+                subprocess.Popen(["xdg-open", str(folder)])
+        except (OSError, AttributeError):
+            messagebox.showinfo(tr("Папка языков"), str(folder), parent=self)
+
+    def _apply_language_direction(self):
+        """Apply basic right alignment for RTL packs (Tk has no full BiDi layout API)."""
+        if get_language_info().direction != "rtl":
+            return
+        pending = list(self.winfo_children())
+        while pending:
+            widget = pending.pop()
+            try:
+                pending.extend(widget.winfo_children())
+            except tk.TclError:
+                pass
+            try:
+                options = set(widget.keys())
+                if "justify" in options:
+                    widget.configure(justify="right")
+                if isinstance(widget, (tk.Entry, tk.Text)):
+                    widget.configure(justify="right")
+            except (tk.TclError, AttributeError):
+                pass
+
+    def change_language(self, locale: str):
+        """Persist a language choice and offer a safe restart to rebuild all widgets."""
+        previous = get_language()
+        if locale == previous:
+            return
+        if self.dirty:
+            save_choice = messagebox.askyesnocancel(
+                tr("Смена языка"),
+                tr("Сохранить изменения текущего проекта перед перезапуском? При ответе «Нет» несохранённые изменения будут потеряны."),
+                parent=self,
+            )
+            if save_choice is None:
+                self.language_code.set(previous)
+                return
+            if save_choice:
+                self.save()
+                if self.dirty:
+                    self.language_code.set(previous)
+                    return
+        try:
+            saved = save_language_preference(locale)
+        except Exception as exc:
+            self.language_code.set(previous)
+            messagebox.showerror(tr("Язык интерфейса"), str(exc), parent=self)
+            return
+        if not saved:
+            self.language_code.set(previous)
+            messagebox.showwarning(
+                tr("Настройки"),
+                tr("Язык выбран, но сохранить настройку не удалось."),
+                parent=self,
+            )
+            return
+        restart = messagebox.askyesno(
+            tr("Язык интерфейса"),
+            tr("Язык сохранён. Перезапустить PzKpfw сейчас, чтобы применить его ко всем окнам?"),
+            parent=self,
+        )
+        if restart:
+            self._restart_application()
+        else:
+            messagebox.showinfo(
+                tr("Язык интерфейса"),
+                tr("Новый язык будет применён при следующем запуске программы."),
+                parent=self,
+            )
+
+    def _restart_application(self):
+        """Replace this process so module-level labels and all dialogs use the new locale."""
+        import os
+        if getattr(sys, "frozen", False):
+            args = [sys.executable, *sys.argv[1:]]
+        else:
+            args = [sys.executable, "-m", "is2_re.gui", *sys.argv[1:]]
+        os.execv(sys.executable, args)
 
     def _update_theme_button(self):
-        self.theme_button.configure(text='☼  Светлая' if self.theme_name.get() == 'dark' else '☾  Тёмная')
+        self.theme_button.configure(text=('☼  ' + tr('Светлая')) if self.theme_name.get() == 'dark' else ('☾  ' + tr('Тёмная')))
 
     def toggle_theme(self):
         self.theme_name.set('light' if self.theme_name.get() == 'dark' else 'dark')
@@ -3444,18 +3608,18 @@ class Is2Studio(tk.Tk):
         self._refresh_diagram()
         self._refresh_graph()
         if not save_theme(name):
-            messagebox.showwarning("Настройки", "Тема применена, но сохранить её для следующего запуска не удалось.", parent=self)
+            messagebox.showwarning(tr("Настройки"), tr("Тема применена, но сохранить её для следующего запуска не удалось."), parent=self)
 
     def show_feature_audit(self):
         if self.doc is None:
-            messagebox.showinfo("Обзор возможностей", "Сначала откройте проект.", parent=self)
+            messagebox.showinfo(tr("Обзор возможностей"), tr("Сначала откройте проект."), parent=self)
             return
         report = feature_audit(self.doc)
         window = tk.Toplevel(self)
-        window.title("Возможности и ограничения проекта")
+        window.title(tr("Возможности и ограничения проекта"))
         window.geometry("850x620")
-        ttk.Label(window, text="Аудит восстановленных функций", font=("TkDefaultFont", 14, "bold"), padding=12).pack(anchor="w")
-        ttk.Label(window, text="Статус экспериментальных функций не означает полного соответствия ИС-2.", padding=(12, 0)).pack(anchor="w")
+        ttk.Label(window, text=tr("Аудит восстановленных функций"), font=("TkDefaultFont", 14, "bold"), padding=12).pack(anchor="w")
+        ttk.Label(window, text=tr("Статус экспериментальных функций не означает полного соответствия ИС-2."), padding=(12, 0)).pack(anchor="w")
         frame = ttk.Frame(window, padding=12)
         frame.pack(fill="both", expand=True)
         scroll = ttk.Scrollbar(frame)
@@ -3463,17 +3627,17 @@ class Is2Studio(tk.Tk):
         text = tk.Text(frame, wrap="word", yscrollcommand=scroll.set)
         text.pack(fill="both", expand=True)
         scroll.config(command=text.yview)
-        labels = {"implemented_tested_locally": "реализовано, проверено локально", "partially_reconstructed": "частично восстановлено", "experimental": "экспериментально", "unknown": "не изучено", "not_implemented": "не реализовано", "not_tested": "не проверено"}
-        lines = [f"Проект: {report['project']}", f"Действий: {report['action_count']}; параметров: {report['parameter_count']}; записей матрицы: {report['matrix_record_count']}", "", "ВОЗМОЖНОСТИ"]
+        labels = {"implemented_tested_locally": tr("реализовано, проверено локально"), "partially_reconstructed": tr("частично восстановлено"), "experimental": tr("экспериментально"), "unknown": tr("не изучено"), "not_implemented": tr("не реализовано"), "not_tested": tr("не проверено")}
+        lines = [tr("Проект: {project}").format(project=report['project']), tr("Действий: {actions}; параметров: {parameters}; записей матрицы: {matrix_records}").format(actions=report['action_count'], parameters=report['parameter_count'], matrix_records=report['matrix_record_count']), "", tr("ВОЗМОЖНОСТИ")]
         for item in report['capabilities']:
-            lines.append(f"• {item['id']} — {labels.get(item['status'], item['status'])}\n  {item['evidence']}")
-        lines += ["", "ДАННЫЕ ДЛЯ ДАЛЬНЕЙШЕЙ ПРОВЕРКИ"]
+            lines.append(f"• {item['id']} — {labels.get(item['status'], item['status'])}\n  {tr(item['evidence'])}")
+        lines += ["", tr("ДАННЫЕ ДЛЯ ДАЛЬНЕЙШЕЙ ПРОВЕРКИ")]
         for item in report['missing_reference_data']:
-            lines.append(f"• {item['item']}: {item['needed']}")
-        lines += ["", "Проверка оригинальной ИС-2: НЕ ВЫПОЛНЕНА."]
+            lines.append(f"• {item['item']}: {tr(item['needed'])}")
+        lines += ["", tr("Проверка оригинальной ИС-2: НЕ ВЫПОЛНЕНА.")]
         text.insert("1.0", "\n".join(lines))
         text.configure(state="disabled")
-        ttk.Button(window, text="Закрыть", command=window.destroy).pack(anchor="e", padx=12, pady=(0,12))
+        ttk.Button(window, text=tr("Закрыть"), command=window.destroy).pack(anchor="e", padx=12, pady=(0,12))
         apply_theme(self, self.theme_name.get())
 
     def validate_project(self):
@@ -3481,37 +3645,38 @@ class Is2Studio(tk.Tk):
             return
         issues = self.doc.validate()
         if issues:
-            messagebox.showwarning("Проверка проекта", "Найдены проблемы:\n\n" + "\n".join(issues[:40]), parent=self)
-            self.status.set(f"Проверка: {len(issues)} проблем")
+            messagebox.showwarning(tr("Проверка проекта"), tr("Найдены проблемы:\n\n{issues}").format(issues="\n".join(issues[:40])), parent=self)
+            self.status.set(tr_dynamic(f"Проверка: {len(issues)} проблем"))
         else:
-            messagebox.showinfo("Проверка проекта", "Структура проекта корректна.", parent=self)
-            self.status.set("Проверка: PASS")
+            messagebox.showinfo(tr("Проверка проекта"), tr("Структура проекта корректна."), parent=self)
+            self.status.set(tr("Проверка: PASS"))
 
     def check_compatibility(self):
         if self.doc is None:
             return
         report = audit_document(self.doc)
+        summary = report["relationship_graph_summary"]
         lines = [
-            f"Формат: {report['format']}",
-            f"Native envelope: {report['native_envelope']}",
-            f"Проверка структуры: {report['structural_validation']}",
-            f"Сохранение XML без потери дерева: {report['writer_semantic_roundtrip']}",
-            f"Повторная сериализация стабильна: {report['writer_idempotent_roundtrip']}",
-            f"Проверка повторно открытого XML: {report['writer_reopened_validation']}",
-            f"Endpoint-ов в графе: {report['relationship_graph_summary']['endpoint_count']}; неразрешённых: {report['relationship_graph_summary']['dangling_endpoint_count']}",
-            f"PzKpfw-разметка в файл не добавляется: {not report['pzkpfw_private_markup_added']}",
-            f"ModuleParams / Module: {report['module_params_module_count']}",
-            f"Оригинальная ИС-2 (Windows runtime): {report['original_is2_runtime_acceptance']}",
+            tr_dynamic(f"Формат: {tr(report['format'])}"),
+            tr_dynamic(f"Нативная оболочка: {report['native_envelope']}"),
+            tr_dynamic(f"Проверка структуры: {report['structural_validation']}"),
+            tr_dynamic(f"Сохранение XML без потери дерева: {report['writer_semantic_roundtrip']}"),
+            tr_dynamic(f"Повторная сериализация стабильна: {report['writer_idempotent_roundtrip']}"),
+            tr_dynamic(f"Проверка повторно открытого XML: {report['writer_reopened_validation']}"),
+            tr_dynamic(f"Endpoint-ов в графе: {summary['endpoint_count']}; неразрешённых: {summary['dangling_endpoint_count']}"),
+            tr_dynamic(f"PzKpfw-разметка в файл не добавляется: {not report['pzkpfw_private_markup_added']}"),
+            tr_dynamic(f"Количество записей ModuleParams / Module: {report['module_params_module_count']}"),
+            tr_dynamic(f"Оригинальная ИС-2 (Windows runtime): {report['original_is2_runtime_acceptance']}"),
         ]
         if report["runtime_risk_notes"]:
-            lines.extend(["", "Замечания:", *report["runtime_risk_notes"]])
-        lines.extend(["", report["runtime_note"]])
+            lines.extend(["", tr("Замечания:"), *(tr(note) for note in report["runtime_risk_notes"])])
+        lines.extend(["", tr(report["runtime_note"])])
         if all(report[key] == "PASS" for key in ("native_envelope", "structural_validation", "writer_semantic_roundtrip", "writer_idempotent_roundtrip", "writer_reopened_validation")):
-            messagebox.showinfo("Совместимость с ИС-2", "\n".join(lines), parent=self)
-            self.status.set("Совместимость: XML writer PASS; оригинальный runtime не проверен")
+            messagebox.showinfo(tr("Совместимость с ИС-2"), "\n".join(lines), parent=self)
+            self.status.set(tr("Совместимость: XML writer PASS; оригинальный runtime не проверен"))
         else:
-            messagebox.showwarning("Совместимость с ИС-2", "\n".join(lines), parent=self)
-            self.status.set("Совместимость: найдены структурные проблемы")
+            messagebox.showwarning(tr("Совместимость с ИС-2"), "\n".join(lines), parent=self)
+            self.status.set(tr("Совместимость: найдены структурные проблемы"))
 
     def _refresh_or_defer(self, key, widget, callback):
         if widget.winfo_ismapped():
@@ -3584,7 +3749,7 @@ class Is2Studio(tk.Tk):
             self._mark_dirty("Изменён паспорт проекта")
             self._refresh_metadata()
         except Exception as exc:
-            messagebox.showerror("Паспорт проекта", str(exc), parent=self)
+            messagebox.showerror(tr("Паспорт проекта"), str(exc), parent=self)
 
     def _refresh_actions(self):
         if self.doc is None:
@@ -3645,36 +3810,40 @@ class Is2Studio(tk.Tk):
         self.category_tree.delete(*self.category_tree.get_children())
         records = self.doc.concept_structure.category_records()
         search = self.concept_search_var.get().strip().casefold() if hasattr(self, "concept_search_var") else ""
-        class_filter = self.concept_class_filter.get() if hasattr(self, "concept_class_filter") else "Все"
+        all_label = tr("Все")
+        class_filter = self.concept_class_filter.get() if hasattr(self, "concept_class_filter") else all_label
         available_groups = sorted({record.group for record in records})
-        group_values = ("Все", *(str(value) for value in available_groups))
+        group_values = (all_label, *(str(value) for value in available_groups))
         if hasattr(self, "concept_group_combo"):
             current_group = self.concept_group_filter.get()
             self.concept_group_combo.configure(values=group_values)
             if current_group not in group_values:
-                self.concept_group_filter.set("Все")
-        group_filter = self.concept_group_filter.get() if hasattr(self, "concept_group_filter") else "Все"
+                self.concept_group_filter.set(all_label)
+        group_filter = self.concept_group_filter.get() if hasattr(self, "concept_group_filter") else all_label
         for record in records:
-            if class_filter != "Все" and record.class_char != class_filter:
+            if class_filter != all_label and record.class_char != class_filter:
                 continue
-            if group_filter != "Все" and str(record.group) != group_filter:
+            if group_filter != all_label and str(record.group) != group_filter:
                 continue
             haystack = f"{record.id} {record.name} {record.class_char} {record.class_label} {record.group} {record.number}".casefold()
             if search and search not in haystack:
                 continue
-            self.category_tree.insert("", "end", iid=record.id, values=(record.id, record.name, f"{record.class_char} — {record.class_label}", record.group, record.number, record.status, record.coding_type, int(record.auto_range)))
+            self.category_tree.insert("", "end", iid=record.id, values=(record.id, record.name, f"{record.class_char} — {tr(record.class_label)}", record.group, record.number, record.status, record.coding_type, int(record.auto_range)))
         visible = set(self.category_tree.get_children(""))
         keep = [ident for ident in selected if ident in visible]
         if keep:
             self.category_tree.selection_set(keep)
         report = self.doc.concept_structure.catalog_report()
         duplicate_count = len(report["duplicate_numbers"])
-        self.concept_summary_var.set(
-            f"Категорий: {report['category_count']} · классов: {report['class_count']} · групп: {report['group_count']} · "
-            f"связей cs: {report['link_count']} · повторяющихся номеров: {duplicate_count} · показано: {len(visible)}" +
-            (' · В проекте нет категорий cs; это допустимо.' if not records else
-             ' · Нет результатов для выбранных фильтров.' if not visible else '')
+        summary = tr("Категорий: {categories} · классов: {classes} · групп: {groups} · связей cs: {links} · дублирующихся номеров: {duplicates} · показано: {shown}").format(
+            categories=report['category_count'], classes=report['class_count'], groups=report['group_count'],
+            links=report['link_count'], duplicates=duplicate_count, shown=len(visible),
         )
+        if not records:
+            summary += " " + tr("В проекте нет категорий cs; это допустимо.")
+        elif not visible:
+            summary += " " + tr("По выбранным фильтрам ничего не найдено.")
+        self.concept_summary_var.set(summary)
 
     def _refresh_links(self):
         if self.doc is None:
@@ -3683,7 +3852,7 @@ class Is2Studio(tk.Tk):
         records = self.doc.concept_structure.link_records()
         for record in records:
             self.link_tree.insert("", "end", iid=record.id, values=(record.id, record.type, record.label, record.e1, record.e2, record.e3, record.range))
-        self.concept_links_summary.set(f'Связей cs: {len(records)}' + (' · В проекте нет связей cs; это допустимо.' if not records else ''))
+        self.concept_links_summary.set(tr('Связей cs: {count}').format(count=len(records)) + (" · " + tr('В проекте нет связей cs; это допустимо.') if not records else ''))
 
     def _refresh_other(self):
         if self.doc is None:
@@ -3716,23 +3885,20 @@ class Is2Studio(tk.Tk):
                     "" if record.power is None else record.power,
                     record.opaque_child_count, attrs,
                 ))
-            self.status.set(
-                f"spz: {len(structure.elements)} AElement, {len(structure.links)} links; "
-                f"content: {len(structure.content_records)} AEContentLink "
-                "(создание / изменение / удаление доступны)"
-            )
-            self.dynamic_summary.set(f"Элементов spz: {len(structure.elements)} · связей spz: {len(structure.links)} · связей content: {len(structure.content_records)}. "
-                                     "Пустые разделы допустимы: проект может использовать только основную модель.")
+            self.status.set(tr("spz: {elements} AElement, связей: {links}; content: {content} AEContentLink (создание / редактирование / удаление доступны)").format(
+                elements=len(structure.elements), links=len(structure.links), content=len(structure.content_records)))
+            self.dynamic_summary.set(tr("Элементов spz: {elements} · связей spz: {links} · связей content: {content}. Пустые разделы допустимы; проект может использовать только основную модель.").format(
+                elements=len(structure.elements), links=len(structure.links), content=len(structure.content_records)))
         except Exception as exc:
-            self.status.set(f"spz/content read warning: {exc}")
-            self.dynamic_summary.set(f'Ошибка чтения spz/content: {exc}')
-        self._set_inspector_text(self.spz_link_detail, "Выберите запись, чтобы увидеть исходный XML.")
-        self._set_inspector_text(self.content_detail, "Выберите запись, чтобы увидеть исходный XML.")
+            self.status.set(tr("Предупреждение чтения spz/content: {error}").format(error=exc))
+            self.dynamic_summary.set(tr("Ошибка чтения spz/content: {error}").format(error=exc))
+        self._set_inspector_text(self.spz_link_detail, tr("Выберите запись, чтобы увидеть исходный XML."))
+        self._set_inspector_text(self.content_detail, tr("Выберите запись, чтобы увидеть исходный XML."))
 
     def _selected_attrs(self, tree, parent: ET.Element, tag: str | None = None):
         ident = self._selected_id(tree)
         if not ident:
-            messagebox.showinfo("Выбор записи", "Сначала выберите запись.", parent=self)
+            messagebox.showinfo(tr("Выбор записи"), tr("Сначала выберите запись."), parent=self)
             return None, None
         candidates = list(parent) if tag is None else parent.findall(tag)
         node = next((n for n in candidates if n.get("id") == ident), None)
@@ -3762,7 +3928,7 @@ class Is2Studio(tk.Tk):
             self.refresh_all()
             self.param_tree.selection_set(ident)
             self.param_tree.see(ident)
-        except Exception as exc: messagebox.showerror("Параметр", str(exc), parent=self)
+        except Exception as exc: messagebox.showerror(tr("Параметр"), str(exc), parent=self)
 
     def edit_parameter(self):
         if self.doc is None: return
@@ -3786,7 +3952,7 @@ class Is2Studio(tk.Tk):
             self._mark_dirty(f"Изменён параметр {ident}")
             self.refresh_all()
             self.param_tree.selection_set(ident)
-        except Exception as exc: messagebox.showerror("Параметр", str(exc), parent=self)
+        except Exception as exc: messagebox.showerror(tr("Параметр"), str(exc), parent=self)
 
     def edit_parameter_advanced(self):
         """Keep editing of unknown native attributes available without changing them by default."""
@@ -3801,23 +3967,23 @@ class Is2Studio(tk.Tk):
             for k in set(attrs) - set(changed): self.doc.update_parameter(ident, **{k: None})
             self._mark_dirty(f"Изменены XML-атрибуты параметра {ident}"); self.refresh_all()
             self.param_tree.selection_set(ident)
-        except Exception as exc: messagebox.showerror("Параметр", str(exc), parent=self)
+        except Exception as exc: messagebox.showerror(tr("Параметр"), str(exc), parent=self)
 
     def assign_parameter_object(self):
         if self.doc is None:
             return
         parameter_id = self._selected_id(self.param_tree)
         if not parameter_id:
-            messagebox.showinfo("Привязка параметра", "Выберите параметр.", parent=self)
+            messagebox.showinfo(tr("Привязка параметра"), tr("Выберите параметр."), parent=self)
             return
         objects = list(self.doc.objects_node)
         if not objects:
-            messagebox.showinfo("Привязка параметра", "В проекте нет объектов. Сначала создайте объект.", parent=self)
+            messagebox.showinfo(tr("Привязка параметра"), tr("В проекте нет объектов. Сначала создайте объект."), parent=self)
             return
         choices = tuple(node.get("id", "") for node in objects if node.get("id"))
         current = self.doc.parameter(parameter_id).get("o", "")
         fields = [("object_id", "Объект", current if current in choices else choices[0], choices)]
-        dialog = RecordDialog(self, f"Назначить объект параметру {parameter_id}", fields)
+        dialog = RecordDialog(self, tr("Назначить объект параметру {parameter_id}").format(parameter_id=parameter_id), fields)
         self.wait_window(dialog)
         if dialog.result is None:
             return
@@ -3827,18 +3993,18 @@ class Is2Studio(tk.Tk):
             self.refresh_all()
             self.param_tree.selection_set(parameter_id)
         except Exception as exc:
-            messagebox.showerror("Привязка параметра", str(exc), parent=self)
+            messagebox.showerror(tr("Привязка параметра"), str(exc), parent=self)
 
     def clear_parameter_object(self):
         if self.doc is None:
             return
         parameter_id = self._selected_id(self.param_tree)
         if not parameter_id:
-            messagebox.showinfo("Привязка параметра", "Выберите параметр.", parent=self)
+            messagebox.showinfo(tr("Привязка параметра"), tr("Выберите параметр."), parent=self)
             return
         current = self.doc.parameter(parameter_id).get("o")
         if current in (None, "", "0"):
-            self.status.set(f"У параметра {parameter_id} нет назначенного объекта")
+            self.status.set(tr_dynamic(f"У параметра {parameter_id} нет назначенного объекта"))
             return
         self.doc.set_parameter_object(parameter_id, None)
         self._mark_dirty(f"Снята привязка объекта у параметра {parameter_id}")
@@ -3853,16 +4019,15 @@ class Is2Studio(tk.Tk):
         content_count = len(list(content_node)) if content_node is not None else 0
         if content_count:
             messagebox.showwarning(
-                "Проверка зависимостей — удаление заблокировано",
-                f"Параметр {ident} нельзя безопасно удалить: ConceptModel/content содержит {content_count} записей, "
-                "а связь этих записей с параметрами не подтверждена. Никаких изменений не внесено.",
+                tr("Проверка зависимостей — удаление заблокировано"),
+                tr("Параметр {ident} нельзя безопасно удалить: ConceptModel/content содержит {count} записей, а связь этих записей с параметрами не подтверждена. Никаких изменений не внесено.").format(ident=ident, count=content_count),
                 parent=self,
             )
             return
-        if not messagebox.askyesno("Удаление параметра", f"Удалить параметр {ident}?\n\nПроверка: зависимые content-записи отсутствуют.", parent=self): return
+        if not messagebox.askyesno(tr("Удаление параметра"), tr("Удалить параметр {ident}?\n\nПроверка: зависимые content-записи отсутствуют.").format(ident=ident), parent=self): return
         try:
             self.doc.delete_parameter(ident); self._mark_dirty(f"Удалён параметр {ident}"); self.refresh_all()
-        except Exception as exc: messagebox.showerror("Параметр", str(exc), parent=self)
+        except Exception as exc: messagebox.showerror(tr("Параметр"), str(exc), parent=self)
 
     def add_object(self):
         if self.doc is None: return
@@ -3874,7 +4039,7 @@ class Is2Studio(tk.Tk):
             self._mark_dirty(f"Создан объект {ident}"); self.refresh_all()
             self.object_tree.selection_set(ident)
             self.object_tree.see(ident)
-        except Exception as exc: messagebox.showerror("Объект", str(exc), parent=self)
+        except Exception as exc: messagebox.showerror(tr("Объект"), str(exc), parent=self)
 
     def edit_object(self):
         if self.doc is None: return
@@ -3888,7 +4053,7 @@ class Is2Studio(tk.Tk):
             self._mark_dirty(f"Изменён объект {ident}"); self.refresh_all()
             self.object_tree.selection_set(ident)
             self.object_tree.see(ident)
-        except Exception as exc: messagebox.showerror("Объект", str(exc), parent=self)
+        except Exception as exc: messagebox.showerror(tr("Объект"), str(exc), parent=self)
 
     def edit_object_advanced(self):
         if self.doc is None: return
@@ -3903,7 +4068,7 @@ class Is2Studio(tk.Tk):
             self._mark_dirty(f"Изменён объект {ident}"); self.refresh_all()
             self.object_tree.selection_set(ident)
             self.object_tree.see(ident)
-        except Exception as exc: messagebox.showerror("Объект", str(exc), parent=self)
+        except Exception as exc: messagebox.showerror(tr("Объект"), str(exc), parent=self)
 
     def _dependency_entry(self, domain: str, ident: str) -> dict | None:
         if self.doc is None:
@@ -3914,10 +4079,10 @@ class Is2Studio(tk.Tk):
     @staticmethod
     def _dependency_note(entry: dict | None) -> str:
         if not entry:
-            return "Известных ссылок не найдено."
-        parts = [f"Известных ссылок: {entry.get('reference_count', 0)}."]
+            return tr("Известных ссылок не найдено.")
+        parts = [tr("Известных ссылок: {count}.").format(count=entry.get('reference_count', 0))]
         if entry.get("opaque_risk"):
-            parts.append("Есть непрозрачные записи; автоматическое каскадирование небезопасно.")
+            parts.append(tr("Есть непрозрачные записи; автоматическое каскадирование небезопасно."))
         for ref in entry.get("references", []):
             parts.append(f"  • {ref.get('relation_kind')}[{ref.get('record_index')}].{ref.get('slot')}")
         return "\n".join(parts)
@@ -3932,38 +4097,36 @@ class Is2Studio(tk.Tk):
         if references:
             ids = ", ".join(parameter_id for parameter_id, _ in references)
             answer = messagebox.askyesno(
-                "Удаление объекта с зависимостями",
-                f"Объект {ident} назначен параметрам: {ids}.\n\n"
-                "Удалить объект и снять атрибут @o у перечисленных параметров?\n"
-                "Операция будет одной записью Undo.", parent=self,
+                tr("Удаление объекта с зависимостями"),
+                tr("Объект {ident} назначен параметрам: {ids}.\n\nУдалить объект и снять атрибут @o у перечисленных параметров?\nОперация будет одной записью Undo.").format(ident=ident, ids=ids), parent=self,
             )
             if not answer:
                 return
-        elif not messagebox.askyesno("Удаление объекта", f"Удалить объект {ident}?\n\nИзвестных привязок параметров нет.", parent=self):
+        elif not messagebox.askyesno(tr("Удаление объекта"), tr("Удалить объект {ident}?\n\nИзвестных привязок параметров нет.").format(ident=ident), parent=self):
             return
         try:
             self.doc.delete_object(ident, clear_parameter_references=bool(references))
             self._mark_dirty(f"Удалён объект {ident}" + (f"; очищено привязок: {len(references)}" if references else ""))
             self.refresh_all()
         except Exception as exc:
-            messagebox.showerror("Объект", str(exc), parent=self)
+            messagebox.showerror(tr("Объект"), str(exc), parent=self)
 
     def convert_selected_action(self, initial_kind=None):
         if self.doc is None: return
         ident = self._selected_id(self.action_tree)
         if not ident:
-            messagebox.showinfo("Действия", "Выберите действие в дереве.", parent=self)
+            messagebox.showinfo(tr("Действия"), tr("Выберите действие в дереве."), parent=self)
             return
         fields = [("kind", "Тип конструкции", KIND_NAMES.get(initial_kind, "Последовательность"), tuple(KIND_LABELS)),
                   ("replace", "Удалить прежних потомков?", "Нет", ("Нет", "Да")),
                   ("content", "Удалить связи ConceptModel/content?", "Нет", ("Нет", "Да"))]
-        dialog = RecordDialog(self, "Преобразование действия " + ident, fields)
+        dialog = RecordDialog(self, tr("Преобразование действия {ident}").format(ident=ident), fields)
         self.wait_window(dialog)
         if dialog.result is None: return
         d = dialog.result
         destructive = d['replace'] == 'Да' or d['content'] == 'Да'
-        if destructive and not messagebox.askyesno("Подтверждение удаления",
-                "Потомки и/или межмодельные связи могут быть необратимо удалены из сохранённого файла. Продолжить?",
+        if destructive and not messagebox.askyesno(tr("Подтверждение удаления"),
+                tr("Потомки и/или межмодельные связи могут быть необратимо удалены из сохранённого файла. Продолжить?"),
                 parent=self):
             return
         try:
@@ -3972,13 +4135,13 @@ class Is2Studio(tk.Tk):
             self._mark_dirty("Преобразовано действие " + ident)
             self.refresh_all()
         except (ValueError, KeyError, ProjectFormatError) as exc:
-            messagebox.showerror("Преобразование действия", str(exc), parent=self)
+            messagebox.showerror(tr("Преобразование действия"), str(exc), parent=self)
 
     def insert_selected_action(self, after):
         if self.doc is None: return
         ident = self._selected_id(self.action_tree)
         if not ident:
-            messagebox.showinfo("Действия", "Выберите дочернее действие в дереве.", parent=self)
+            messagebox.showinfo(tr("Действия"), tr("Выберите дочернее действие в дереве."), parent=self)
             return
         dialog = RecordDialog(self, "Вставка действия", [("name", "Название нового действия", "Новое действие", None)])
         self.wait_window(dialog)
@@ -3988,14 +4151,14 @@ class Is2Studio(tk.Tk):
             self._mark_dirty("Добавлено соседнее действие")
             self.refresh_all()
         except (ValueError, KeyError, ProjectFormatError) as exc:
-            messagebox.showerror("Вставка действия", str(exc), parent=self)
+            messagebox.showerror(tr("Вставка действия"), str(exc), parent=self)
 
     def add_root_action(self): self._action_add(parent_id=None)
     def add_child_action(self):
         if self.doc is None: return
         parent = self._selected_id(self.action_tree)
         if not parent:
-            messagebox.showinfo("Действие", "Выберите родительское действие.", parent=self); return
+            messagebox.showinfo(tr("Действие"), tr("Выберите родительское действие."), parent=self); return
         self._action_add(parent_id=parent)
 
     def _action_add(self, parent_id):
@@ -4022,32 +4185,32 @@ class Is2Studio(tk.Tk):
             self.doc.root = staged.root
             self._mark_dirty(f"Создано действие {ident}"); self.refresh_all()
             self.action_tree.selection_set(ident); self.action_tree.see(ident)
-        except (ValueError, KeyError, ProjectFormatError) as exc: messagebox.showerror("Действие", str(exc), parent=self)
+        except (ValueError, KeyError, ProjectFormatError) as exc: messagebox.showerror(tr("Действие"), str(exc), parent=self)
 
     def edit_action(self):
         if self.doc is None: return
         ident = self._selected_id(self.action_tree)
-        if not ident: return messagebox.showinfo("Действие", "Выберите действие.", parent=self)
+        if not ident: return messagebox.showinfo(tr("Действие"), tr("Выберите действие."), parent=self)
         node = self.doc.action(ident)
         # Structural type changes must go through the conversion command,
         # otherwise a raw @type update would not create/remove the native links.
         keys = ("name", "formalization", "mark", "symbol", "status", "level", "number")
         fields = [(k, "Символ (буква или код)" if k == "symbol" else k, display_action_symbol(node.get(k, "")) if k == "symbol" else node.get(k, ""), None) for k in keys]
-        dialog = RecordDialog(self, f"Действие {ident}", fields); self.wait_window(dialog)
+        dialog = RecordDialog(self, tr("Действие {ident}").format(ident=ident), fields); self.wait_window(dialog)
         if dialog.result is None: return
         try:
             changes = {k: (v if v != "" else None) for k,v in dialog.result.items()}
             changes["symbol"] = encode_action_symbol(dialog.result["symbol"])
             self.doc.update_action(ident, **changes)
             self._mark_dirty(f"Изменено действие {ident}"); self.refresh_all(); self.action_tree.selection_set(ident)
-        except Exception as exc: messagebox.showerror("Действие", str(exc), parent=self)
+        except Exception as exc: messagebox.showerror(tr("Действие"), str(exc), parent=self)
 
     def delete_action(self):
         if self.doc is None:
             return
         ident = self._selected_id(self.action_tree)
         if not ident:
-            return messagebox.showinfo("Действие", "Выберите действие.", parent=self)
+            return messagebox.showinfo(tr("Действие"), tr("Выберите действие."), parent=self)
         subtree: set[str] = set()
         stack = [ident]
         while stack:
@@ -4060,9 +4223,11 @@ class Is2Studio(tk.Tk):
         cascade = False
         if children:
             cascade = messagebox.askyesno(
-                "Удаление поддерева",
-                f"Действие {ident} имеет дочерние элементы (всего в поддереве: {len(subtree) - 1}). "
-                f"Удалить всё поддерево?\n\n{self._dependency_note(self._dependency_entry('action', ident))}",
+                tr("Удаление поддерева"),
+                tr("Действие {ident} имеет дочерние элементы (всего в поддереве: {count}). Удалить всё поддерево?\n\n{dependency_note}").format(
+                    ident=ident, count=len(subtree) - 1,
+                    dependency_note=self._dependency_note(self._dependency_entry('action', ident)),
+                ),
                 parent=self,
             )
             if not cascade:
@@ -4073,15 +4238,18 @@ class Is2Studio(tk.Tk):
         cascade_content = False
         if content_refs:
             cascade_content = messagebox.askyesno(
-                "Удаление зависимостей",
-                f"С действиями поддерева связано {len(content_refs)} AEContentLink. Удалить и эти связи?\n\n"
-                f"{self._dependency_note(self._dependency_entry('action', ident))}",
+                tr("Удаление зависимостей"),
+                tr("С действиями поддерева связано {count} AEContentLink. Удалить и эти связи?\n\n{dependency_note}").format(
+                    count=len(content_refs), dependency_note=self._dependency_note(self._dependency_entry('action', ident)),
+                ),
                 parent=self,
             )
             if not cascade_content:
                 return
         if not children and not content_refs and not messagebox.askyesno(
-            "Удаление действия", f"Удалить действие {ident}?\n\n{self._dependency_note(self._dependency_entry('action', ident))}", parent=self
+            tr("Удаление действия"), tr("Удалить действие {ident}?\n\n{dependency_note}").format(
+                ident=ident, dependency_note=self._dependency_note(self._dependency_entry('action', ident)),
+            ), parent=self
         ):
             return
         try:
@@ -4089,7 +4257,7 @@ class Is2Studio(tk.Tk):
             self._mark_dirty(f"Удалено действие {ident}")
             self.refresh_all()
         except Exception as exc:
-            messagebox.showerror("Действие", str(exc), parent=self)
+            messagebox.showerror(tr("Действие"), str(exc), parent=self)
 
     def add_category(self):
         if self.doc is None: return
@@ -4100,14 +4268,14 @@ class Is2Studio(tk.Tk):
         try:
             ident=self.doc.concept_structure.add_category(d["name"],class_id=int(d["class"]),group=int(d["group"]),number=int(d["number"]),status=int(d["status"]),auto_range=d["autoRange"]=="1",coding_type=int(d["codingType"]))
             self._mark_dirty(f"Создана категория {ident}"); self.refresh_all(); self.category_tree.selection_set(ident)
-        except Exception as exc: messagebox.showerror("Категория",str(exc),parent=self)
+        except Exception as exc: messagebox.showerror(tr("Категория"),str(exc),parent=self)
 
     def bulk_edit_categories(self):
         if self.doc is None:
             return
         selected = set(self.category_tree.selection())
         if not selected:
-            messagebox.showinfo("ConceptModel", "Выберите одну или несколько категорий (Ctrl/Shift для множественного выбора).", parent=self)
+            messagebox.showinfo("ConceptModel", tr("Выберите одну или несколько категорий (Ctrl/Shift для множественного выбора)."), parent=self)
             return
         ordered_ids = [ident for ident in self.category_tree.get_children("") if ident in selected]
         current_groups = {self.doc.concept_structure.category(ident).get("group", "-1") for ident in ordered_ids}
@@ -4116,7 +4284,7 @@ class Is2Studio(tk.Tk):
             ("group", "Новое значение group", initial_group, None),
             ("start_number", "Начальный number (пусто = сохранить прежние)", "", None),
         ]
-        dialog = RecordDialog(self, f"Групповое редактирование ({len(ordered_ids)} катег.)", fields)
+        dialog = RecordDialog(self, tr("Групповое редактирование ({count} катег.)").format(count=len(ordered_ids)), fields)
         self.wait_window(dialog)
         if dialog.result is None:
             return
@@ -4132,7 +4300,7 @@ class Is2Studio(tk.Tk):
                 updates[ident] = changes
             changed = self.doc.concept_structure.update_categories(updates)
             if not changed:
-                self.status.set("Групповое редактирование: значения не изменились")
+                self.status.set(tr("Групповое редактирование: значения не изменились"))
                 return
             self._mark_dirty(
                 f"Групповое редактирование ConceptModel: {len(changed)} категорий",
@@ -4142,7 +4310,7 @@ class Is2Studio(tk.Tk):
             if changed:
                 self.category_tree.selection_set(*changed)
         except Exception as exc:
-            messagebox.showerror("Групповое редактирование ConceptModel", str(exc), parent=self)
+            messagebox.showerror(tr("Групповое редактирование ConceptModel"), str(exc), parent=self)
 
     def show_concept_catalog(self):
         if self.doc is None:
@@ -4163,36 +4331,36 @@ class Is2Studio(tk.Tk):
             "note": "Сводка read-only; неизвестные ветви XML не изменяются.",
         }
         dialog = tk.Toplevel(self)
-        dialog.title("Обзор ConceptModel — PzKpfw")
+        dialog.title(tr("Обзор ConceptModel — PzKpfw"))
         dialog.geometry("820x560")
         text = tk.Text(dialog, wrap="none", font=("Consolas", 9))
         text.pack(fill="both", expand=True, padx=8, pady=8)
         text.insert("1.0", json.dumps(report, ensure_ascii=False, indent=2))
         text.configure(state="disabled")
-        ttk.Button(dialog, text="Закрыть", command=dialog.destroy).pack(anchor="e", padx=8, pady=(0, 8))
+        ttk.Button(dialog, text=tr("Закрыть"), command=dialog.destroy).pack(anchor="e", padx=8, pady=(0, 8))
 
     def edit_category(self):
         if self.doc is None: return
         selected = self.category_tree.selection()
-        if not selected: return messagebox.showinfo("Категория","Выберите категорию.",parent=self)
-        if len(selected) != 1: return messagebox.showinfo("Категория","Для индивидуального редактирования выберите ровно одну категорию. Для нескольких используйте «Групповое изменение». ",parent=self)
+        if not selected: return messagebox.showinfo(tr("Категория"),tr("Выберите категорию."),parent=self)
+        if len(selected) != 1: return messagebox.showinfo(tr("Категория"),tr("Для индивидуального редактирования выберите ровно одну категорию. Для нескольких используйте «Групповое изменение». "),parent=self)
         ident = selected[0]
         n=self.doc.concept_structure.category(ident)
         fields=[(k,k,n.get(k,""), tuple(str(x) for x in range(1,8)) if k=="class" else (("0","1") if k=="autoRange" else None)) for k in ("name","class","group","number","status","autoRange","codingType")]
-        dialog=RecordDialog(self,f"Категория {ident}",fields); self.wait_window(dialog)
+        dialog=RecordDialog(self, tr("Категория {ident}").format(ident=ident), fields); self.wait_window(dialog)
         if dialog.result is None: return
         d=dialog.result
         try:
             self.doc.concept_structure.update_category(ident,**{"class":int(d["class"]),"group":int(d["group"]),"number":int(d["number"]),"status":int(d["status"]),"autoRange":d["autoRange"],"codingType":int(d["codingType"]),"name":d["name"]})
             self._mark_dirty(f"Изменена категория {ident}"); self.refresh_all(); self.category_tree.selection_set(ident)
-        except Exception as exc: messagebox.showerror("Категория",str(exc),parent=self)
+        except Exception as exc: messagebox.showerror(tr("Категория"),str(exc),parent=self)
 
     def edit_category_attributes(self):
         if self.doc is None:
             return
         selected = self.category_tree.selection()
         if len(selected) != 1:
-            messagebox.showinfo("Дополнительные атрибуты", "Выберите ровно одну категорию.", parent=self)
+            messagebox.showinfo(tr("Дополнительные атрибуты"), tr("Выберите ровно одну категорию."), parent=self)
             return
         ident = selected[0]
         node = self.doc.concept_structure.category(ident)
@@ -4207,14 +4375,14 @@ class Is2Studio(tk.Tk):
             self.refresh_all()
             self.category_tree.selection_set(ident)
         except Exception as exc:
-            messagebox.showerror("Дополнительные атрибуты", str(exc), parent=self)
+            messagebox.showerror(tr("Дополнительные атрибуты"), str(exc), parent=self)
 
     def edit_concept_link_attributes(self):
         if self.doc is None:
             return
         ident = self._selected_id(self.link_tree)
         if not ident:
-            messagebox.showinfo("Дополнительные атрибуты", "Выберите связь ConceptModel/cs.", parent=self)
+            messagebox.showinfo(tr("Дополнительные атрибуты"), tr("Выберите связь ConceptModel/cs."), parent=self)
             return
         node = self.doc.concept_structure.link(ident)
         attributes = {key: value for key, value in node.attrib.items() if key != "id"}
@@ -4224,17 +4392,17 @@ class Is2Studio(tk.Tk):
             return
         try:
             self.doc.concept_structure.set_link_attributes(ident, dialog.result)
-            self._mark_dirty(f"Изменены XML-атрибуты SCBinaryLink {ident}")
+            self._mark_dirty(f"Изменены XML-атрибуты Связь SCBinaryLink {ident}")
             self.refresh_all()
             self.link_tree.selection_set(ident)
         except Exception as exc:
-            messagebox.showerror("Дополнительные атрибуты", str(exc), parent=self)
+            messagebox.showerror(tr("Дополнительные атрибуты"), str(exc), parent=self)
 
     def delete_category(self):
         if self.doc is None: return
         selected = self.category_tree.selection()
-        if not selected: return messagebox.showinfo("Категория","Выберите категорию.",parent=self)
-        if len(selected) != 1: return messagebox.showinfo("Категория","Удаляйте категории по одной: у каждой собственный набор зависимостей и каскадных последствий.",parent=self)
+        if not selected: return messagebox.showinfo(tr("Категория"),tr("Выберите категорию."),parent=self)
+        if len(selected) != 1: return messagebox.showinfo(tr("Категория"),tr("Удаляйте категории по одной: у каждой собственный набор зависимостей и каскадных последствий."),parent=self)
         ident = selected[0]
         count=sum(ident in {n.get("e1"),n.get("e2"),n.get("e3")} for n in self.doc.concept_structure.links)
         content_node = self.doc.root.find("models/ConceptModel/content")
@@ -4242,21 +4410,27 @@ class Is2Studio(tk.Tk):
         cascade=False
         cascade_content=False
         if count:
-            cascade=messagebox.askyesno("Удаление категории",f"Категория используется в {count} SCBinaryLink. Удалить также эти связи?\n\n{self._dependency_note(self._dependency_entry('category', ident))}",parent=self)
+            cascade=messagebox.askyesno(tr("Удаление категории"),tr("Категория используется в {count} SCBinaryLink. Удалить также эти связи?\n\n{dependency_note}").format(
+                count=count, dependency_note=self._dependency_note(self._dependency_entry('category', ident)),
+            ),parent=self)
             if not cascade: return
         if content_count:
-            cascade_content=messagebox.askyesno("Удаление категории",f"Категория используется в {content_count} AEContentLink. Удалить также эти связи?\n\n{self._dependency_note(self._dependency_entry('category', ident))}",parent=self)
+            cascade_content=messagebox.askyesno(tr("Удаление категории"),tr("Категория используется в {count} AEContentLink. Удалить также эти связи?\n\n{dependency_note}").format(
+                count=content_count, dependency_note=self._dependency_note(self._dependency_entry('category', ident)),
+            ),parent=self)
             if not cascade_content: return
-        if not count and not content_count and not messagebox.askyesno("Удаление категории",f"Удалить категорию {ident}?\n\n{self._dependency_note(self._dependency_entry('category', ident))}",parent=self): return
+        if not count and not content_count and not messagebox.askyesno(tr("Удаление категории"),tr("Удалить категорию {ident}?\n\n{dependency_note}").format(
+                ident=ident, dependency_note=self._dependency_note(self._dependency_entry('category', ident)),
+            ),parent=self): return
         try:
             self.doc.concept_structure.delete_category(ident,cascade_links=cascade,cascade_content_links=cascade_content)
             self._mark_dirty(f"Удалена категория {ident}"); self.refresh_all()
-        except Exception as exc: messagebox.showerror("Категория",str(exc),parent=self)
+        except Exception as exc: messagebox.showerror(tr("Категория"),str(exc),parent=self)
 
     def add_concept_link(self):
         if self.doc is None: return
         ids=[n.get("id","") for n in self.doc.concept_structure.categories]
-        if not ids: return messagebox.showinfo("Связь","Сначала создайте категории.",parent=self)
+        if not ids: return messagebox.showinfo(tr("Связь"),tr("Сначала создайте категории."),parent=self)
         fields=[("type","Тип связи","2",("1","2","3")),("e1","E1 (0 = null)",ids[0],tuple(["0"]+ids)),("e2","E2 (0 = null)",ids[0],tuple(["0"]+ids)),("e3","E3 (0 = null)","0",tuple(["0"]+ids)),("name","Название","",None),("range","Range (пусто = default)","",None)]
         dialog=RecordDialog(self,"Новая SCBinaryLink",fields); self.wait_window(dialog)
         if dialog.result is None: return
@@ -4264,27 +4438,27 @@ class Is2Studio(tk.Tk):
         try:
             ident=self.doc.concept_structure.add_link(int(d["type"]),e1=d["e1"],e2=d["e2"],e3=d["e3"],name=d["name"],range_value=int(d["range"]) if d["range"].strip() else None)
             self._mark_dirty(f"Создана связь {ident}"); self.refresh_all(); self.link_tree.selection_set(ident)
-        except Exception as exc: messagebox.showerror("Связь",str(exc),parent=self)
+        except Exception as exc: messagebox.showerror(tr("Связь"),str(exc),parent=self)
 
     def edit_concept_link(self):
         if self.doc is None: return
         ident=self._selected_id(self.link_tree)
-        if not ident: return messagebox.showinfo("Связь","Выберите связь.",parent=self)
+        if not ident: return messagebox.showinfo(tr("Связь"),tr("Выберите связь."),parent=self)
         n=self.doc.concept_structure.link(ident); ids=[x.get("id","") for x in self.doc.concept_structure.categories]
         fields=[("type","Тип",n.get("type","1"),("1","2","3")),("e1","E1",n.get("e1","0"),tuple(["0"]+ids)),("e2","E2",n.get("e2","0"),tuple(["0"]+ids)),("e3","E3",n.get("e3","0"),tuple(["0"]+ids)),("name","Название",n.get("name",""),None),("range","Range",n.get("range","99"),None)]
-        dialog=RecordDialog(self,f"Связь {ident}",fields); self.wait_window(dialog)
+        dialog=RecordDialog(self, tr("Связь {ident}").format(ident=ident), fields); self.wait_window(dialog)
         if dialog.result is None: return
         d=dialog.result
         try:
             self.doc.concept_structure.update_link(ident,type=int(d["type"]),e1=d["e1"],e2=d["e2"],e3=d["e3"],name=d["name"],range=int(d["range"]))
             self._mark_dirty(f"Изменена связь {ident}"); self.refresh_all(); self.link_tree.selection_set(ident)
-        except Exception as exc: messagebox.showerror("Связь",str(exc),parent=self)
+        except Exception as exc: messagebox.showerror(tr("Связь"),str(exc),parent=self)
 
     def delete_concept_link(self):
         if self.doc is None: return
         ident=self._selected_id(self.link_tree)
-        if not ident: return messagebox.showinfo("Связь","Выберите связь.",parent=self)
-        if not messagebox.askyesno("Удаление связи",f"Удалить связь {ident}?",parent=self): return
+        if not ident: return messagebox.showinfo(tr("Связь"),tr("Выберите связь."),parent=self)
+        if not messagebox.askyesno(tr("Удаление связи"),f"Удалить связь {ident}?",parent=self): return
         self.doc.concept_structure.delete_link(ident); self._mark_dirty(f"Удалена связь {ident}"); self.refresh_all()
 
     def recompute_auto_ranges(self):
@@ -4292,12 +4466,12 @@ class Is2Studio(tk.Tk):
         changed=self.doc.concept_structure.recompute_auto_ranges()
         count=sum(len(x) for x in changed.values())
         self._mark_dirty(f"Пересчитан AutoRange: {count} связей в {len(changed)} группах"); self.refresh_all()
-        messagebox.showinfo("AutoRange",f"Обновлено связей: {count}\nКатегорий: {len(changed)}",parent=self)
+        messagebox.showinfo("AutoRange", tr("Обновлено связей: {count}\nКатегорий: {categories}").format(count=count, categories=len(changed)), parent=self)
 
     def _about(self):
         """Show the product logo independently from the taskbar application icon."""
         window = tk.Toplevel(self)
-        window.title('О PzKpfw')
+        window.title(tr('О PzKpfw'))
         window.resizable(False, False)
         window.transient(self)
         window.iconphoto(True, self._app_icon_image) if self._app_icon_image is not None else None
@@ -4310,14 +4484,14 @@ class Is2Studio(tk.Tk):
         except (OSError, tk.TclError):
             pass
         ttk.Label(body, text=f'PzKpfw {__version__}', font=('TkDefaultFont', 18, 'bold')).pack()
-        ttk.Label(body, text='Редактор проектов .is2', style='Muted.TLabel').pack(pady=(0, 12))
+        ttk.Label(body, text=tr('Редактор проектов .is2'), style='Muted.TLabel').pack(pady=(0, 12))
         explanation = ('Независимый редактор моделей ИС-2: СПД, декомпозиция, '
                        'параметры, объекты, спецификации и матричные формы.\n\n'
                        'Сохранение и проверка XML, резервные копии и история правок. '
                        'Совместимость с исходной Windows-программой ИС-2 '
                        'ещё не подтверждена для всех проектов.')
         ttk.Label(body, text=explanation, wraplength=410, justify='center').pack()
-        ttk.Button(body, text='Закрыть', command=window.destroy).pack(pady=(16, 0))
+        ttk.Button(body, text=tr('Закрыть'), command=window.destroy).pack(pady=(16, 0))
         window.bind('<Escape>', lambda _event: window.destroy())
         window.grab_set()
         window.focus_set()
@@ -4344,9 +4518,9 @@ def main(argv: list[str] | None = None) -> int:
             app._restore_editor_state()
             app._set_enabled(True)
             app._set_title()
-            app.status.set(f"Открыт: {app.path.name}" + (f"; настройки графа не загружены: {view_warning}" if view_warning else ""))
+            app.status.set(f"{tr('Открыт')}: {app.path.name}" + (f"; {tr('настройки графа не загружены')}: {view_warning}" if view_warning else ""))
         except Exception as exc:
-            messagebox.showerror("Ошибка открытия", str(exc), parent=app)
+            messagebox.showerror(tr("Ошибка открытия"), str(exc), parent=app)
     app.mainloop()
     return 0
 
