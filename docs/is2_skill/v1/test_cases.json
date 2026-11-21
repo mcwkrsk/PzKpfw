@@ -1,0 +1,10 @@
+{
+  "package_version": 1,
+  "protocol_version": 1,
+  "cases": [
+    {"file": "examples/valid_minimal.json", "stage": "execute", "accepted": true},
+    {"file": "examples/invalid_unknown_operation.json", "stage": "parse", "accepted": false, "error_contains": "unsupported"},
+    {"file": "examples/invalid_missing_parent.json", "stage": "execute", "accepted": false, "error_contains": "action id '999' does not exist"}
+  ]
+}
+

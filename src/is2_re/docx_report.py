@@ -68,7 +68,7 @@ def _tile_ranges(extent, limit, intervals):
     return result
 
 
-def diagram_tiles(doc, focus, *, max_width=1300, max_height=1450):
+def diagram_tiles(doc, focus, *, max_width=700, max_height=1450):
     """Rasterize the application's own primitives in bounded tiles, not a screenshot."""
     _, Image, ImageDraw, ImageFont = _dependencies()
     ops, width, height = primitives(doc, focus)
@@ -210,8 +210,12 @@ def create_report(doc, options=ReportOptions()):
             document.add_paragraph(label, style='Heading 2')
             for image, (x, y, nx, ny, tw, th) in diagram_tiles(doc, ident):
                 if nx * ny > 1: document.add_paragraph(f'Часть {y}.{x} из {ny} × {nx}')
-                scale_width = 15.8 * tw / 1300 if nx > 1 else 15.8
-                document.add_picture(image, width=Cm(min(scale_width, 23 * tw / th)))
+                # Every tile is an independent printable fragment.  Giving a
+                # narrow tile only its proportional share of the page kept the
+                # overall diagram scale, but made labels unreadably small on
+                # wide coursework schemes.  Expand each fragment to the usable
+                # page width while still respecting the available page height.
+                document.add_picture(image, width=Cm(min(15.8, 23 * tw / th)))
     forms, warnings = project_forms(doc)
     if options.forms:
         for key in ('A', 'B', 'D', 'D1', 'D2'):
@@ -242,7 +246,7 @@ def create_report(doc, options=ReportOptions()):
         else:
             document.add_paragraph('Объекты и параметры в проекте не заданы.')
         for title, body in (
-            ('Описание таблиц постоянной информации', 'Добавьте необходимые таблицы из исходных данных.'),
+            ('Описание таблиц постоянной информации', 'Добавьте справочные таблицы, используемые в схеме.'),
             ('Программная реализация', 'Добавьте описание реализации и её изображения.'),
             ('Приложение', 'Добавьте необходимые материалы.'),
         ):

@@ -29,6 +29,7 @@ class DocxReportTests(unittest.TestCase):
             self.assertIn('Форма C', text)
             self.assertNotIn('Харин', text)
             self.assertGreaterEqual(len(document.inline_shapes), 2)
+            self.assertTrue(all(shape.width >= 5_000_000 for shape in document.inline_shapes))
             tables = [[[cell.text for cell in row.cells] for row in table.rows] for table in document.tables]
             self.assertTrue(any(row[:2] == ['A5.1', 'Диаметр'] for table in tables for row in table))
             self.assertTrue(any('Код ПД1' in table[0] for table in tables))

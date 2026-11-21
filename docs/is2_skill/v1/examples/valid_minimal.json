@@ -1,0 +1,43 @@
+{
+  "protocol_version": 1,
+  "summary": "Добавить расчётный объект, действие и исходный параметр",
+  "assumptions": [],
+  "questions": [],
+  "operations": [
+    {
+      "operation_id": "object-1",
+      "type": "add_object",
+      "arguments": {"name": "Цилиндрическая передача"}
+    },
+    {
+      "operation_id": "action-1",
+      "type": "add_action",
+      "arguments": {
+        "name": "Определить передаточное отношение",
+        "action_type": 0,
+        "formalization": 2,
+        "status": 1,
+        "parent_id": "1"
+      }
+    },
+    {
+      "operation_id": "parameter-1",
+      "type": "add_parameter",
+      "arguments": {
+        "object_operation_id": "object-1",
+        "attributes": {
+          "name": "Передаточное отношение",
+          "group": "5",
+          "number": "1",
+          "sign": "u",
+          "codingType": "1",
+          "value": "3",
+          "unit": "-"
+        }
+      }
+    }
+  ],
+  "sources": [{"title": "Задание пользователя", "locator": "Передаточное отношение u = 3"}],
+  "manual_checks": ["Проверить значение u по выданному заданию"]
+}
+

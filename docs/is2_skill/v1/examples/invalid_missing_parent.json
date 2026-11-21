@@ -1,0 +1,16 @@
+{
+  "protocol_version": 1,
+  "summary": "Добавить действие к отсутствующему родителю",
+  "operations": [
+    {
+      "operation_id": "bad-parent",
+      "type": "add_action",
+      "arguments": {
+        "name": "Недостижимое действие",
+        "action_type": 0,
+        "parent_id": "999"
+      }
+    }
+  ]
+}
+
