@@ -225,7 +225,7 @@
   "Добавить элемент в текущем разделе.": "Add an item to the current section.",
   "Добавить…": "Add…",
   "Добавьте необходимые материалы.": "Add the required materials.",
-  "Добавьте необходимые таблицы из исходных данных.": "Add the required tables from the source data.",
+  "Добавьте справочные таблицы, используемые в схеме.": "Add the reference tables used in the scheme.",
   "Добавьте описание реализации и её изображения.": "Add a description of the implementation and its images.",
   "Документ Word": "Word document",
   "Доп. XML…": "Extra XML…",

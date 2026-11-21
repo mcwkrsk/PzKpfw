@@ -1,0 +1,108 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://pzkpfw.local/schemas/assistant-plan-v1.json",
+  "title": "PzKpfw assistant plan protocol v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["protocol_version", "summary", "operations"],
+  "properties": {
+    "protocol_version": {"const": 1},
+    "summary": {"type": "string", "minLength": 1, "maxLength": 4000},
+    "assumptions": {"$ref": "#/$defs/textList"},
+    "questions": {"$ref": "#/$defs/textList"},
+    "manual_checks": {"$ref": "#/$defs/textList"},
+    "sources": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["title"],
+        "properties": {
+          "title": {"type": "string", "minLength": 1, "maxLength": 240},
+          "locator": {"type": "string", "maxLength": 4000}
+        }
+      }
+    },
+    "operations": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {"$ref": "#/$defs/operation"}
+    }
+  },
+  "$defs": {
+    "textList": {
+      "type": "array",
+      "maxItems": 128,
+      "items": {"type": "string", "minLength": 1, "maxLength": 4000}
+    },
+    "scalar": {"type": ["string", "integer"]},
+    "attributes": {
+      "type": "object",
+      "maxProperties": 64,
+      "additionalProperties": {"type": ["string", "integer"]}
+    },
+    "nullableAttributes": {
+      "type": "object",
+      "maxProperties": 64,
+      "additionalProperties": {"type": ["string", "integer", "null"]}
+    },
+    "operation": {
+      "oneOf": [
+        {"$ref": "#/$defs/addObject"},
+        {"$ref": "#/$defs/renameObject"},
+        {"$ref": "#/$defs/addAction"},
+        {"$ref": "#/$defs/setActionFormula"},
+        {"$ref": "#/$defs/addActionParameterLink"},
+        {"$ref": "#/$defs/renumberActions"},
+        {"$ref": "#/$defs/addParameter"},
+        {"$ref": "#/$defs/updateParameter"}
+      ]
+    },
+    "operationBase": {
+      "type": "object",
+      "required": ["type", "arguments"],
+      "properties": {"operation_id": {"type": "string", "minLength": 1, "maxLength": 240}}
+    },
+    "addObject": {
+      "allOf": [{"$ref": "#/$defs/operationBase"}],
+      "unevaluatedProperties": false,
+      "properties": {
+        "type": {"const": "add_object"},
+        "arguments": {
+          "type": "object", "additionalProperties": false, "required": ["name"],
+          "properties": {"name": {"type": "string", "minLength": 1}, "attributes": {"$ref": "#/$defs/attributes"}}
+        }
+      }
+    },
+    "renameObject": {
+      "allOf": [{"$ref": "#/$defs/operationBase"}], "unevaluatedProperties": false,
+      "properties": {"type": {"const": "rename_object"}, "arguments": {"type": "object", "additionalProperties": false, "required": ["object_id", "name"], "properties": {"object_id": {"$ref": "#/$defs/scalar"}, "name": {"type": "string", "minLength": 1}}}}
+    },
+    "addAction": {
+      "allOf": [{"$ref": "#/$defs/operationBase"}], "unevaluatedProperties": false,
+      "properties": {"type": {"const": "add_action"}, "arguments": {"type": "object", "additionalProperties": false, "required": ["name", "action_type"], "properties": {"name": {"type": "string", "minLength": 1}, "action_type": {"$ref": "#/$defs/scalar"}, "formalization": {"$ref": "#/$defs/scalar"}, "status": {"$ref": "#/$defs/scalar"}, "mark": {"type": "string"}, "symbol": {"$ref": "#/$defs/scalar"}, "level": {"$ref": "#/$defs/scalar"}, "number": {"$ref": "#/$defs/scalar"}, "parent_id": {"$ref": "#/$defs/scalar"}, "parent_operation_id": {"type": "string"}, "alternatives": {"$ref": "#/$defs/textList"}}}}
+    },
+    "setActionFormula": {
+      "allOf": [{"$ref": "#/$defs/operationBase"}], "unevaluatedProperties": false,
+      "properties": {"type": {"const": "set_action_formula"}, "arguments": {"type": "object", "additionalProperties": false, "required": ["action_id", "expression", "reference"], "properties": {"action_id": {"$ref": "#/$defs/scalar"}, "expression": {"type": "string", "minLength": 1}, "reference": {"type": "string", "minLength": 1}}}}
+    },
+    "addActionParameterLink": {
+      "allOf": [{"$ref": "#/$defs/operationBase"}], "unevaluatedProperties": false,
+      "properties": {"type": {"const": "add_action_parameter_link"}, "arguments": {"type": "object", "additionalProperties": false, "required": ["action_id", "parameter_id", "role"], "properties": {"action_id": {"$ref": "#/$defs/scalar"}, "parameter_id": {"$ref": "#/$defs/scalar"}, "role": {"enum": ["function", "argument", "default_argument"]}, "power": {"$ref": "#/$defs/scalar"}}}}
+    },
+    "renumberActions": {
+      "allOf": [{"$ref": "#/$defs/operationBase"}], "unevaluatedProperties": false,
+      "properties": {"type": {"const": "renumber_actions"}, "arguments": {"type": "object", "additionalProperties": false, "properties": {"symbol": {"type": "string", "minLength": 1, "maxLength": 1}}}}
+    },
+    "addParameter": {
+      "allOf": [{"$ref": "#/$defs/operationBase"}], "unevaluatedProperties": false,
+      "properties": {"type": {"const": "add_parameter"}, "arguments": {"type": "object", "additionalProperties": false, "required": ["attributes"], "properties": {"attributes": {"$ref": "#/$defs/attributes"}, "object_operation_id": {"type": "string"}}}}
+    },
+    "updateParameter": {
+      "allOf": [{"$ref": "#/$defs/operationBase"}], "unevaluatedProperties": false,
+      "properties": {"type": {"const": "update_parameter"}, "arguments": {"type": "object", "additionalProperties": false, "required": ["parameter_id", "changes"], "properties": {"parameter_id": {"$ref": "#/$defs/scalar"}, "changes": {"$ref": "#/$defs/nullableAttributes"}}}}
+    }
+  }
+}
+

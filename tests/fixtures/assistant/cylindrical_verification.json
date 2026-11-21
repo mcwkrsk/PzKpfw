@@ -1,0 +1,36 @@
+{
+  "scenario_version": 1,
+  "name": "Базовый проверочный расчёт цилиндрической передачи",
+  "methodology": [
+    "Детали машин, формула (6.23), печатная страница 57",
+    "Детали машин, таблицы 6.15–6.16, печатные страницы 57–58"
+  ],
+  "assignment": {
+    "title": "Контрольный проверочный расчёт",
+    "transmission_kind": "cylindrical",
+    "calculation_mode": "verification",
+    "parent_action_id": "1",
+    "inputs": [
+      {"name": "Число зубьев шестерни", "symbol": "z1", "value": "20", "unit": "-"},
+      {"name": "Число зубьев колеса", "symbol": "z2", "value": "60", "unit": "-"},
+      {"name": "Нормальный модуль", "symbol": "m", "value": "2", "unit": "мм"},
+      {"name": "Угол наклона зуба", "symbol": "beta", "value": "0", "unit": "град"},
+      {"name": "Коэффициент смещения шестерни", "symbol": "x1", "value": "0", "unit": "-"},
+      {"name": "Коэффициент смещения колеса", "symbol": "x2", "value": "0", "unit": "-"},
+      {"name": "Рабочее напряжение изгиба", "symbol": "sigmaF", "value": "120", "unit": "МПа"},
+      {"name": "Максимальный момент", "symbol": "T1max", "value": "300", "unit": "Н·м"},
+      {"name": "Рабочий момент", "symbol": "T1", "value": "200", "unit": "Н·м"},
+      {"name": "Допускаемое напряжение", "symbol": "sigmaFPmax", "value": "240", "unit": "МПа"}
+    ]
+  },
+  "expected_parameters": {
+    "aw": "80",
+    "T1_calc": "200",
+    "Ft": "10000",
+    "Fr": "3639.702343",
+    "Fx": "0",
+    "sigmaFmax": "180",
+    "utilFmax": "0.75"
+  },
+  "expected_check_text": "условие выполнено"
+}

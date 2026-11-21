@@ -24,3 +24,13 @@ Thumbs.db
 /_internal/
 /_internal.backup-*/
 /PzKpfw.exe.backup-*
+/tmp/
+.pzkpfw-backups/
+*.is2.bak
+*.pem
+*.key
+*.p12
+*.pfx
+credentials.json
+secrets.json
+token.json

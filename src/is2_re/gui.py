@@ -8,6 +8,7 @@ from .i18n import (tr, tr_dynamic, available_languages, discover_languages, get_
 
 import hashlib
 import json
+import logging
 import sys
 import textwrap
 import tkinter as tk
@@ -51,6 +52,8 @@ from .matrix_canvas import MatrixCanvas, wheel_steps
 from . import __version__
 from .ui_icons import make_history_icon
 from .parameter_dialog import ParameterDialog, group_label
+from .assistant import ExecutionResult, append_audit_record
+from .assistant_gui import AssistantDialog
 
 
 class RecordDialog(tk.Toplevel):
@@ -302,6 +305,8 @@ class Is2Studio(tk.Tk):
         self.edit_menu.add_command(label=tr("История действий…"), command=self.show_history)
         menu.add_cascade(label=tr("Правка"), menu=self.edit_menu)
         project_menu = tk.Menu(menu, tearoff=False)
+        project_menu.add_command(label="ИИ-ассистент…", command=self.show_assistant)
+        project_menu.add_separator()
         project_menu.add_command(label=tr("Проверить проект"), command=self.validate_project)
         project_menu.add_command(label=tr("Проверить совместимость с ИС-2"), command=self.check_compatibility)
         project_menu.add_command(label=tr("Обзор возможностей и ограничений…"), command=self.show_feature_audit)
@@ -2439,6 +2444,54 @@ class Is2Studio(tk.Tk):
         if self.path is not None:
             self._save_graph_view_state()
         return report
+
+    def show_assistant(self):
+        if self.doc is None:
+            messagebox.showinfo("ИИ-ассистент", "Сначала откройте или создайте проект.", parent=self)
+            return
+        workspace_path = Path(self.path).parent if self.path else Path.cwd()
+        dialog = AssistantDialog(
+            self,
+            self.doc,
+            self._apply_assistant_result,
+            workspace_path=workspace_path,
+        )
+
+    def _apply_assistant_result(self, result: ExecutionResult) -> None:
+        if self.doc is None:
+            raise ValueError("Открытый проект больше недоступен")
+        backup_info = None
+        project_path = Path(self.path) if self.path else None
+        if project_path is not None and project_path.is_file():
+            # The user has confirmed the plan, but the in-memory document has
+            # not been replaced yet. A failed backup therefore aborts cleanly.
+            backup_info = create_project_backup(project_path)
+        candidate = result.candidate
+        candidate.source_path = str(self.path) if self.path else self.doc.source_path
+        self.doc = candidate
+        if backup_info is not None and hasattr(self, "history"):
+            self.history.note(
+                "backup",
+                "Резервная копия перед применением плана ассистента",
+                details=[str(backup_info.path), backup_info.sha256],
+                state=self._document_snapshot(),
+            )
+        operations = [item.description for item in result.applied_operations]
+        self._mark_dirty(
+            f"Ассистент: {result.plan.summary}",
+            operation_group=operations,
+        )
+        self.refresh_all()
+        if backup_info is not None:
+            self.status.set(
+                f"Изменения ассистента применены; резервная копия: {backup_info.path.name}"
+            )
+        try:
+            append_audit_record(result)
+        except OSError as exc:
+            # A journal failure must never roll back an already accepted and
+            # valid in-memory project change.
+            logging.getLogger(__name__).warning("Assistant audit journal was not written: %s", exc)
 
     def _commit_link_repair(self, selector: str, *, target_id: str | None = None, clear: bool = False) -> dict:
         if clear == (target_id is not None):

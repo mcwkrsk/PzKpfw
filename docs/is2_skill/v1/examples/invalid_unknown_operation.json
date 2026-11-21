@@ -1,0 +1,8 @@
+{
+  "protocol_version": 1,
+  "summary": "Недопустимая попытка выполнить команду",
+  "operations": [
+    {"operation_id": "bad-1", "type": "run_command", "arguments": {}}
+  ]
+}
+
