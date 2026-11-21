@@ -1,0 +1,9 @@
+{
+  "format_version": 1,
+  "locale": "ru_pre1918",
+  "native_name": "Русский (до 1918 г.)",
+  "english_name": "Russian (pre-1918 orthography)",
+  "direction": "ltr",
+  "author": "PzKpfw initial translation; community review welcome",
+  "notes": "All current catalog entries have an initial translation. Native-speaker proofreading is welcome; new source strings may use the Russian fallback until translated."
+}

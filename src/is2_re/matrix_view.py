@@ -1,4 +1,5 @@
-"""Read-only, object-grouped matrix projection with cell descriptions."""
+"""Только чтение, object-grouped matrix projection with cell descriptions."""
+from .i18n import tr
 from .specifications import project_forms, primary_links, parameter_code, action_code, _sort_number
 from .gui_models import action_tree_rows
 from collections import defaultdict
@@ -80,7 +81,7 @@ def grouped_matrix(doc, *, context=None):
     labels = []
     for i in order:
         obj_id = params[i].get('o','')
-        obj = object_names.get(obj_id, f'Объект ID {obj_id}' if obj_id and obj_id != '0' else 'Без объекта')
+        obj = object_names.get(obj_id, tr('Объект ID {id}').format(id=obj_id) if obj_id and obj_id != '0' else tr('Без объекта'))
         labels.append(obj + '\n' + parameter_code(params[i]))
     if rows:
         actions = {n.get('id',''): n for n in doc.actions}
@@ -97,7 +98,7 @@ def grouped_matrix(doc, *, context=None):
                 cells.append(raw + ''.join(mark for mark in mark_order if mark in hints and mark not in raw))
             new_rows.append([row_marks.get(node.get('id',''), ''), row[1]] + cells)
         rows=new_rows
-    return ['Структ.', headers[1]]+labels, rows, [params[i].get('id','') for i in order], warnings
+    return [tr('Структ.'), headers[1]]+labels, rows, [params[i].get('id','') for i in order], warnings
 
 def structural_row_marks(doc, actions):
     """Reconstruct observed sequence boundaries and alternative branches for display."""
@@ -125,9 +126,9 @@ def structural_row_marks(doc, actions):
 
 def cell_description(doc, action_id, parameter_id, *, context=None):
     action, param = doc.action(action_id), doc.parameter(parameter_id)
-    roles = {'*':'функция', '+':'аргумент', '.':'аргумент по умолчанию', '?':'аргумент альтернативы', '!':'счётчик цикла',
-             '[':'начало последовательности', ']':'конец последовательности', '#':'альтернатива',
-             '/':'ветвь альтернативы', '{':'начало цикла', '}':'конец цикла'}
+    roles = {'*':tr('функция'), '+':tr('аргумент'), '.':tr('аргумент по умолчанию'), '?':tr('аргумент альтернативы'), '!':tr('счётчик цикла'),
+             '[':tr('начало последовательности'), ']':tr('конец последовательности'), '#':tr('альтернатива'),
+             '/':tr('ветвь альтернативы'), '{':tr('начало цикла'), '}':tr('конец цикла')}
     key = (str(action_id), str(parameter_id))
     if context is None:
         links, _ = primary_links(doc)
@@ -136,12 +137,12 @@ def cell_description(doc, action_id, parameter_id, *, context=None):
     else:
         entries = context[0].get(key, ())
         marks = context[1]
-    details = ', '.join(f"{m} — {roles.get(m, 'значение не расшифровано')}" + (f"; кратность {power}" if power not in ('','1') else '') for m,power in entries) or 'Записанная связь отсутствует'
+    details = ', '.join(f"{m} — {roles.get(m, tr('значение не расшифровано'))}" + (tr('; кратность {power}').format(power=power) if power not in ('','1') else '') for m,power in entries) or tr('Записанная связь отсутствует')
     hints = marks.get(key, set())
     if hints:
-        explanations = {'[':'начало последовательности', ']':'конец последовательности',
-                        '#':'альтернатива', '/':'ветвь альтернативы',
-                        '.':'аргумент по умолчанию', '{':'начало цикла', '}':'конец цикла'}
+        explanations = {'[':tr('начало последовательности'), ']':tr('конец последовательности'),
+                        '#':tr('альтернатива'), '/':tr('ветвь альтернативы'),
+                        '.':tr('аргумент по умолчанию'), '{':tr('начало цикла'), '}':tr('конец цикла')}
         details += '\n' + '; '.join(f'{mark} — {explanations[mark]}' for mark in '.[]{}#/' if mark in hints)
-        details += ' (вычислено для отображения; в XML отдельно не записано)'
+        details += tr(' (вычислено для отображения; в XML отдельно не записано)')
     return f"{action_code(action)}  {action.get('name','')}\n{parameter_code(param)}  {param.get('name','')}\n{details}"

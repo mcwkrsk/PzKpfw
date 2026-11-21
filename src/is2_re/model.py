@@ -1,4 +1,4 @@
-"""Read-only semantic projection of the observed IS-2 project XML format.
+"""Только чтение semantic projection of the observed IS-2 project XML format.
 
 The original XML tree is retained. This module deliberately does not mutate or
 rewrite documents: canonical saving rules are not yet verified against IS-2.

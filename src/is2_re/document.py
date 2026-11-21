@@ -341,7 +341,7 @@ class ProjectDocument:
                     seen.add(cur)
                     cur = parent_of[cur]
         # Parameter/@o is the recovered native Parameter -> Object reference.
-        # Validate it in its own ID namespace; an absent/zero value means unassigned.
+        # Validate it in its own ID namespace; an отсутствует/zero value means unassigned.
         parameter_nodes = self.params_node.findall("param")
         object_nodes = list(self.objects_node)
         parameter_ids = [node.get("id", "") for node in parameter_nodes]

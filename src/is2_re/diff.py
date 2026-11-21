@@ -17,6 +17,7 @@ from typing import Any, Iterable
 import xml.etree.ElementTree as ET
 
 from .document import ProjectDocument, _clean_formatting_text
+from .i18n import tr
 
 
 class ProjectDiffError(ValueError):
@@ -258,7 +259,7 @@ def compare_documents(reference: ProjectDocument, current: ProjectDocument) -> P
             add(kind="modified_text", path=cur_path, tag=cur_node.tag,
                 reference_value=old_text, current_value=new_text,
                 ambiguous=ambiguous,
-                description=f"Текстовое содержимое <{cur_node.tag}> изменено")
+                description=tr("Текстовое содержимое <{tag}> изменено").format(tag=cur_node.tag))
 
         ref_children = list(ref_node)
         cur_children = list(cur_node)
@@ -294,7 +295,7 @@ def compare_documents(reference: ProjectDocument, current: ProjectDocument) -> P
                 reference_value=f"<{child.tag}> (старый XML-фрагмент)", fragment_xml=fragment,
                 before_anchor=before_anchor, after_anchor=after_anchor,
                 ambiguous=child_ambiguous,
-                description=f"Удалён элемент <{child.tag}>" + (f" с id={identity[1]}" if identity and identity[0] == "id" else ""))
+                description=tr("Удалён элемент <{tag}>").format(tag=child.tag) + (f" с id={identity[1]}" if identity and identity[0] == "id" else ""))
 
         for ref_index in sorted(matches):
             cur_index, pair_ambiguous = matches[ref_index]
@@ -310,7 +311,7 @@ def compare_documents(reference: ProjectDocument, current: ProjectDocument) -> P
             add(kind="added", path=current_paths[cur_index], parent_path=cur_path,
                 index=cur_index, tag=child.tag, current_value=f"<{child.tag}> (новый XML-фрагмент)",
                 fragment_xml=fragment, ambiguous=identity is None and len(child_group) > 1,
-                description=f"Добавлен элемент <{child.tag}>" + (f" с id={identity[1]}" if identity and identity[0] == "id" else ""))
+                description=tr("Добавлен элемент <{tag}>").format(tag=child.tag) + (f" с id={identity[1]}" if identity and identity[0] == "id" else ""))
 
     if reference.root.tag != current.root.tag:
         raise ProjectDiffError("project root tags differ; projects cannot be compared safely")
@@ -318,7 +319,7 @@ def compare_documents(reference: ProjectDocument, current: ProjectDocument) -> P
     ref_bytes = reference.to_bytes(pretty=False)
     cur_bytes = current.to_bytes(pretty=False)
     if any(op.ambiguous for op in operations):
-        warnings.append("Часть однотипных XML-узлов не имеет устойчивого ID и сопоставлена по позиции; проверьте её вручную перед восстановлением.")
+        warnings.append(tr("Часть однотипных XML-узлов не имеет устойчивого ID и сопоставлена по позиции; проверьте её вручную перед восстановлением."))
     return ProjectDiff(
         reference_path=reference.source_path, current_path=current.source_path,
         reference_sha256=_sha256(ref_bytes), current_sha256=_sha256(cur_bytes),
@@ -613,7 +614,7 @@ def expand_related_restore_bundle(
             for relation_key in edges_by_entity.get(entity_key, []):
                 for relation_operation in relation_operations_for_key.get(relation_key, []):
                     if relation_operation not in selected_set:
-                        reasons[relation_operation].append(f"Связь {relation_key} с сущностью {entity_key}")
+                        reasons[relation_operation].append(tr("Связь {relation_key} с сущностью {entity_key}").format(relation_key=relation_key, entity_key=entity_key))
                         selected_set.add(relation_operation)
                 queue_relations.append(relation_key)
         while queue_relations:
@@ -630,7 +631,7 @@ def expand_related_restore_bundle(
                 # not cause an unrelated whole-graph expansion.
                 if entity_operation:
                     if entity_operation not in selected_set:
-                        reasons[entity_operation].append(f"Конечная точка связи {relation_key}: {entity_key}")
+                        reasons[entity_operation].append(tr("Конечная точка связи {relation_key}: {entity_key}").format(relation_key=relation_key, entity_key=entity_key))
                         selected_set.add(entity_operation)
                     queue_entities.append(entity_key)
         if len(selected_set) > max_operations:
@@ -648,7 +649,7 @@ def expand_related_restore_bundle(
         "added_operation_ids": added,
         "added_reasons": {key: value for key, value in reasons.items() if key in added},
         "opaque_record_count": len(graph["opaque_records"]),
-        "warnings": (["Непрозрачные записи не входят в автоматический анализ зависимостей; итоговую проверку обязательно выполнить вручную."]
+        "warnings": ([tr("Непрозрачные записи не входят в автоматический анализ зависимостей; итоговую проверку обязательно выполнить вручную.")]
                      if graph["opaque_records"] else []),
         "max_operations": max_operations,
         "automatic_id_guessing": False,

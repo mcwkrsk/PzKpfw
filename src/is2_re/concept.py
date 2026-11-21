@@ -5,6 +5,7 @@ SubjectCategory (pk) and SCBinaryLink (link) fields; unrecognised nodes and
 attributes are retained verbatim at the semantic XML level.
 """
 from __future__ import annotations
+from .i18n import tr
 
 from dataclasses import dataclass
 from typing import Iterable, Mapping
@@ -18,10 +19,10 @@ CATEGORY_FIELDS = {
 LINK_FIELDS = {"name", "e1", "e2", "e3", "type", "range"}
 CLASS_CHARS = {1: "S", 2: "P", 3: "Z", 4: "K", 5: "O", 6: "R", 7: "C"}
 CLASS_LABELS = {
-    1: "Цикл", 2: "Процесс", 3: "Задача", 4: "Компонент",
-    5: "Объект", 6: "Признак / атрибут", 7: "Значение признака",
+    1: tr("Цикл"), 2: tr("Процесс"), 3: tr("Задача"), 4: tr("Компонент"),
+    5: tr("Объект"), 6: tr("Признак / атрибут"), 7: tr("Значение признака"),
 }
-LINK_LABELS = {1: "Упорядочивание", 2: "Состав", 3: "Компоновка"}
+LINK_LABELS = {1: tr("Упорядочивание"), 2: tr("Состав"), 3: tr("Компоновка")}
 
 
 def _integer(value: str | None, field: str, *, default: int | None = None) -> int:
@@ -57,7 +58,7 @@ class SubjectCategory:
 
     @property
     def class_label(self) -> str:
-        return CLASS_LABELS.get(self.class_id, f"Неизвестный класс {self.class_id}")
+        return CLASS_LABELS.get(self.class_id, tr('Неизвестный класс {class_id}').format(class_id=self.class_id))
 
     @property
     def sort_key(self) -> tuple[int, int, int]:
@@ -77,7 +78,7 @@ class SCBinaryLink:
 
     @property
     def label(self) -> str:
-        return LINK_LABELS.get(self.type, f"Неизвестная связь {self.type}")
+        return LINK_LABELS.get(self.type, tr('Неизвестная связь {link_type}').format(link_type=self.type))
 
     @property
     def endpoint_ids(self) -> tuple[str | None, str | None, str | None]:

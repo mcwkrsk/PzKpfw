@@ -632,7 +632,7 @@ def main(argv: list[str] | None = None) -> int:
                 if destination.exists() and not args.overwrite:
                     raise RepairError("destination already exists; pass --overwrite to replace it")
                 if report["summary"]["validation_issue_count"] != 0:
-                    raise RepairError("repaired document still has validation issues; no file was written. Run link-integrity/validate and repair all remaining problems first")
+                    raise RepairError("repaired document still has validation issues; нет файла was written. Run link-integrity/validate and repair all remaining problems first")
                 repaired.save(args.output)
                 report["written_to"] = str(args.output)
             if args.report:

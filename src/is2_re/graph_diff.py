@@ -5,6 +5,7 @@ from typing import Any
 
 from .document import ProjectDocument
 from .graph import build_relationship_graph
+from .i18n import tr
 
 
 def compare_relationship_graphs(reference: ProjectDocument, current: ProjectDocument) -> dict[str, Any]:
@@ -47,12 +48,11 @@ def compare_relationship_graphs(reference: ProjectDocument, current: ProjectDocu
     warnings = []
     if ambiguous_relation_keys:
         warnings.append(
-            "Часть AIEBinaryLink/AEContentLink сопоставляется по индексу записи: "
-            "вставка или удаление перед записью может выглядеть как изменение нескольких связей."
+            tr("Часть AIEBinaryLink/AEContentLink сопоставляется по индексу записи: вставка или удаление перед записью может выглядеть как изменение нескольких связей.")
         )
     if old["opaque_records"] or new["opaque_records"]:
         warnings.append(
-            "В проектах есть непрозрачные записи, которые не включены в типизированное сравнение графа."
+            tr("В проектах есть непрозрачные записи, которые не включены в типизированное сравнение графа.")
         )
     return {
         "schema_version": 1,

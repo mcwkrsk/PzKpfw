@@ -11,6 +11,7 @@ from collections import defaultdict
 import textwrap
 
 from .document import ProjectDocument
+from .i18n import tr, available_languages, get_language_info
 from .gui_models import action_tree_rows
 from .specifications import action_code, project_forms
 
@@ -48,9 +49,9 @@ class CourseScene:
 def create_course_project(name: str, root_title: str, *, author: str = '', symbol: str = 'z') -> ProjectDocument:
     """A minimal editable course scaffold; does not invent native ModuleParams."""
     if not root_title.strip():
-        raise ValueError('Укажите название основной работы')
+        raise ValueError(tr('Укажите название основной работы'))
     if len(symbol) != 1 or not symbol.isprintable() or symbol.isspace():
-        raise ValueError('Обозначение должно состоять из одного печатного символа')
+        raise ValueError(tr('Обозначение должно состоять из одного печатного символа'))
     doc = ProjectDocument.new_empty(name, user_name=author)
     doc.add_action(root_title.strip(), action_type='2', status='1', formalization='2',
                    symbol=str(ord(symbol)), level=1, number=1)
@@ -64,11 +65,11 @@ def renumber_structure(doc: ProjectDocument, *, symbol: str = 'z') -> dict[str, 
     remain unchanged. This is NOT the original native codeStructure() algorithm.
     """
     if len(symbol) != 1 or not symbol.isprintable() or symbol.isspace():
-        raise ValueError('Необходим один печатный символ')
+        raise ValueError(tr('Необходим один печатный символ'))
     staged = doc.clone()
     before = staged.validate(deep=True)
     if before:
-        raise ValueError('Нельзя перенумеровать некорректный проект: ' + '; '.join(before))
+        raise ValueError(tr('Нельзя перенумеровать некорректный проект: {issues}').format(issues='; '.join(before)))
     rows = action_tree_rows(staged)
     counters: dict[int, int] = defaultdict(int)
     changes = []
@@ -83,7 +84,7 @@ def renumber_structure(doc: ProjectDocument, *, symbol: str = 'z') -> dict[str, 
             changes.append({'id': row.action_id, 'old': previous, 'code': action_code(n)})
     preflight = staged.serialization_preflight()
     if not (preflight['semantic_preserved'] and preflight['writer_idempotent'] and not preflight['validation_issues']):
-        raise ValueError('После перенумерации не прошла проверка записи')
+        raise ValueError(tr('После перенумерации не прошла проверка записи'))
     doc.root = staged.root
     return {'reassigned': changes, 'action_count': len(rows),
             'algorithm': 'PzKpfw depth-global sequential numbering; NOT native codeStructure()'}
@@ -98,7 +99,15 @@ def course_checklist(doc: ProjectDocument) -> dict[str, object]:
     missing_codes = [n.get('id', '?') for n in actions if action_code(n).startswith('ID ')]
     missing_names = [n.get('id', '?') for n in actions if not n.get('name', '').strip()]
     no_children = [n.get('id', '?') for n in actions if n.get('type') != '0' and not doc.composition_children(n.get('id', ''))]
-    placeholders = [n.get('id', '?') for n in actions if n.get('name', '').lower().startswith('новое действие')]
+    placeholder_prefixes = {'новое действие'}
+    for language in available_languages():
+        localized = get_language_info(language.locale).messages.get('Новое действие {index}', '')
+        if isinstance(localized, str) and '{index}' in localized:
+            prefix = localized.split('{index}', 1)[0].strip().casefold()
+            if prefix:
+                placeholder_prefixes.add(prefix)
+    placeholders = [n.get('id', '?') for n in actions
+                    if any(n.get('name', '').casefold().startswith(prefix) for prefix in placeholder_prefixes)]
     forms, form_warnings = project_forms(doc)
     result = {
         'name': doc.root.get('name', ''), 'actions': len(actions),
@@ -109,9 +118,9 @@ def course_checklist(doc: ProjectDocument) -> dict[str, object]:
         'empty_composite_actions': no_children, 'placeholder_actions': placeholders,
         'form_warnings': form_warnings,
         'remarks': [
-            'Соответствие методическим указаниям и требованиям преподавателя проверяется отдельно.',
-            'Точное соответствие оригинальной ИС-2 не подтверждено испытанием в Windows.',
-            'Нумерация PzKpfw — отдельная явная команда, а не восстановленный native codeStructure().',
+            tr('Соответствие методическим указаниям и требованиям преподавателя проверяется отдельно.'),
+            tr('Точное соответствие оригинальной ИС-2 не подтверждено испытанием в Windows.'),
+            tr('Нумерация PzKpfw — отдельная явная команда, а не восстановленный native codeStructure().'),
         ],
     }
     return result
@@ -226,15 +235,16 @@ def edge_paths(scene: CourseScene):
 
 
 def _wrapped_lines(value: str, line_width: int = 24, max_lines: int = 3) -> list[str]:
-    lines = textwrap.wrap(value or '(без названия)', width=line_width, break_long_words=True, break_on_hyphens=False)
+    lines = textwrap.wrap(value or tr('(без названия)'), width=line_width, break_long_words=True, break_on_hyphens=False)
     if len(lines) > max_lines:
         lines = lines[:max_lines]
         lines[-1] = lines[-1].rstrip(' .') + '…'
     return lines
 
 
-def scene_svg(scene: CourseScene, *, selected: str | None = None, title: str = 'Курсовая — структурная схема') -> str:
+def scene_svg(scene: CourseScene, *, selected: str | None = None, title: str | None = None) -> str:
     """Export a true, resolution-independent SVG (not an image screenshot)."""
+    title = title if title is not None else tr('Курсовая — структурная схема')
     w, h = scene.node_width, scene.node_height
     by_id = {node.ident: node for node in scene.nodes}
     lines = [f'<svg xmlns="http://www.w3.org/2000/svg" width="{scene.width}" height="{scene.height}" viewBox="0 0 {scene.width} {scene.height}">',
@@ -281,22 +291,22 @@ def set_alternative_labels(doc: ProjectDocument, action_id: str, labels: list[st
     """
     import xml.etree.ElementTree as ET
     if len(labels) != 2 or not all(isinstance(x, str) and x.strip() for x in labels):
-        raise ValueError('У альтернативы должны быть две непустые подписи')
+        raise ValueError(tr('У альтернативы должны быть две непустые подписи'))
     staged = doc.clone()
     target = staged.action(action_id)
     if target.get('type') != '1':
-        raise ValueError('Подписи вариантов редактируются только у альтернативы')
+        raise ValueError(tr('Подписи вариантов редактируются только у альтернативы'))
     children = list(target)
     if any(child.tag != 'alts' or set(child.attrib) - {'text'} or len(child) or
            (child.text or '').strip() for child in children):
-        raise ValueError('У альтернативы есть непонятные дочерние XML-данные; редактирование запрещено')
+        raise ValueError(tr('У альтернативы есть непонятные дочерние XML-данные; редактирование запрещено'))
     if len(children) > 2:
-        raise ValueError('Неподтверждённая форма альтернативы: более двух вариантов')
+        raise ValueError(tr('Неподтверждённая форма альтернативы: более двух вариантов'))
     for child in children:
         target.remove(child)
     for label in labels:
         ET.SubElement(target, 'alts', {'text': label.strip()})
     checks = staged.serialization_preflight()
     if not (checks['semantic_preserved'] and checks['writer_idempotent'] and not checks['validation_issues']):
-        raise ValueError('Ошибка проверки формата после изменения вариантов')
+        raise ValueError(tr('Ошибка проверки формата после изменения вариантов'))
     doc.root = staged.root

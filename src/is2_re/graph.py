@@ -10,6 +10,7 @@ from collections import Counter
 from typing import Any, Iterable
 
 from .document import ProjectDocument
+from .i18n import tr
 
 RELATION_LABELS = {
     "scbinarylink": "SCBinaryLink (ConceptModel/cs)",
@@ -54,7 +55,7 @@ def build_relationship_graph(doc: ProjectDocument) -> dict[str, Any]:
         ident = node.get("id")
         if not ident:
             continue
-        name = node.get("name", "") or "(без названия)"
+        name = node.get("name", "") or tr("(без названия)")
         detail = "AFElement" + " · ".join(
             f"{field}={node.get(field)}" for field in ("type", "level", "number") if node.get(field) is not None
         )
@@ -64,7 +65,7 @@ def build_relationship_graph(doc: ProjectDocument) -> dict[str, Any]:
         ident = node.get("id")
         if not ident:
             continue
-        name = node.get("name", "") or "(без названия)"
+        name = node.get("name", "") or tr("(без названия)")
         detail = "AIElement / SubjectCategory" + " · ".join(
             f"{field}={node.get(field)}" for field in ("class", "group", "number", "status") if node.get(field) is not None
         )
@@ -74,7 +75,7 @@ def build_relationship_graph(doc: ProjectDocument) -> dict[str, Any]:
         ident = node.get("id")
         if not ident:
             continue
-        name = node.get("name", "") or "(без названия)"
+        name = node.get("name", "") or tr("(без названия)")
         detail = "AIElement / spz AElement" + " · ".join(
             f"{field}={node.get(field)}" for field in ("type", "status", "level", "number") if node.get(field) is not None
         )
@@ -86,21 +87,21 @@ def build_relationship_graph(doc: ProjectDocument) -> dict[str, Any]:
         ident = node.get("id")
         if not ident:
             continue
-        name = node.get("name", "") or "(без названия)"
+        name = node.get("name", "") or tr("(без названия)")
         detail = "PrimaryModel / Parameter" + " · ".join(
             f"{field}={node.get(field)}" for field in ("group", "codingType", "number", "sign", "o") if node.get(field) is not None
         )
-        add_entity("parameter", ident, f"Параметр #{ident} · {name}", detail, dict(node.attrib))
+        add_entity("parameter", ident, tr("Параметр #{ident} · {name}").format(ident=ident, name=name), detail, dict(node.attrib))
 
     for node in doc.objects_node:
         ident = node.get("id")
         if not ident:
             continue
-        name = node.get("name", "") or "(без названия)"
+        name = node.get("name", "") or tr("(без названия)")
         detail = "PrimaryModel / Object" + " · ".join(
             f"{key}={value}" for key, value in node.attrib.items() if key not in {"id", "name"}
         )
-        add_entity("object", ident, f"Объект #{ident} · {name}", detail, dict(node.attrib))
+        add_entity("object", ident, tr("Объект #{ident} · {name}").format(ident=ident, name=name), detail, dict(node.attrib))
 
     def add_relation(
         *, key: str, kind: str, label: str, detail: str,

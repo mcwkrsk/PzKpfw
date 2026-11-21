@@ -7,6 +7,7 @@ runs on a clone first; a rejected transformation leaves the document intact.
 from __future__ import annotations
 
 from .document import ProjectDocument
+from .i18n import tr
 
 # Numeric enum assignments established by the supplied native code analysis.
 CONVERSIONS = {
@@ -83,7 +84,7 @@ def convert_action(
     node.set('formalization', formalization)
     added = []
     for index in range(count):
-        name = child_names[index] if child_names is not None else f'Новое действие {index + 1}'
+        name = child_names[index] if child_names is not None else tr('Новое действие {index}').format(index=index + 1)
         added.append(staged.add_action(name, action_type='0', status='0', formalization='0', parent_id=ident))
     _commit(doc, staged)
     return {

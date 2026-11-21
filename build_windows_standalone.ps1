@@ -56,7 +56,7 @@ if ($LASTEXITCODE -ne 0) { throw 'Could not install build dependencies' }
 $env:PYTHONPATH = Join-Path $PSScriptRoot 'src'
 & $buildPython -m unittest discover -s tests -p 'test_*.py' -q
 if ($LASTEXITCODE -ne 0) { throw 'Source tests failed' }
-& $buildPython -m PyInstaller --noconfirm --clean --onedir --windowed --name 'PzKpfw' --icon 'src\is2_re\assets\pzkpfw.ico' --paths 'src' --add-data 'src\is2_re\assets;is2_re\assets' 'pzkpfw_standalone_entry.py'
+& $buildPython -m PyInstaller --noconfirm --clean --onedir --windowed --name 'PzKpfw' --icon 'src\is2_re\assets\pzkpfw.ico' --paths 'src' --add-data 'src\is2_re\assets;is2_re\assets' --add-data 'src\is2_re\locales;is2_re\locales' 'pzkpfw_standalone_entry.py'
 if ($LASTEXITCODE -ne 0) { throw 'EXE build failed' }
 if (-not (Test-Path 'dist\PzKpfw\_internal\python312.dll')) { throw 'Build is incomplete: _internal\python312.dll is missing' }
 if (-not (Get-ChildItem 'dist\PzKpfw\_internal' -Filter '_tkinter*.pyd' -Recurse -ErrorAction SilentlyContinue)) { throw 'Build is incomplete: tkinter extension is missing' }
