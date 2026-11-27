@@ -127,9 +127,73 @@ def course_checklist(doc: ProjectDocument) -> dict[str, object]:
     return result
 
 
+SHEET_DEPTH = 'sheet'
+SPD_SHEET_DEPTH = 'spd-sheet'
+
+
+def spd_sheet_heads(doc: ProjectDocument) -> list[str]:
+    """Sheets of «Формирование СПД», as IS-2 keeps them: the root action plus
+    the actions listed in ModuleParams/PrimaryModelAuto/@decStr (their printed
+    codes, e.g. "z32;z43;z5.12;"), ordered by level, then number."""
+    from .specifications import action_code
+    nodes_by_id = {n.get('id', ''): n for n in doc.actions}
+    children = {link.get('afe2', '') for link in doc.links if link.get('type') == '2'}
+    roots = [ident for ident in nodes_by_id if ident not in children]
+    codes = set()
+    for module in doc.root.iter('Module'):
+        if module.get('name') == 'PrimaryModelAuto':
+            for param in module.iter('param'):
+                codes.update(code.strip() for code in (param.get('decStr') or '').split(';') if code.strip())
+    heads = [ident for ident, node in nodes_by_id.items() if ident not in roots and action_code(node) in codes]
+    order = lambda ident: (_level_number(nodes_by_id[ident]), ident)
+    return sorted(roots, key=order)[:1] + sorted(heads, key=order)
+
+
+def _is_inline(nodes_by_id, parent: str, child: str) -> bool:
+    """IS-2 draws an alternative and the body of a loop on the sheet of their
+    parent; they never get a sheet of their own."""
+    return (nodes_by_id.get(child) is not None and nodes_by_id[child].get('type') == '1') or \
+        (nodes_by_id.get(parent) is not None and nodes_by_id[parent].get('type') == '3')
+
+
+def _level_number(node):
+    try:
+        return int(node.get('level', '')), int(node.get('number', ''))
+    except ValueError:
+        return 10**6, 10**6
+
+
+def sheet_actions(doc: ProjectDocument) -> list[str]:
+    """Actions that have their own decomposition sheet, ordered as in IS-2
+    (by level, then number): every composite action except alternatives and
+    loop bodies, which are drawn on their parent's sheet."""
+    nodes_by_id = {n.get('id', ''): n for n in doc.actions}
+    parent_of = {}
+    composite = set()
+    for link in doc.links:
+        if link.get('type') == '2':
+            parent_of[link.get('afe2', '')] = link.get('afe1', '')
+            composite.add(link.get('afe1', ''))
+    ids = [ident for ident in nodes_by_id if ident in composite
+           and not _is_inline(nodes_by_id, parent_of.get(ident, ''), ident)]
+    return sorted(ids, key=lambda ident: (_level_number(nodes_by_id[ident]), ident))
+
+
 @reads_document
-def build_course_scene(doc: ProjectDocument, focus: str | None = None, *, max_depth: int | None = None) -> CourseScene:
-    """Tidy hierarchy with sequence rails. Focus selects an entire subtree."""
+def build_course_scene(doc: ProjectDocument, focus: str | None = None, *, max_depth: int | str | None = None) -> CourseScene:
+    """Tidy hierarchy with sequence rails. Focus selects an entire subtree.
+
+    ``max_depth=SHEET_DEPTH`` draws one IS-2 sheet: the action, its children
+    and, inline, the contents of alternatives and loop bodies."""
+    sheet = max_depth == SHEET_DEPTH
+    stop_at = frozenset()
+    if max_depth == SPD_SHEET_DEPTH:
+        # An SPD sheet shows its head's whole subtree; other sheet heads are
+        # drawn as leaves (their contents are on their own sheets).
+        stop_at = frozenset(spd_sheet_heads(doc)) - {focus}
+        max_depth = None
+    if sheet:
+        max_depth = None
     nodes_by_id = {n.get('id', ''): n for n in doc.actions}
     if focus is not None:
         doc.action(focus)
@@ -161,7 +225,7 @@ def build_course_scene(doc: ProjectDocument, focus: str | None = None, *, max_de
     edges: list[CourseEdge] = []
     slot = 0
 
-    def allocate(ident: str, depth: int, ancestry: frozenset[str], branch_preview: bool = False):
+    def allocate(ident: str, depth: int, ancestry: frozenset[str], branch_preview: bool = False, inline: bool = False):
         nonlocal slot
         if ident in emitted or ident not in nodes_by_id or ident in ancestry:
             return None
@@ -170,10 +234,16 @@ def build_course_scene(doc: ProjectDocument, focus: str | None = None, *, max_de
         # alternative, so its two exits do not disappear from the overview.
         at_alternative_boundary = (max_depth is not None and depth == max_depth
                                    and nodes_by_id[ident].get('type') == '1')
-        kids = children.get(ident, []) if not branch_preview and (max_depth is None or depth < max_depth or at_alternative_boundary) else []
+        if ident in stop_at:
+            kids = []
+        elif sheet:
+            kids = children.get(ident, []) if depth == 0 or inline else []
+        else:
+            kids = children.get(ident, []) if not branch_preview and (max_depth is None or depth < max_depth or at_alternative_boundary) else []
         children_x = []
         for child in kids:
-            x = allocate(child, depth + 1, ancestry | {ident}, at_alternative_boundary)
+            x = allocate(child, depth + 1, ancestry | {ident}, at_alternative_boundary,
+                         sheet and _is_inline(nodes_by_id, ident, child))
             if x is not None:
                 children_x.append(x)
                 edges.append(CourseEdge(ident, child, nodes_by_id[ident].get('type', '')))

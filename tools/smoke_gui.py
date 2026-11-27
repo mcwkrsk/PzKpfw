@@ -96,7 +96,9 @@ def main():
         model_before = app.doc.to_bytes()
         spd._toggle_is2_view()
         app.update()
-        assert spd._is2_view and spd._is2_sheet_bar.winfo_ismapped()
+        # Full interface: sheet list; simple interface: sheet strip above the diagram.
+        sheets_shown = spd._is2_sheet_bar if app.interface_mode == 'full' else spd._sheet_strip
+        assert spd._is2_view and sheets_shown.winfo_ismapped()
         assert len(spd._is2_sheets) >= 2
         sheet = next(label for label, ident in spd._is2_sheets.items() if ident == '1')
         spd._is2_sheet_choice.set(sheet)
@@ -117,6 +119,7 @@ def main():
             app.update()
             original_root = tuple(app.pack_slaves())
             original_menu = app.cget('menu')
+            original_panes = len(app.course_panel._focus_panes.panes())
             canvas = focus_panel.canvas
             zoom = focus_panel.zoom
             view = (canvas.xview(), canvas.yview())
@@ -149,7 +152,7 @@ def main():
             assert focus_panel.canvas is canvas and focus_panel.zoom == zoom
             assert app.tooltip_button.winfo_ismapped()
             if focus_panel is app.course_panel:
-                assert len(app.course_panel._focus_panes.panes()) == 3
+                assert len(app.course_panel._focus_panes.panes()) == original_panes
                 assert app.course_panel._focus_right.winfo_ismapped()
                 assert app.course_panel._focus_right.winfo_width() >= 80
         panel = app.decomposition_panel

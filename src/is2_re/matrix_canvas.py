@@ -178,12 +178,24 @@ class MatrixCanvas(tk.Canvas):
         if self.selected_row is not None and first_row <= self.selected_row < last_row:
             y = self.header_height + self.selected_row * self.row_height - self.offset_y
             self._item('selection', 'rectangle', 0, y, width, y + self.row_height, fill=p['primary'], outline='')
-        for col in range(first_col, last_col):
+        # The grid ends where the table ends: a closing line after the last
+        # column and after the last row, nothing drawn in the empty space.
+        table_right = min(width, self.edges[-1] - self.offset_x)
+        table_bottom = min(total_height, self.header_height + len(self.rows)*self.row_height - self.offset_y)
+        closing_col = last_col + 1 if last_col == len(self.headers) else last_col
+        for col in range(first_col, closing_col):
             x = self.edges[col] - self.offset_x
-            self._item('grid', 'line', x, self.header_height, x, total_height, fill=p['border'])
+            if col == len(self.headers):
+                x -= 1  # keep the closing line inside the canvas when the table fills it
+            self._item('grid', 'line', x, self.header_height, x, table_bottom, fill=p['border'])
+        closing_row = last_row + 1 if last_row == len(self.rows) else last_row
+        for row in range(first_row, closing_row):
+            y = self.header_height + row*self.row_height - self.offset_y
+            if row == len(self.rows):
+                y -= 1
+            self._item('grid', 'line', 0, y, table_right, y, fill=p['border'])
         for row in range(first_row, last_row):
             y = self.header_height + row*self.row_height - self.offset_y
-            self._item('grid', 'line', 0, y, width, y, fill=p['border'])
             values = self.rows[row]
             for col in range(first_col, min(last_col, len(values))):
                 value = values[col]
@@ -193,14 +205,14 @@ class MatrixCanvas(tk.Canvas):
                                      y+self.row_height/2, text=str(value), fill=color, font=self.font,
                                      width=max(1,self.widths[col]-4))
         # The header overlays partially scrolled rows, keeping it fixed.
-        self._item('heading_bg', 'rectangle', 0, 0, width, self.header_height, fill=p['surface'], outline='')
+        self._item('heading_bg', 'rectangle', 0, 0, table_right, self.header_height, fill=p['surface'], outline='')
         for col in range(first_col, last_col):
             x = self.edges[col] - self.offset_x
             cw = self.widths[col]
             self._item('heading_cells', 'rectangle', x, 0, x+cw, self.header_height, fill=p['surface'], outline=p['border'])
             self._item('heading_text', 'text', x+cw/2, self.header_height/2, text=self.headers[col], font=self.heading_font,
                              fill=p['ink'], width=max(1, cw-6))
-        self._item('heading_line', 'line', 0, self.header_height, width, self.header_height, fill=p['border'])
+        self._item('heading_line', 'line', 0, self.header_height, table_right, self.header_height, fill=p['border'])
         self._finish_items()
 
     def identify_row(self, y):

@@ -13,7 +13,6 @@ import re
 import sys
 import tempfile
 import time
-import urllib.request
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -168,6 +167,8 @@ def parse_release(payload: dict) -> ReleaseInfo:
 
 
 def _open(url: str):
+    # urllib pulls in http/ssl/email (~40 ms); load it only when the network is used.
+    import urllib.request
     request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT, "Accept": "application/vnd.github+json"})
     return urllib.request.urlopen(request, timeout=NETWORK_TIMEOUT)
 

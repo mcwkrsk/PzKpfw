@@ -11,6 +11,7 @@ import json
 import sys
 import functools
 import textwrap
+import time
 import tkinter as tk
 import tkinter.font as tkfont
 from tkinter import filedialog, messagebox, ttk
@@ -28,7 +29,7 @@ from .graph_layout import automatic_relationship_layout
 from .view_state import load_view_state, save_view_state, ViewStateError
 from .dependencies import dependency_report
 from .repair import link_integrity_report, available_repair_targets, apply_link_repairs
-from .backups import create_project_backup, list_project_backups, restore_project_backup, BackupError
+from .backups import backups_home, create_project_backup, list_project_backups, restore_project_backup, BackupError
 from .diff import (compare_documents, apply_selected_restores, expand_related_restore_bundle, ProjectDiffError)
 from .merge import merge_documents, ProjectMergeError
 from .graph_diff import compare_relationship_graphs
@@ -42,12 +43,13 @@ from .grid_tree import GridTreeview
 from .decomposition_view import DecompositionPanel
 from .button_notebook import ButtonNotebook
 from .ui_resources import persistent_menu, canvas_tag_at
-from .ui_performance import CoalescedCallback
+from .ui_layout import SideMenu
+from .ui_performance import CoalescedCallback, DebouncedCallback, ZOOM_REDRAW_DELAY_MS, preview_scale
 from .focus_view import PackSnapshot
 from .tooltips import ButtonTooltips
-from . import installation, modules as pz_modules
+from . import installation, modules as pz_modules, autosave as pz_autosave
 from .modules_gui import ModulesDialog, UpdateController
-from .ui_theme import apply_theme, load_theme, save_theme, load_tooltips, save_tooltips, BACKGROUND, SURFACE, INK, MUTED, BORDER, PRIMARY, PALETTES
+from .ui_theme import load_interface_mode, save_interface_mode, load_recent_files, remember_recent_file, apply_theme, load_theme, save_theme, load_tooltips, save_tooltips, BACKGROUND, SURFACE, INK, MUTED, BORDER, PRIMARY, PALETTES
 from .feature_audit import feature_audit
 from .matrix_view import grouped_matrix, cell_description, inferred_structural_marks, matrix_context
 from .matrix_canvas import MatrixCanvas, wheel_steps
@@ -198,6 +200,20 @@ class JsonAttributesDialog(tk.Toplevel):
 
 
 class Is2Studio(tk.Tk):
+    @property
+    def dirty(self) -> bool:
+        return self.__dict__.get('_dirty', False)
+
+    @dirty.setter
+    def dirty(self, value) -> None:
+        # A clean project needs no recovery copy: drop it and any pending autosave.
+        self.__dict__['_dirty'] = bool(value)
+        if not value:
+            for name in ('autosave', 'recovery'):
+                helper = self.__dict__.get(name)
+                if helper is not None:
+                    (helper.reset if name == 'autosave' else helper.discard)()
+
     def __init__(self):
         super().__init__()
         self.title(tr("PzKpfw — редактор проектов .is2"))
@@ -239,7 +255,17 @@ class Is2Studio(tk.Tk):
         self.notebook.bind("<<NotebookTabChanged>>", self._on_notebook_tab_changed, add="+")
         self._set_enabled(False)
         self._on_notebook_tab_changed()
+        self.side_menu = SideMenu(self, anchor_widget=self._nav_row, toggle_widget=self.menu_button, title=tr('Меню'),
+                                  on_open=self._side_menu_opened, on_close=self._side_menu_closed)
+        self.side_menu.set_entries(self._side_menu_entries)
+        self.interface_mode = None
+        self.set_interface_mode(load_interface_mode(), save=False)
         self.protocol("WM_DELETE_WINDOW", self._quit)
+        self.recovery = pz_autosave.RecoveryStore()
+        self.autosave_writer = pz_autosave.BackgroundWriter(self)
+        self.autosave = pz_autosave.AutosaveScheduler(self, self._autosave_now)
+        self._autosave_backed_up = set()
+        self.after(1500, self._offer_recovery)
         self._set_title()
         self.updates = UpdateController(self)
         self.loaded_modules = []
@@ -303,7 +329,8 @@ class Is2Studio(tk.Tk):
         messagebox.showinfo(tr('Экспорт DOCX'), tr('Отчёт создан. Проверьте схемы, формы и заполните оставленные разделы.'), parent=self)
 
     def _build_menu(self):
-        menu = tk.Menu(self)
+        menu = self._menubar = tk.Menu(self)
+        self._menubar_history_entries = False
         file_menu = tk.Menu(menu, tearoff=False)
         file_menu.add_command(label=tr("Новый проект…"), accelerator="Ctrl+N", command=self.new_project)
         file_menu.add_command(label=tr("Новый проект с главным действием…"), command=self.new_coursework)
@@ -311,6 +338,10 @@ class Is2Studio(tk.Tk):
         file_menu.add_command(label=tr("Сохранить"), accelerator="Ctrl+S", command=self.save)
         file_menu.add_command(label=tr("Сохранить как…"), command=self.save_as)
         file_menu.add_command(label=tr("Резервные копии…"), command=self.show_backups)
+        self.autosave_to_file = tk.BooleanVar(value=bool(pz_autosave.load_settings().get("to_file", False)))
+        file_menu.add_checkbutton(label=tr("Автосохранение в файл проекта"), variable=self.autosave_to_file,
+                                  command=lambda: pz_autosave.save_settings(to_file=bool(self.autosave_to_file.get())))
+        file_menu.add_command(label=tr("Восстановить несохранённую работу…"), command=lambda: self._offer_recovery(manual=True))
         file_menu.add_separator()
         file_menu.add_command(label=tr("Экспорт обзора в HTML…"), command=lambda: self.export_document("report"))
         file_menu.add_command(label=tr("Отчёт в DOCX…"), command=self.export_docx_report)
@@ -372,29 +403,19 @@ class Is2Studio(tk.Tk):
         *primary* workspace.  Non-coursework tools are still available under
         'Дополнительно', without duplicating the main workflow.
         """
-        # A compact textual identity gives the working area back to the editor.
-        header = ttk.Frame(self, padding=(20, 13, 20, 8))
-        header.pack(fill='x')
-        brand = ttk.Frame(header)
+        # Two interface modes share the same widgets (see set_interface_mode):
+        #   full   - the classic layout: name header, command toolbar, tab row;
+        #   simple - one tab row with a side menu (default).
+        # The header/toolbar frames exist in both modes but are packed only in "full".
+        self._full_header = ttk.Frame(self, padding=(20, 13, 20, 8))
+        brand = ttk.Frame(self._full_header)
         brand.pack(side='left')
         ttk.Label(brand, text='PzKpfw', style='AppTitle.TLabel').pack(side='left')
         ttk.Label(brand, text='()', style='AppAccent.TLabel').pack(side='left')
-        ttk.Label(header, text=tr('// РЕДАКТОР МОДЕЛЕЙ ИС-2'),
+        ttk.Label(self._full_header, text=tr('// РЕДАКТОР МОДЕЛЕЙ ИС-2'),
                   style='Eyebrow.TLabel').pack(side='left', padx=(20, 0), pady=(4, 0))
-        self.theme_button = ttk.Button(header, style='Quiet.TButton', command=self.toggle_theme)
-        self.theme_button.pack(side='right')
-        tooltip_button = ttk.Button(header, textvariable=self.tooltip_button_text,
-                                    command=self.toggle_tooltips, style='Quiet.TButton')
-        tooltip_button._tooltip_text = tr('Включить или выключить пояснения к кнопкам при наведении.')
-        tooltip_button.pack(side='right', padx=(0, 8))
-        self.tooltip_button = tooltip_button
-        self.file_label = ttk.Label(header, text=tr('Файл не открыт'), style='Muted.TLabel')
-        self.file_label.pack(side='right', padx=(0, 18))
-        self._update_theme_button()
-
-        ttk.Separator(self, orient='horizontal').pack(fill='x', padx=20, pady=(0, 2))
-        toolbar = ttk.Frame(self, padding=(20, 9, 20, 10))
-        toolbar.pack(fill='x')
+        self._full_separator = ttk.Separator(self, orient='horizontal')
+        toolbar = self._full_toolbar = ttk.Frame(self, padding=(20, 9, 20, 10))
         ttk.Button(toolbar, text=tr('+ Новый проект'), command=self.new_coursework,
                    style='Primary.TButton').pack(side='left')
         ttk.Button(toolbar, text=tr('Открыть .is2'), command=self.open_file).pack(side='left', padx=(7, 0))
@@ -408,11 +429,32 @@ class Is2Studio(tk.Tk):
         ttk.Button(toolbar, text=tr('Проверить проект'), command=self.validate_project).pack(side='left', padx=(14, 0))
         ttk.Button(toolbar, text=tr('Экспорт…'), command=self._show_export_menu).pack(side='left', padx=(7, 0))
 
-        nav = ttk.Frame(self, padding=(20, 0, 20, 5))
+        # Shared by both modes: children of the window, packed into the header
+        # (full) or the tab row (simple).
+        self.theme_button = ttk.Button(self, style='Quiet.TButton', command=self.toggle_theme)
+        tooltip_button = ttk.Button(self, textvariable=self.tooltip_button_text,
+                                    command=self.toggle_tooltips, style='Quiet.TButton')
+        tooltip_button._tooltip_text = tr('Включить или выключить пояснения к кнопкам при наведении.')
+        self.tooltip_button = tooltip_button
+        self.interface_button = ttk.Button(self, style='Quiet.TButton', command=self.toggle_interface_mode)
+        self.interface_button._tooltip_text = tr('Переключить упрощённый и полный вид интерфейса.')
+        self.file_label = ttk.Label(self, text=tr('Файл не открыт'), style='Muted.TLabel')
+        self._update_theme_button()
+
+        nav = self._nav_row = ttk.Frame(self, padding=(20, 0, 20, 5))
         nav.pack(fill='x')
+        # Simple mode on a narrow window: the right-hand group (file name,
+        # tooltips, interface, theme) moves to a second line instead of being cut.
+        self._nav_overflow = ttk.Frame(self, padding=(20, 0, 20, 5))
+        self._nav_overflow_active = False
+        nav.bind('<Configure>', lambda _e: self._request_fit_nav(), add='+')
+        self.menu_button = ttk.Button(nav, text='☰ ' + tr('Меню'), command=lambda: self.side_menu.toggle(),
+                                      style='MainNav.TButton')
+        self.menu_button._tooltip_text = tr('Создание, открытие и сохранение проекта, проверка, экспорт, последние файлы.')
         self.navigation_buttons = {}
         self.notebook = ttk.Notebook(self, style='Main.TNotebook')
         self.notebook.pack(fill='both', expand=True, padx=20, pady=(0, 6))
+        self.notebook.bind('<Configure>', lambda _e: self._request_fit_nav(), add='+')
         self.course_page = ttk.Frame(self.notebook)    # kept as compatibility alias
         self.action_page = ttk.Frame(self.notebook)
         self.param_page = ttk.Frame(self.notebook)
@@ -468,6 +510,7 @@ class Is2Studio(tk.Tk):
         self.xml_text = tk.Text(self.xml_page, wrap='none', font=('Consolas', 10),
                                 state='disabled', bg=SURFACE, fg=INK)
         self.xml_text.pack(fill='both', expand=True)
+        self.xml_text.bind('<Map>', lambda _e: self._flush_deferred_view('xml'), add='+')
         self.status = tk.StringVar(value=tr('Готово · откройте .is2 или создайте проект'))
         status_bar = ttk.Frame(self, padding=(12, 6))
         status_bar.pack(fill='x', side='bottom')
@@ -499,6 +542,10 @@ class Is2Studio(tk.Tk):
         panel.exit_focus_view()
 
     def _escape_diagram_focus(self, _event=None):
+        side_menu = getattr(self, 'side_menu', None)
+        if side_menu is not None and side_menu.is_open:
+            side_menu.close()
+            return 'break'
         if self._diagram_focus is not None:
             self.exit_diagram_focus()
             return 'break'
@@ -597,16 +644,20 @@ class Is2Studio(tk.Tk):
         ttk.Button(bar, text=tr('+ Связь…'), command=lambda: self.edit_primary_link(False)).pack(side='left', padx=(0, 4))
         ttk.Button(bar, text=tr('− Связь…'), command=lambda: self.edit_primary_link(True)).pack(side='left', padx=(0, 4))
         ttk.Button(bar, text=tr('Кратность…'), command=self.edit_primary_link_power).pack(side='left', padx=(0, 4))
-        ttk.Button(bar, text='CSV…', command=lambda: self.export_document('primary-matrix')).pack(side='left', padx=(0, 4))
-        ttk.Button(bar, text=tr('Обновить'), command=self._refresh_matrix).pack(side='left')
+        self._matrix_bar = bar
+        self._matrix_csv_button = ttk.Button(bar, text='CSV…', command=lambda: self.export_document('primary-matrix'))
+        self._matrix_csv_button.pack(side='left', padx=(0, 4))
+        self._matrix_refresh_button = ttk.Button(bar, text=tr('Обновить'), command=self._refresh_matrix)
+        self._matrix_refresh_button.pack(side='left')
         self._matrix_zoom = 1.0
         self._matrix_zoom_text = tk.StringVar(value='100%')
         ttk.Button(bar, text='−', width=3, command=lambda: self._scale_matrix(-1)).pack(side='left', padx=(14, 2))
         ttk.Label(bar, textvariable=self._matrix_zoom_text, width=5, anchor='center').pack(side='left')
         ttk.Button(bar, text='+', width=3, command=lambda: self._scale_matrix(1)).pack(side='left', padx=(2, 0))
-        ttk.Label(self.matrix_page, text=tr('Щелчок — выделить строку и столбец; двойной щелчок — изменить связь.'),
-                  padding=(12, 0), style='Muted.TLabel').pack(anchor='w')
-        box = ttk.Frame(self.matrix_page, padding=9)
+        # Placed by set_interface_mode: a row of its own (full) or the end of the command row (simple).
+        self._matrix_hint = ttk.Label(self.matrix_page, text=tr('Щелчок — выделить строку и столбец; двойной щелчок — изменить связь.'),
+                                      style='Muted.TLabel')
+        box = self._matrix_box = ttk.Frame(self.matrix_page, padding=9)
         box.pack(fill='both', expand=True)
         self._matrix_font = tkfont.nametofont('TkDefaultFont').copy()
         self._matrix_heading_font = tkfont.nametofont('TkDefaultFont').copy()
@@ -970,7 +1021,7 @@ class Is2Studio(tk.Tk):
         self.diagram_canvas = tk.Canvas(holder, background="white", highlightthickness=0,
                                         xscrollincrement=30, yscrollincrement=30)
         self.diagram_canvas.bind('<Map>', lambda _e: self._flush_deferred_view('diagram'), add='+')
-        self._diagram_zoom_redraw = CoalescedCallback(self.diagram_canvas, self._refresh_diagram, interval_ms=30)
+        self._diagram_zoom_redraw = DebouncedCallback(self.diagram_canvas, self._refresh_diagram, interval_ms=ZOOM_REDRAW_DELAY_MS)
         self.diagram_canvas._theme_course_canvas = True
         self.diagram_caption = tk.StringVar(value=tr('Выберите действие для просмотра полного названия.'))
         ttk.Label(self.diagram_page, textvariable=self.diagram_caption, wraplength=1200, padding=(8, 2)).pack(anchor='w', fill='x')
@@ -991,7 +1042,11 @@ class Is2Studio(tk.Tk):
         self.diagram_canvas.bind('<B2-Motion>', lambda e: self.diagram_canvas.scan_dragto(e.x, e.y, gain=1))
 
     def _diagram_scale(self, factor):
+        old = self.diagram_zoom
         self.diagram_zoom = max(.5, min(2.0, self.diagram_zoom * factor))
+        canvas = getattr(self, 'diagram_canvas', None)
+        if canvas is not None and getattr(self, 'doc', None) is not None and old:
+            preview_scale(canvas, self.diagram_zoom / old)
         self._diagram_zoom_redraw.request()
         return 'break'
 
@@ -1319,7 +1374,7 @@ class Is2Studio(tk.Tk):
             xscrollincrement=30, yscrollincrement=30,
         )
         self._graph_drag_redraw = CoalescedCallback(self.graph_canvas, self._refresh_graph, interval_ms=25)
-        self._graph_zoom_redraw = CoalescedCallback(self.graph_canvas, self._finish_graph_zoom, interval_ms=30)
+        self._graph_zoom_redraw = DebouncedCallback(self.graph_canvas, self._finish_graph_zoom, interval_ms=ZOOM_REDRAW_DELAY_MS)
         self.graph_canvas.bind('<Map>', lambda _e: self._flush_deferred_view('graph'), add='+')
         xscroll = ttk.Scrollbar(canvas_holder, orient="horizontal", command=self.graph_canvas.xview)
         yscroll = ttk.Scrollbar(canvas_holder, orient="vertical", command=self.graph_canvas.yview)
@@ -1851,7 +1906,11 @@ class Is2Studio(tk.Tk):
                 self._show_page(self.other_page); self.dynamic_tabs.select(self.content_page); self.content_tree.selection_set(str(index)); self.content_tree.see(str(index))
 
     def _graph_zoom_step(self, factor):
+        old = self.graph_zoom
         self.graph_zoom = min(2.5, max(0.5, self.graph_zoom * factor))
+        canvas = getattr(self, 'graph_canvas', None)
+        if canvas is not None and getattr(self, 'doc', None) is not None and old:
+            preview_scale(canvas, self.graph_zoom / old)
         self._graph_zoom_redraw.request()
 
     def _finish_graph_zoom(self):
@@ -2350,6 +2409,10 @@ class Is2Studio(tk.Tk):
         if hasattr(self, "undo_button"):
             self.undo_button.configure(state="normal" if can_undo else "disabled")
             self.redo_button.configure(state="normal" if can_redo else "disabled")
+        if getattr(self, "_menubar_history_entries", False):
+            end = self._menubar.index("end")
+            self._menubar.entryconfigure(end - 1, state="normal" if can_undo else "disabled")
+            self._menubar.entryconfigure(end, state="normal" if can_redo else "disabled")
         if hasattr(self, "edit_menu"):
             undo_label = self.history.undo_label
             redo_label = self.history.redo_label
@@ -3183,6 +3246,14 @@ class Is2Studio(tk.Tk):
         dirty = " *" if self.dirty else ""
         self.title(f"PzKpfw — {name}{dirty}")
         self.file_label.configure(text=(self.path.name + dirty) if self.path else tr("Файл не открыт"))
+        if getattr(self, "interface_mode", None) == "simple":
+            self._request_fit_nav()
+        if self.path is not None and str(self.path) != getattr(self, "_last_recent_path", None):
+            self._last_recent_path = str(self.path)
+            try:
+                remember_recent_file(self.path)
+            except OSError:
+                pass
 
     def _mark_dirty(self, message="Изменения не сохранены", *, operation_group=None):
         # Localize controlled status/history templates after their IDs and
@@ -3200,6 +3271,8 @@ class Is2Studio(tk.Tk):
             self._last_history_snapshot = current
             current_fingerprint = self._fingerprint(current)
             self.dirty = self._saved_fingerprint is None or current_fingerprint != self._saved_fingerprint
+            if self.dirty and getattr(self, 'autosave', None) is not None:
+                self.autosave.note_edit()
         else:
             self.dirty = False
         self.status.set(message)
@@ -3214,6 +3287,8 @@ class Is2Studio(tk.Tk):
         self._doc_revision += 1
         self._last_history_snapshot = snapshot
         self.dirty = self._saved_fingerprint is None or self._fingerprint(snapshot) != self._saved_fingerprint
+        if self.dirty and getattr(self, 'autosave', None) is not None:
+            self.autosave.note_edit()
         self.refresh_all()
         self.status.set(f"{tr(operation)}: {label}")
         self._set_title()
@@ -3324,8 +3399,9 @@ class Is2Studio(tk.Tk):
         except Exception as exc:
             messagebox.showerror(tr("Новый проект"), str(exc), parent=self)
 
-    def open_file(self):
-        target = filedialog.askopenfilename(parent=self, title=tr("Открыть проект IS-2"), filetypes=[("IS-2 project", "*.is2 *.xml"), ("All files", "*.*")])
+    def open_file(self, target=None):
+        if target is None:
+            target = filedialog.askopenfilename(parent=self, title=tr("Открыть проект IS-2"), filetypes=[("IS-2 project", "*.is2 *.xml"), ("All files", "*.*")])
         if not target:
             return
         if self.dirty and not self._save_prompt():
@@ -3425,7 +3501,7 @@ class Is2Studio(tk.Tk):
         window.title(f"Резервные копии — {self.path.name}")
         window.geometry("900x430")
         window.transient(self)
-        ttk.Label(window, text=tr("Резервные копии хранятся отдельно от .is2 в .pzkpfw-backups. Восстановление текущего файла сначала создаёт rollback-копию."), padding=8, wraplength=850).pack(anchor="w")
+        ttk.Label(window, text=tr("Резервные копии хранятся в общей папке приложения: {path}. Восстановление текущего файла сначала создаёт rollback-копию.").format(path=backups_home()), padding=8, wraplength=850).pack(anchor="w")
         tree = GridTreeview(window, columns=("created", "size", "valid", "hash"), show="headings", selectmode="browse")
         for key, title, width in (("created", "Создана (UTC)", 220), ("size", "Размер", 90), ("valid", "XML", 90), ("hash", "SHA-256", 420)):
             tree.heading(key, text=title); tree.column(key, width=width, anchor="w")
@@ -3686,6 +3762,7 @@ class Is2Studio(tk.Tk):
         self._update_theme_button()
         self._update_history_icons()
         self.course_panel._draw()
+        self.course_panel._sheet_strip.apply_palette(PALETTES[name])
         self.decomposition_panel.draw()
         self._draw_matrix_groups()
         self.matrix_tree._schedule()
@@ -3774,7 +3851,8 @@ class Is2Studio(tk.Tk):
             return
         self._deferred_views.discard(key)
         if self.doc is not None:
-            {'diagram': self._refresh_diagram, 'graph': self._refresh_graph}[key]()
+            refresh = {'diagram': '_refresh_diagram', 'graph': '_refresh_graph', 'xml': '_refresh_xml_text'}[key]
+            getattr(self, refresh)()
 
     def refresh_all(self):
         if self.doc is None:
@@ -3796,7 +3874,12 @@ class Is2Studio(tk.Tk):
         self._refresh_links()
         self._refresh_other()
         self._refresh_or_defer('graph', self.graph_canvas, self._refresh_graph)
-        xml = ET.tostring(self.doc.root, encoding="unicode")
+        # Serializing the whole project into the XML tab is the slowest part of a
+        # refresh; it is done only while that tab is visible (or when it is shown).
+        self._refresh_or_defer('xml', self.xml_text, self._refresh_xml_text)
+
+    def _refresh_xml_text(self):
+        xml = ET.tostring(self.doc.root, encoding="unicode") if self.doc is not None else ""
         self.xml_text.configure(state="normal")
         self.xml_text.delete("1.0", "end")
         self.xml_text.insert("1.0", xml)
@@ -4667,9 +4750,294 @@ class Is2Studio(tk.Tk):
         self.dirty = False
         self._quit()
 
+    # ---- interface modes and the side menu -----------------------------------
+    def _interface_label(self):
+        return tr('Интерфейс: упрощённый') if self.interface_mode == 'simple' else tr('Интерфейс: полный')
+
+    def toggle_interface_mode(self):
+        self.set_interface_mode('full' if self.interface_mode == 'simple' else 'simple')
+
+    def set_interface_mode(self, mode, *, save=True):
+        """Rearrange the same widgets for the simple or the full (classic) layout."""
+        if mode not in ('simple', 'full'):
+            mode = 'simple'
+        if self._diagram_focus is not None:
+            self.exit_diagram_focus()
+        self.side_menu.close()
+        self.interface_mode = mode
+        simple = mode == 'simple'
+        nav = self._nav_row
+        right = (self.theme_button, self.tooltip_button, self.interface_button, self.file_label)
+        for widget in right + (self.menu_button, self._full_header, self._full_separator, self._full_toolbar):
+            widget.pack_forget()
+        self._nav_overflow.pack_forget()
+        self._nav_overflow_active = False
+        self._nav_alignment = None
+        if simple:
+            nav.configure(padding=(20, 8, 20, 5))
+            first_tab = next(iter(self.navigation_buttons.values()))
+            self.menu_button.pack(side='left', padx=(0, 12), before=first_tab)
+            container = nav
+        else:
+            nav.configure(padding=(20, 0, 20, 5))
+            self._full_header.pack(fill='x', before=nav)
+            self._full_separator.pack(fill='x', padx=20, pady=(0, 2), before=nav)
+            self._full_toolbar.pack(fill='x', before=nav)
+            container = self._full_header
+        self.theme_button.pack(in_=container, side='right')
+        self.tooltip_button.pack(in_=container, side='right', padx=(0, 8))
+        self.interface_button.pack(in_=container, side='right', padx=(0, 8))
+        self.file_label.pack(in_=container, side='right', padx=(0, 14))
+        for widget in right:
+            widget.lift()
+        self.interface_button.configure(text=self._interface_label())
+        if simple:
+            self._request_fit_nav()
+        # Undo and redo as separate items of the menu bar (simple mode).
+        if simple and not self._menubar_history_entries:
+            self._menubar.add_command(label=tr('Отменить'), command=self.undo)
+            self._menubar.add_command(label=tr('Повторить'), command=self.redo)
+            self._menubar_history_entries = True
+        elif not simple and self._menubar_history_entries:
+            end = self._menubar.index('end')
+            self._menubar.delete(end - 1, end)
+            self._menubar_history_entries = False
+        self._update_history_controls()
+        # Matrix page: usage hint in the command row (simple) or as its own row (full).
+        self._matrix_hint.pack_forget()
+        self._matrix_csv_button.pack_forget()
+        if simple:
+            self._matrix_hint.pack(in_=self._matrix_bar, side='right')
+            self._matrix_hint.lift()
+        else:
+            self._matrix_csv_button.pack(side='left', padx=(0, 4), before=self._matrix_refresh_button)
+            self._matrix_hint.configure(padding=(12, 0))
+            self._matrix_hint.pack(anchor='w', before=self._matrix_box)
+        if simple:
+            self._matrix_hint.configure(padding=0)
+        self.course_panel.set_interface_mode(mode)
+        self.decomposition_panel.set_interface_mode(mode)
+        if save:
+            try:
+                save_interface_mode(mode)
+            except (OSError, ValueError):
+                pass
+
+    def _side_menu_opened(self):
+        """The menu simply lies over the left part of the tab row; nothing moves."""
+
+    def _side_menu_closed(self):
+        pass
+
+    def _request_fit_nav(self):
+        """Fit the tab row once, after pending geometry changes."""
+        if getattr(self, '_fit_nav_job', None) is None:
+            try:
+                self._fit_nav_job = self.after_idle(self._run_fit_nav)
+            except tk.TclError:
+                self._fit_nav_job = None
+
+    def _run_fit_nav(self):
+        self._fit_nav_job = None
+        self._fit_nav_row()
+
+    def destroy(self):
+        job, self._fit_nav_job = getattr(self, '_fit_nav_job', None), None
+        if job is not None:
+            try:
+                self.after_cancel(job)
+            except tk.TclError:
+                pass
+        super().destroy()
+
+    def _align_nav_to_page(self):
+        """Line the tab row up with the page below it, so the menu button and
+        the page's first button start at the same x (the notebook's own border
+        differs between platforms and themes)."""
+        try:
+            page = self.notebook.nametowidget(self.notebook.select())
+            if not page.winfo_ismapped():
+                return
+            left = page.winfo_rootx() - self.winfo_rootx()
+            right = self.winfo_rootx() + self.winfo_width() - page.winfo_rootx() - page.winfo_width()
+        except (tk.TclError, KeyError):
+            return
+        if not (0 <= left <= 80 and 0 <= right <= 80):
+            return
+        if (left, right) != getattr(self, '_nav_alignment', None):
+            self._nav_alignment = (left, right)
+            self._nav_row.configure(padding=(left, 8, right, 5))
+            self._nav_overflow.configure(padding=(left, 0, right, 5))
+
+    def _fit_nav_row(self):
+        """Simple mode: keep the right-hand group whole; wrap it below the tabs if needed."""
+        if self.interface_mode != 'simple' or self._diagram_focus is not None:
+            return
+        self._align_nav_to_page()
+        try:
+            nav = self._nav_row
+            group = (self.theme_button, self.tooltip_button, self.interface_button, self.file_label)
+            tabs = [self.menu_button] + list(self.navigation_buttons.values())
+            needed = (sum(w.winfo_reqwidth() + 5 for w in tabs) + 12
+                      + sum(w.winfo_reqwidth() for w in group) + 8 + 8 + 14 + 40)
+            overflow = nav.winfo_width() > 1 and needed > nav.winfo_width()
+        except tk.TclError:
+            return
+        if overflow == self._nav_overflow_active:
+            return
+        self._nav_overflow_active = overflow
+        container = self._nav_overflow if overflow else nav
+        for widget in group:
+            widget.pack_forget()
+        if overflow:
+            self._nav_overflow.pack(fill='x', after=nav)
+        else:
+            self._nav_overflow.pack_forget()
+        self.theme_button.pack(in_=container, side='right')
+        self.tooltip_button.pack(in_=container, side='right', padx=(0, 8))
+        self.interface_button.pack(in_=container, side='right', padx=(0, 8))
+        self.file_label.pack(in_=container, side='right', padx=(0, 14))
+        for widget in group:
+            widget.lift()
+
+    def _side_menu_entries(self):
+        def open_recent(path):
+            if not Path(path).is_file():
+                messagebox.showerror(tr("Ошибка открытия"), tr("Файл не найден: {path}").format(path=path), parent=self)
+                return
+            self.open_file(path)
+        recent = [(Path(path).name, (lambda p=path: open_recent(p))) for path in load_recent_files()]
+        return [
+            (tr('Проект'), [
+                (tr('Новый проект с главным действием…'), self.new_coursework),
+                (tr('Новый проект…'), self.new_project),
+                (tr('Открыть…'), self.open_file),
+                (tr('Сохранить'), self.save),
+                (tr('Сохранить как…'), self.save_as),
+                (tr('Резервные копии…'), self.show_backups),
+                (tr('Восстановить несохранённую работу…'), lambda: self._offer_recovery(manual=True)),
+            ]),
+            (tr('Последние файлы'), recent or [(tr('Нет последних файлов'), None)]),
+            (tr('Проверка'), [
+                (tr('Проверить проект'), self.validate_project),
+                (tr('Проверить модель'), self.course_panel._check),
+            ]),
+            (tr('Экспорт'), [
+                (tr('Комплект проекта (схемы, формы, проверка)…'), self.course_panel._export_all),
+                (tr('Отчёт в DOCX…'), self.export_docx_report),
+                (tr('Схема СПД в SVG…'), self.course_panel._export_svg),
+                (tr('Лист декомпозиции в SVG…'), self.decomposition_panel.export),
+                (tr('Все листы декомпозиции…'), self.decomposition_panel.export_all),
+                (tr('Спецификации в HTML…'), lambda: self.export_document('specifications')),
+                (tr('Матрица в CSV…'), lambda: self.export_document('primary-matrix')),
+                (tr('Отчёт в HTML…'), lambda: self.export_document('report')),
+            ]),
+            (tr('Вид'), [
+                (self._interface_label(), self.toggle_interface_mode),
+                (self._tooltip_label(), self.toggle_tooltips),
+                (self.theme_button.cget('text').strip('☼☾ '), self.toggle_theme),
+            ]),
+        ]
+
+    # ---- autosave ------------------------------------------------------------
+    def _autosave_now(self):
+        """Serialize once here (Tk thread); write the recovery copy and, if
+        enabled, the project file in the background."""
+        if self.doc is None or not self.dirty:
+            return
+        doc, path, snapshot = self.doc, self.path, self._last_history_snapshot
+        try:
+            payload = doc.to_bytes()
+        except Exception as exc:
+            self.status.set(tr("Автосохранение не удалось: {error}").format(error=exc))
+            return
+        to_file = bool(self.autosave_to_file.get()) and path is not None and not doc.validate()
+        backup_first = to_file and path not in self._autosave_backed_up and path.exists()
+        title = path.name if path is not None else tr("Новый проект")
+        recovery = self.recovery
+
+        def work():
+            recovery.write(payload, str(path) if path else None, title)
+            if to_file:
+                pz_autosave.check_payload(payload)
+                if backup_first and path.read_bytes() != payload:
+                    create_project_backup(path)
+                pz_autosave.atomic_write(path, payload)
+            return to_file
+
+        def done(written_file, error):
+            stamp = time.strftime("%H:%M")
+            if error is not None:
+                self.status.set(tr("Автосохранение не удалось: {error}").format(error=error))
+                return
+            if not written_file:
+                self.status.set(tr("Копия для восстановления: {time}").format(time=stamp))
+                return
+            self._autosave_backed_up.add(path)
+            # Mark clean only if nothing changed while the file was written.
+            if self.doc is doc and self.path == path and self._last_history_snapshot is snapshot:
+                doc.source_path = str(path)
+                self._saved_fingerprint = self._fingerprint(snapshot)
+                self.history.note("save", "Автосохранение", details=[str(path)], state=snapshot)
+                self.dirty = False
+                self._update_history_controls()
+                self._set_title()
+            self.status.set(tr("Автосохранено: {time}").format(time=stamp))
+        self.autosave_writer.submit(work, done)
+
+    def _offer_recovery(self, manual=False):
+        """Offer copies left by a crash; Yes opens, No deletes, Cancel keeps for later."""
+        try:
+            found = self.recovery.orphans()
+        except OSError:
+            found = []
+        if not found:
+            if manual:
+                messagebox.showinfo(tr("Восстановление"), tr("Несохранённой работы для восстановления нет."), parent=self)
+            return
+        for item in found:
+            when = time.strftime("%d.%m.%Y %H:%M", time.localtime(item.saved_at))
+            answer = messagebox.askyesnocancel(
+                tr("Найдена несохранённая работа"),
+                tr("PzKpfw был закрыт, не сохранив изменения в «{name}» ({time}). Открыть восстановленную копию?\n\n"
+                   "Да — открыть копию, Нет — удалить её, Отмена — решить позже.").format(name=item.title or tr("Новый проект"), time=when),
+                parent=self)
+            if answer is None:
+                return
+            if not answer:
+                self.recovery.remove(item)
+                continue
+            if self.dirty and not self._save_prompt():
+                return
+            try:
+                doc = ProjectDocument.from_bytes(item.payload_path.read_bytes())
+            except Exception as exc:
+                messagebox.showerror(tr("Восстановление"), str(exc), parent=self)
+                return
+            self._flush_view_state_save()
+            source = Path(item.source) if item.source else None
+            doc.source_path = str(source) if source else None
+            self.doc = doc
+            self.path = source
+            self.graph_selected_key = None
+            self._reset_history(saved=False)
+            self.history.note("restore", "Восстановлено после сбоя", details=[str(item.payload_path)], state=self._document_snapshot())
+            self.refresh_all()
+            self._set_enabled(True)
+            self._set_title()
+            # The copy now belongs to this session; the old file is no longer needed.
+            self.recovery.remove(item)
+            self.autosave.note_edit()
+            self.status.set(tr("Восстановлено: {name}. Сохраните проект.").format(name=item.title or tr("Новый проект")))
+            return
+
     def _quit(self):
         if self.dirty and not self._save_prompt():
             return
+        # Saved or deliberately discarded: no recovery copy should survive.
+        self.autosave.reset()
+        self.autosave_writer.wait()
+        self.recovery.discard()
         self._save_graph_view_state()
         self._matrix_hide_tooltip()
         self.button_tooltips.hide()

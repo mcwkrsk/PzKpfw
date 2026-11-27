@@ -1,6 +1,9 @@
 """Atomic, validated project backups kept outside native .is2 documents.
 
-Backups are stored beside the project in ``.pzkpfw-backups/<filename>/``.
+Backups are stored in the application's data folder
+(``%LOCALAPPDATA%\\PzKpfw\\backups\\<filename>-<path hash>\\`` on Windows), not
+beside the project. Older versions kept them in ``.pzkpfw-backups/<filename>/``
+next to the project; those copies are still listed and can be restored.
 The backup bytes are exact copies of the source file; no metadata is added to
 or removed from the native XML. Restore operations validate the XML envelope,
 create a rollback backup of an existing destination, and replace it atomically.
@@ -32,11 +35,33 @@ class BackupInfo:
     validation_issues: tuple[str, ...] = ()
 
 
+def backups_home() -> Path:
+    """Shared folder for all project backups, next to autosave and modules."""
+    from .installation import data_dir
+    return data_dir() / "backups"
+
+
 def backup_directory(source: str | Path, root: str | Path | None = None) -> Path:
     source = Path(source).expanduser().resolve()
     if root is not None:
         return Path(root).expanduser().resolve()
+    key = str(source).casefold() if os.name == "nt" else str(source)
+    return backups_home() / f"{source.name}-{hashlib.sha256(key.encode('utf-8')).hexdigest()[:10]}"
+
+
+def legacy_backup_directory(source: str | Path) -> Path:
+    """Where versions before 1.1.0 kept backups (beside the project)."""
+    source = Path(source).expanduser().resolve()
     return source.parent / ".pzkpfw-backups" / source.name
+
+
+def _write_source_note(root: Path, source: Path) -> None:
+    note = root / "source.txt"
+    try:
+        if not note.exists() or note.read_text(encoding="utf-8").strip() != str(source):
+            note.write_text(str(source) + "\n", encoding="utf-8")
+    except OSError:
+        pass  # The note only helps people browsing the folder.
 
 
 def _sha256(payload: bytes) -> str:
@@ -105,6 +130,8 @@ def create_project_backup(
     digest = _sha256(payload)
     root = backup_directory(source, backup_root)
     root.mkdir(parents=True, exist_ok=True)
+    if backup_root is None:
+        _write_source_note(root, source)
 
     for existing in sorted(root.glob("*.is2.bak"), key=lambda item: item.name, reverse=True):
         try:
@@ -143,15 +170,18 @@ def list_project_backups(
     *,
     backup_root: str | Path | None = None,
 ) -> list[BackupInfo]:
-    root = backup_directory(source, backup_root)
-    if not root.exists():
-        return []
+    roots = [backup_directory(source, backup_root)]
+    if backup_root is None:
+        roots.append(legacy_backup_directory(source))
     records: list[BackupInfo] = []
-    for path in root.glob("*.is2.bak"):
-        try:
-            records.append(inspect_backup(path))
-        except (OSError, BackupError):
+    for root in roots:
+        if not root.is_dir():
             continue
+        for path in root.glob("*.is2.bak"):
+            try:
+                records.append(inspect_backup(path))
+            except (OSError, BackupError):
+                continue
     return sorted(records, key=lambda item: (item.created_at, item.path.name), reverse=True)
 
 

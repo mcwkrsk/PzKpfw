@@ -12,11 +12,11 @@ import re
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox, font as tkfont
 
-from .coursework import build_course_scene, _wrapped_lines
+from .coursework import SHEET_DEPTH, build_course_scene, sheet_actions, _wrapped_lines
 from .gui_models import action_tree_rows
 from .specifications import action_code
 from .button_notebook import ButtonNotebook
-from .ui_performance import CoalescedCallback
+from .ui_performance import CoalescedCallback, DebouncedCallback, ZOOM_REDRAW_DELAY_MS, preview_scale
 from .focus_view import PackSnapshot
 from .document import reads_document
 
@@ -29,10 +29,9 @@ def sheet_scene(doc, focus=None):
         width, height, stepx, stepy = 82, 44, 116, 86
         lines = {n.ident: [n.code] for n in base.nodes}
     else:
-        root = doc.action(focus)
-        # A cycle sheet also exposes the body sequence, as in the reference.
-        depth = 2 if root.get('type') == '3' else 1
-        base = build_course_scene(doc, focus, max_depth=depth)
+        doc.action(focus)
+        # As in IS-2: alternatives and loop bodies are drawn on this sheet.
+        base = build_course_scene(doc, focus, max_depth=SHEET_DEPTH)
         width, stepx = 280, 340
         lines = {n.ident: (textwrap.wrap(n.title or tr('(без названия)'), width=33,
                               break_long_words=True, break_on_hyphens=False) or [tr('(без названия)')]) for n in base.nodes}
@@ -168,9 +167,12 @@ class DecompositionPanel(ttk.Frame):
         focus_button=ttk.Button(bar,text=tr('⛶ На весь экран'),command=lambda:self.app.enter_diagram_focus(self))
         focus_button._tooltip_text=tr('Скрыть панели и показать диаграмму на всю рабочую область.')
         focus_button.pack(side='right')
+        self._export_buttons=[]
         for title,fn in [('◀',lambda:self.step(-1)),('▶',lambda:self.step(1)),(tr('Сохранить SVG…'),self.export),(tr('Сохранить все…'),self.export_all)]:
-            ttk.Button(bar,text=title,command=fn).pack(side='left',padx=(0,5))
-        ttk.Checkbutton(bar,text=tr('Коды блоков'),variable=self.show_codes,command=self.draw).pack(side='left',padx=8)
+            button=ttk.Button(bar,text=title,command=fn);button.pack(side='left',padx=(0,5))
+            if fn in (self.export,self.export_all):self._export_buttons.append(button)
+        self._codes_check=ttk.Checkbutton(bar,text=tr('Коды блоков'),variable=self.show_codes,command=self.draw)
+        self._codes_check.pack(side='left',padx=8)
         ttk.Checkbutton(bar,text=tr('Структурные символы'),variable=self.show_symbols,command=self.draw).pack(side='left',padx=8)
         ttk.Label(self,text=tr('Листы: ◀ ▶ · Ctrl + колесо — масштаб · Ctrl + 0 — вписать · структурные символы приблизительные'),style='Muted.TLabel',padding=(8,2)).pack(anchor='w')
         self.tabs=ButtonNotebook(self);self.tabs.pack(fill='x',padx=6)
@@ -180,6 +182,7 @@ class DecompositionPanel(ttk.Frame):
         self._focus_return_bar=ttk.Button(self.tabs.bar,text=tr('← Вернуться'),command=self.app.exit_diagram_focus)
         self.canvas=tk.Canvas(holder,background='#1b1b29',highlightthickness=0)
         self._resize_redraw = CoalescedCallback(self.canvas, self.draw)
+        self._zoom_redraw = DebouncedCallback(self.canvas, self.draw, interval_ms=ZOOM_REDRAW_DELAY_MS)
         self.canvas.bind('<Configure>', self._resize_redraw.request)
         # A hidden diagram is drawn when its canvas is shown again.
         self._draw_pending = False
@@ -218,7 +221,7 @@ class DecompositionPanel(ttk.Frame):
         doc=self.app.doc
         nodes = {} if doc is None else {node.get('id', ''): node for node in doc.actions}
         parents = set() if doc is None else {link.get('afe1', '') for link in doc.links if link.get('type') == '2'}
-        ids = [] if doc is None else [row.action_id for row in action_tree_rows(doc) if row.action_id in parents]
+        ids = [] if doc is None else sheet_actions(doc)
         signature = tuple((ident, action_code(nodes[ident])) for ident in ids)
         if signature!=getattr(self, '_signature', None) or not self.tabs.tabs():
             previous=self.focus
@@ -247,12 +250,27 @@ class DecompositionPanel(ttk.Frame):
         self.draw()
         self.canvas.xview_moveto(0);self.canvas.yview_moveto(0)
 
+    def set_interface_mode(self,mode):
+        """Simple mode keeps SVG export in the side menu; full mode shows the buttons here."""
+        for button in self._export_buttons:button.pack_forget()
+        if mode!='simple':
+            for button in self._export_buttons:button.pack(side='left',padx=(0,5),before=self._codes_check)
+
     def step(self,direction):
         tabs=self.tabs.tabs()
         if tabs:self.tabs.select(tabs[max(0,min(len(tabs)-1,self.tabs.index('current')+direction))])
 
     def scale(self,factor):
-        self.zoom=max(.25,min(2.5,self.zoom*factor));self._resize_redraw.request();return 'break'
+        old=self.zoom
+        self.zoom=max(.25,min(2.5,self.zoom*factor))
+        if self.zoom==old:
+            return 'break'
+        if self.app.doc is not None:
+            preview_scale(self.canvas,self.zoom/old)
+            self._zoom_redraw.request()
+        else:
+            self._resize_redraw.request()
+        return 'break'
 
     def _wheel_zoom(self, event):
         if event.delta:

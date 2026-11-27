@@ -65,6 +65,47 @@ def load_tooltips() -> bool:
 def save_tooltips(enabled: bool) -> bool:
     return _save_preference('button_tooltips', bool(enabled))
 
+INTERFACE_MODES = ('simple', 'full')
+RECENT_FILES_LIMIT = 8
+
+
+def load_interface_mode() -> str:
+    """'simple' (default): compact rows and a side menu; 'full': the classic layout."""
+    value = _load_preferences().get('interface')
+    return value if value in INTERFACE_MODES else 'simple'
+
+
+def save_interface_mode(mode: str) -> bool:
+    if mode not in INTERFACE_MODES:
+        raise ValueError('Unknown interface mode')
+    return _save_preference('interface', mode)
+
+
+def load_recent_files() -> list[str]:
+    value = _load_preferences().get('recent_files', [])
+    return [str(item) for item in value if isinstance(item, str)][:RECENT_FILES_LIMIT] if isinstance(value, list) else []
+
+
+def remember_recent_file(path) -> list[str]:
+    """Move `path` to the top of the recent list; returns the new list."""
+    path = str(path)
+    key = os.path.normcase(os.path.abspath(path))
+    items = [path] + [item for item in load_recent_files() if os.path.normcase(os.path.abspath(item)) != key]
+    items = items[:RECENT_FILES_LIMIT]
+    _save_preference('recent_files', items)
+    return items
+
+
+def load_spd_tree_visible() -> bool:
+    """Simple mode shows the action tree only on request (default: hidden)."""
+    value = _load_preferences().get('spd_tree', False)
+    return value if isinstance(value, bool) else False
+
+
+def save_spd_tree_visible(visible: bool) -> bool:
+    return _save_preference('spd_tree', bool(visible))
+
+
 def apply_theme(root: tk.Tk, name: str = 'dark') -> None:
     p = PALETTES[name]
     style = ttk.Style(root)
@@ -102,6 +143,16 @@ def apply_theme(root: tk.Tk, name: str = 'dark') -> None:
         style.configure(name_, background=p['surface'], foreground=fg)
     style.configure('TLabel', background=p['bg'], foreground=p['ink'])
     style.configure('Muted.TLabel', background=p['bg'], foreground=p['muted'])
+    # Side menu: a slightly raised panel with flat, left-aligned entries.
+    style.configure('Sidebar.TFrame', background=p['surface'])
+    style.configure('Sidebar.TLabel', background=p['surface'], foreground=p['ink'])
+    style.configure('SidebarHeading.TLabel', background=p['surface'], foreground=p['muted'], font=('TkDefaultFont', 9, 'bold'))
+    style.configure('SidebarMuted.TLabel', background=p['surface'], foreground=p['muted'])
+    style.configure('Sidebar.TButton', background=p['surface'], foreground=p['ink'], borderwidth=0,
+                    relief='flat', anchor='w', padding=(14, 6), focuscolor=p['surface'])
+    style.map('Sidebar.TButton', background=[('active', p['selected']), ('disabled', p['surface'])],
+              foreground=[('disabled', p['muted'])])
+    style.configure('SidebarSeparator.TFrame', background=p['border'])
     # Clam's border element is used explicitly for a complete outline on all
     # four sides, including notebook tabs on Windows.
     style.configure('TButton', padding=(10, 7), borderwidth=1,
@@ -151,6 +202,17 @@ def apply_theme(root: tk.Tk, name: str = 'dark') -> None:
                     borderwidth=1, bordercolor=p['button_border'], lightcolor=p['button_border'],
                     darkcolor=p['button_border'], relief='flat')
     style.map('MainNav.TButton',
+              background=[('selected', p['primary']), ('active', p['selected'])],
+              foreground=[('selected', '#ffffff'), ('active', p['ink'])],
+              bordercolor=[('selected', p['primary']), ('active', p['accent'])],
+              lightcolor=[('selected', p['primary']), ('active', p['accent'])],
+              darkcolor=[('selected', p['primary']), ('active', p['accent'])])
+    # Sheet tabs (z11, z32, …) are small and as wide as their text, as in IS-2.
+    style.configure('SheetTab.TButton', padding=(10, 3), width=0, font=(ui_family, 9),
+                    background=p['button'], foreground=p['ink'], borderwidth=1,
+                    bordercolor=p['button_border'], lightcolor=p['button_border'],
+                    darkcolor=p['button_border'], relief='flat')
+    style.map('SheetTab.TButton',
               background=[('selected', p['primary']), ('active', p['selected'])],
               foreground=[('selected', '#ffffff'), ('active', p['ink'])],
               bordercolor=[('selected', p['primary']), ('active', p['accent'])],

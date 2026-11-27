@@ -125,6 +125,21 @@ def is2_parameter_marks(doc):
     return {ident: ', '.join(labels) for ident, labels in grouped.items()}
 
 
+def is2_block_marks(doc):
+    """Block labels as IS-2 prints them in the lower left corner of a block:
+    an element shows its function ('*A9.9'), an alternative shows the
+    parameter that selects the branch ('#A5.10'). Only existing matrix
+    records are used."""
+    params = {p.get('id', ''): p for p in doc.params_node.findall('param')}
+    links, _ = primary_links(doc)
+    grouped = defaultdict(list)
+    for action, parameter, marker, _power in links:
+        prefix = {'*': '*', '?': '#'}.get(marker)
+        if prefix:
+            grouped[action].append(prefix + parameter_code(params[parameter]))
+    return {ident: ', '.join(labels) for ident, labels in grouped.items()}
+
+
 def is2_spd_svg(doc, scene, selected=None):
     w,h=scene.node_width,scene.node_height
     output=[f'<svg xmlns="http://www.w3.org/2000/svg" width="{scene.width}" height="{scene.height}" viewBox="0 0 {scene.width} {scene.height}">',
@@ -140,7 +155,7 @@ def is2_spd_svg(doc, scene, selected=None):
         parent, child = nodes[edge.source], nodes[edge.target]
         if parent.kind == '3':
             output.append(f'<text x="{parent.x+w/2+5}" y="{(parent.y+h+child.y)/2}" font-size="11">+</text>')
-    marks = is2_parameter_marks(doc)
+    marks = is2_block_marks(doc)
     for n in scene.nodes:
         color='#14842a' if n.ident==selected else '#202020'
         output.append(f'<g><rect x="{n.x}" y="{n.y}" width="{w}" height="{h}" fill="white" stroke="{color}"/>')

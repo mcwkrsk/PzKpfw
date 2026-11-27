@@ -9,7 +9,7 @@ package next to it::
 ``module.json``::
 
     {"id": "course-rules", "name": "Проверка по правилам курса",
-     "version": "1.0.0", "min_app_version": "9.10.0",
+     "version": "1.0.0", "min_app_version": "1.0.0",
      "entry": "course_rules:register", "description": "...", "author": "...",
      "requirements": []}
 
@@ -33,6 +33,7 @@ from pathlib import Path, PurePosixPath
 
 from . import __version__
 from .installation import InstallationError, data_dir, download, fetch_json, is_newer, parse_version
+
 CATALOGUE_URL = "https://raw.githubusercontent.com/mcwkrsk/PzKpfw/master/modules/index.json"
 MANIFEST = "module.json"
 ID_RE = re.compile(r"^[a-z][a-z0-9-]{1,63}$")

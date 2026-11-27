@@ -12,18 +12,19 @@ from tkinter import ttk, filedialog, messagebox, font as tkfont
 from pathlib import Path
 
 from .coursework import (
-    build_course_scene, scene_svg, course_checklist, renumber_structure, set_alternative_labels, _wrapped_lines, edge_paths,
+    SPD_SHEET_DEPTH, build_course_scene, spd_sheet_heads, scene_svg, course_checklist, renumber_structure, set_alternative_labels, _wrapped_lines, edge_paths,
 )
 from .gui_models import action_tree_rows
 from .specifications import action_code, parameter_code, primary_links, add_primary_link, remove_primary_link, FORM_NAMES
 from .exports import export_report
 from .specifications import form_html
 from .grid_tree import GridTreeview
-from .ui_performance import CoalescedCallback
+from .ui_layout import FlowRow, SheetStrip
+from .ui_performance import CoalescedCallback, DebouncedCallback, ZOOM_REDRAW_DELAY_MS, preview_scale
 from .ui_resources import persistent_menu
 from .focus_view import PackSnapshot, restored_sash_positions
-from .is2_spd_view import build_is2_spd_scene, is2_connectors, is2_parameter_marks, is2_spd_svg
-from .ui_theme import BACKGROUND, SURFACE, INK, MUTED, BORDER, PRIMARY, PALE_BLUE, TEAL
+from .is2_spd_view import build_is2_spd_scene, is2_block_marks, is2_connectors, is2_parameter_marks, is2_spd_svg
+from .ui_theme import BACKGROUND, SURFACE, INK, MUTED, BORDER, PRIMARY, PALE_BLUE, TEAL, PALETTES, load_spd_tree_visible, save_spd_tree_visible
 
 KIND_TEXT = {'0': tr('Элементарное'), '1': tr('Альтернатива'), '2': tr('Последовательность'), '3': tr('Цикл') }
 FORMAL_LABELS = {'0': tr('Аналитическая'), '2': tr('Алгоритмическая')}
@@ -127,20 +128,20 @@ class CourseworkPanel(ttk.Frame):
     def _build(self):
         # The structure editor is a normal program tab; project creation belongs
         # to the application header rather than a special 'coursework' workspace.
-        top = ttk.Frame(self, padding=(11, 8, 11, 0))
-        top.pack(fill='x')
-        ttk.Label(top, text=tr('Формирование СПД'), font=('TkDefaultFont', 13, 'bold')).pack(side='left')
-        ttk.Label(top, text=tr('Выберите действие на схеме или слева; свойства редактируются справа'),
+        # The command widgets are children of this panel and are packed into
+        # different containers by set_interface_mode():
+        #   full   - title row, structure row, view row (the classic layout);
+        #   simple - one row that wraps on narrow windows; exports and the model
+        #            check are in the side menu.
+        self._title_row = ttk.Frame(self, padding=(11, 8, 11, 0))
+        ttk.Label(self._title_row, text=tr('Формирование СПД'), font=('TkDefaultFont', 13, 'bold')).pack(side='left')
+        ttk.Label(self._title_row, text=tr('Выберите действие на схеме или слева; свойства редактируются справа'),
                   style='Muted.TLabel').pack(side='left', padx=(17, 0))
-        focus_button = ttk.Button(top, text=tr('⛶ На весь экран'), command=lambda: self.app.enter_diagram_focus(self))
-        focus_button._tooltip_text = tr('Скрыть панели и показать схему на всю рабочую область.')
-        focus_button.pack(side='right')
-        self._is2_mode_button = ttk.Button(top, text=tr('Вид ИС-2'), command=self._toggle_is2_view)
-        self._is2_mode_button._tooltip_text = tr('Переключить расположение схемы на листы по образцу ИС-2.')
-        self._is2_mode_button.pack(side='right', padx=(0, 6))
+        self._structure_row = ttk.Frame(self, padding=(11, 7, 11, 2))
+        self._views_row = ttk.Frame(self, padding=(11, 4, 11, 8))
+        self._simple_row = FlowRow(self, padding=(0, 7, 0, 6))
 
-        structure = ttk.Frame(self, padding=(11, 7, 11, 2))
-        structure.pack(fill='x')
+        self._structure_buttons = []
         for label, callback, primary in [
             (tr('+ Корневое'), self._add_root, False), (tr('+ Дочернее'), self._add_child, True),
             (tr('Вставить до'), lambda: self._insert(False), False),
@@ -149,34 +150,43 @@ class CourseworkPanel(ttk.Frame):
             ('↑', lambda: self._move(-1), False), ('↓', lambda: self._move(1), False),
             (tr('Удалить'), self._delete, False),
         ]:
-            button = ttk.Button(structure, text=label, command=callback,
-                                style='Primary.TButton' if primary else 'TButton')
-            button.pack(side='left', padx=(0, 5))
+            button = ttk.Button(self, text=label, command=callback,
+                                style='Primary.TButton' if primary else 'TButton',
+                                **({'width': 3} if label in ('↑', '↓') else {}))
+            self._structure_buttons.append(button)
             self._edit_buttons.append(button)
-        code_button = ttk.Button(structure, text=tr('Перенумеровать z…'), command=self._renumber)
-        code_button.pack(side='right')
-        self._edit_buttons.append(code_button)
+        self._renumber_button = ttk.Button(self, text=tr('Перенумеровать z…'), command=self._renumber)
+        self._edit_buttons.append(self._renumber_button)
 
         # The creation dialog already offers the new action's type. Keep
         # conversion of an existing action available in a compact menu.
-        construction = ttk.Menubutton(structure, text=tr('Изменить конструкцию ▾'))
+        construction = self._construction_button = ttk.Menubutton(self, text=tr('Изменить конструкцию ▾').replace('▾', '').strip())
         choices = tk.Menu(construction, tearoff=False)
         for label, kind in ((tr('Последовательность'), 'sequence'), (tr('Альтернатива'), 'alternative'),
                             (tr('Цикл'), 'iteration'), (tr('Элементарное'), 'elementary')):
             choices.add_command(label=label, command=lambda k=kind: self._convert(k))
         construction.configure(menu=choices)
-        construction.pack(side='left', padx=(0, 5))
         self._edit_buttons.append(construction)
 
-        views = ttk.Frame(self, padding=(11, 4, 11, 8))
-        views.pack(fill='x')
-        for label, action in (
-            (tr('Общая схема'), self._root_scene), (tr('Вся декомпозиция'), self._full_scene),
-            (tr('Экспорт SVG'), self._export_svg), (tr('Проверить модель'), self._check),
+        self._view_buttons = {}
+        for key, label, action in (
+            ('root', tr('Общая схема'), self._root_scene), ('full', tr('Вся декомпозиция'), self._full_scene),
+            ('svg', tr('Экспорт SVG'), self._export_svg), ('check', tr('Проверить модель'), self._check),
         ):
-            ttk.Button(views, text=label, command=action).pack(side='left', padx=(0, 5))
-        self.mode_label = ttk.Label(views, text=tr('Вся модель · 100%'), style='Muted.TLabel')
-        self.mode_label.pack(side='right')
+            self._view_buttons[key] = ttk.Button(self, text=label, command=action)
+        self.mode_label = ttk.Label(self, text=tr('Вся модель · 100%'), style='Muted.TLabel')
+        self._focus_button = ttk.Button(self, text=tr('⛶ На весь экран'), command=lambda: self.app.enter_diagram_focus(self))
+        self._focus_button._tooltip_text = tr('Скрыть панели и показать схему на всю рабочую область.')
+        self._is2_mode_button = ttk.Button(self, text=tr('Вид ИС-2'), command=self._toggle_is2_view)
+        self._is2_mode_button._tooltip_text = tr('Переключить расположение схемы на листы по образцу ИС-2.')
+        # Simple mode: the action tree is hidden by default and shown by this
+        # button; sheets are switched with the strip above the diagram.
+        self._tree_button = ttk.Button(self, text=tr('Дерево действий'), style='MainNav.TButton',
+                                       command=lambda: self._set_tree_visible(not self._tree_visible()))
+        self._tree_button._tooltip_text = tr('Показать или скрыть дерево действий слева от схемы.')
+        self._sheet_strip = SheetStrip(self, self._select_sheet, padding=(0, 0, 0, 6))
+        self._simple_row.overflow_host = self._sheet_strip.extra
+        self.interface_mode = None
         self._is2_sheet_bar = ttk.Frame(self, padding=(11, 2, 11, 5))
         ttk.Label(self._is2_sheet_bar, text=tr('Лист:')).pack(side='left', padx=(0, 6))
         self._is2_sheet_choice = ttk.Combobox(self._is2_sheet_bar, state='readonly', width=54)
@@ -244,6 +254,7 @@ class CourseworkPanel(ttk.Frame):
         sy.grid(row=0, column=1, sticky='ns'); sx.grid(row=1, column=0, sticky='ew')
         center.columnconfigure(0, weight=1); center.rowconfigure(0, weight=1)
         self._resize_redraw = CoalescedCallback(self.canvas, self._draw)
+        self._zoom_redraw = DebouncedCallback(self.canvas, self._draw, interval_ms=ZOOM_REDRAW_DELAY_MS)
         self.canvas.bind('<Configure>', self._resize_redraw.request)
         # Redraws requested while the scheme is hidden run when it is shown.
         self._draw_pending = False
@@ -261,6 +272,7 @@ class CourseworkPanel(ttk.Frame):
         self._canvas_help = ttk.Label(center, text=tr('ЛКМ — выбрать · двойной щелчок — открыть лист · Ctrl + колесо — масштаб · Ctrl + 0 — вписать · средняя кнопка — перемещение'),
                                       style='Muted.TLabel', padding=(6, 4))
         self._canvas_help.grid(row=2, column=0, sticky='w')
+        self._center_pane = center
 
         # Scrollable inspector: on 650–720 px screens the function/argument
         # controls remain available, unlike the previous fixed-height sidebar.
@@ -382,16 +394,19 @@ class CourseworkPanel(ttk.Frame):
         self._focus_layout = PackSnapshot(self)
         self._focus_restore_token = getattr(self, '_focus_restore_token', 0) + 1
         self._focus_pane_width = self._focus_panes.winfo_width()
-        self._focus_sashes = [self._focus_panes.sashpos(i) for i in (0, 1)]
+        self._focus_had_tree = self._tree_visible()
+        self._focus_sashes = [self._focus_panes.sashpos(i) for i in range(len(self._focus_panes.panes()) - 1)]
         self._focus_layout.hide_except({self._focus_panes})
-        self._focus_panes.forget(self._focus_left)
+        if self._focus_had_tree:
+            self._focus_panes.forget(self._focus_left)
         self._focus_panes.forget(self._focus_right)
         self._canvas_help.grid_remove()
         self._focus_return_bar.pack(fill='x', before=self._focus_panes)
 
     def exit_focus_view(self):
         self._focus_return_bar.pack_forget()
-        self._focus_panes.insert(0, self._focus_left, weight=2)
+        if getattr(self, '_focus_had_tree', True):
+            self._focus_panes.insert(0, self._focus_left, weight=2)
         self._focus_panes.add(self._focus_right, weight=3)
         self._canvas_help.grid()
         self._focus_layout.restore()
@@ -408,6 +423,13 @@ class CourseworkPanel(ttk.Frame):
                 width = self._focus_panes.winfo_width()
                 if width < 300 and attempt < 2:
                     self.after(80, lambda: restore_sashes(attempt + 1))
+                    return
+                if len(self._focus_sashes) == 1:
+                    # Tree hidden: only the sash between diagram and properties.
+                    old = max(1, self._focus_pane_width)
+                    position = round(self._focus_sashes[0] * width / old)
+                    margin = min(120, width // 4)
+                    self._focus_panes.sashpos(0, max(margin, min(position, width - margin)))
                     return
                 first, second = restored_sash_positions(width, self._focus_pane_width, self._focus_sashes)
                 self._focus_panes.sashpos(1, second)
@@ -496,8 +518,90 @@ class CourseworkPanel(ttk.Frame):
         self._refresh_tree()
         if self._is2_view:
             self._refresh_is2_sheets()
+        self._refresh_sheet_strip()
         self._draw_when_visible()
         self._show_properties()
+
+    def set_interface_mode(self, mode):
+        """Place the command widgets for the simple or the full layout (no re-creation)."""
+        if mode == self.interface_mode:
+            return
+        self.interface_mode = mode
+        rows = (self._title_row, self._structure_row, self._views_row, self._simple_row)
+        widgets = (self._structure_buttons + [self._renumber_button, self._construction_button]
+                   + list(self._view_buttons.values()) + [self.mode_label, self._focus_button, self._is2_mode_button,
+                                                          self._tree_button])
+        self._simple_row.clear()
+        for widget in widgets + list(rows) + [self._sheet_strip]:
+            widget.pack_forget()
+        self.mode_label.grid_forget()
+        anchor = self._is2_sheet_bar if self._is2_sheet_bar.winfo_manager() else self._focus_panes
+        if mode == 'simple':
+            self._simple_row.pack(fill='x', before=anchor)
+            self._simple_row.set_items(
+                [self._tree_button] + self._structure_buttons + [
+                    self._construction_button, self._view_buttons['full']],
+                right=[self._renumber_button, self._is2_mode_button, self._focus_button])
+            self._sheet_strip.pack(fill='x', before=self._focus_panes)
+            self._sheet_strip.lift()
+            self._sheet_strip.apply_palette(PALETTES[self.app.theme_name.get()])
+            self._refresh_sheet_strip()
+            self._is2_sheet_bar.pack_forget()      # the strip replaces the sheet list
+            self._set_tree_visible(load_spd_tree_visible(), save=False)
+            # Scope and zoom go under the diagram instead of taking a row of their own.
+            self.mode_label.grid(in_=self._center_pane, row=3, column=0, sticky='w', padx=(6, 0))
+            self.mode_label.lift()
+            return
+        self._set_tree_visible(True, save=False)
+        if getattr(self, '_is2_view', False):
+            self._is2_sheet_bar.pack(fill='x', before=self._focus_panes)
+        anchor = self._is2_sheet_bar if self._is2_sheet_bar.winfo_manager() else self._focus_panes
+        for row in (self._title_row, self._structure_row, self._views_row):
+            row.pack(fill='x', before=anchor)
+        self._focus_button.pack(in_=self._title_row, side='right')
+        self._is2_mode_button.pack(in_=self._title_row, side='right', padx=(0, 6))
+        for button in self._structure_buttons:
+            button.pack(in_=self._structure_row, side='left', padx=(0, 5))
+        self._renumber_button.pack(in_=self._structure_row, side='right')
+        self._construction_button.pack(in_=self._structure_row, side='left', padx=(0, 5))
+        for key in ('root', 'full', 'svg', 'check'):
+            self._view_buttons[key].pack(in_=self._views_row, side='left', padx=(0, 5))
+        self.mode_label.pack(in_=self._views_row, side='right')
+        for widget in widgets:
+            widget.lift()
+
+    # ---- action tree and sheet strip (simple mode) -----------------------------
+    def _tree_visible(self):
+        return str(self._focus_left) in self._focus_panes.panes()
+
+    def _set_tree_visible(self, visible, save=True):
+        if self.app._diagram_focus is not None:
+            return
+        panes = self._focus_panes
+        if visible and not self._tree_visible():
+            panes.insert(0, self._focus_left, weight=2)
+        elif not visible and self._tree_visible():
+            panes.forget(self._focus_left)
+        self._tree_button.state(['selected'] if visible else ['!selected'])
+        if save:
+            save_spd_tree_visible(visible)
+
+    def _sheet_list(self):
+        """«Общая схема», then the IS-2 SPD sheets (see coursework.spd_sheet_heads)."""
+        sheets = [(None, tr('Общая схема'))]
+        if self.doc is not None:
+            sheets += [(ident, action_code(self.doc.action(ident))) for ident in spd_sheet_heads(self.doc)]
+        return sheets
+
+    def _refresh_sheet_strip(self):
+        if self.interface_mode != 'simple':
+            return
+        self._sheet_strip.set_sheets(self._sheet_list())
+        self._sheet_strip.select(self.focus_id)
+
+    def _select_sheet(self, ident):
+        self._navigate_scene(ident, 2 if ident is None else SPD_SHEET_DEPTH)
+        self._sheet_strip.select(self.focus_id)
 
     def _draw_when_visible(self):
         try:
@@ -529,7 +633,10 @@ class CourseworkPanel(ttk.Frame):
         if key is not None and cached is not None and cached[0][0] is key[0] and cached[0][1:] == key[1:]:
             return cached[1]
         builder = build_is2_spd_scene if getattr(self, '_is2_view', False) else build_course_scene
-        scene = builder(self.doc, self.focus_id, max_depth=self.depth_limit)
+        depth = self.depth_limit
+        if depth == SPD_SHEET_DEPTH and builder is build_is2_spd_scene:
+            depth = 2  # the IS-2 view has its own sheet rules
+        scene = builder(self.doc, self.focus_id, max_depth=depth)
         self._scene_cache = (key, scene) if key is not None else None
         return scene
 
@@ -538,7 +645,7 @@ class CourseworkPanel(ttk.Frame):
         cached = getattr(self, '_marks_cache', None)
         if key is not None and cached is not None and cached[0][0] is key[0] and cached[0][1] == key[1]:
             return cached[1]
-        marks = is2_parameter_marks(self.doc)
+        marks = is2_block_marks(self.doc)
         self._marks_cache = (key, marks) if key is not None else None
         return marks
 
@@ -547,7 +654,8 @@ class CourseworkPanel(ttk.Frame):
         self._is2_mode_button.configure(text=tr('Обычный вид') if self._is2_view else tr('Вид ИС-2'))
         if self._is2_view:
             self._refresh_is2_sheets()
-            self._is2_sheet_bar.pack(fill='x', before=self._focus_panes)
+            if self.interface_mode != 'simple':      # simple mode uses the sheet strip
+                self._is2_sheet_bar.pack(fill='x', before=self._focus_panes)
         else:
             self._is2_sheet_bar.pack_forget()
         self._draw()
@@ -741,6 +849,7 @@ class CourseworkPanel(ttk.Frame):
             title_linespace = title_font.metrics('linespace')
             code_linespace = code_font.metrics('linespace')
             small_linespace = small_font.metrics('linespace')
+        marks = self._parameter_marks() if show_labels else {}
         by_id = {n.ident: n for n in scene.nodes}
         for edge, points in edge_paths(scene):
             coords = [value*s for value in points]
@@ -752,10 +861,17 @@ class CourseworkPanel(ttk.Frame):
             children_by_parent.setdefault(edge.source, []).append(by_id[edge.target])
         for parent in scene.nodes:
             kids = sorted(children_by_parent.get(parent.ident, ()), key=lambda node:node.x)
+            if parent.kind == '3' and show_labels:
+                # A loop is marked with '+' beside the line to its body, as in IS-2.
+                for kid in kids:
+                    canvas.create_text((parent.x+scene.node_width/2)*s + max(4, 6*s),
+                                       ((parent.y+scene.node_height) + kid.y)/2*s, anchor='w', text='+',
+                                       fill='#f3f3f8' if dark else INK, font=code_font, tags=('loop-mark',))
             if len(kids) > 1 and parent.kind == '2':
                 for a,b in zip(kids,kids[1:]):
                     canvas.create_line((a.x+scene.node_width)*s, (a.y+scene.node_height/2)*s,
                                        b.x*s,(b.y+scene.node_height/2)*s,fill='#70cfcb' if dark else '#4874ad',arrow='last')
+        sheet_heads = set(spd_sheet_heads(self.doc)) - {self.focus_id} if self.depth_limit == SPD_SHEET_DEPTH else set()
         for node in scene.nodes:
             x,y = node.x*s,node.y*s
             tags=('course-node', 'course-action:'+node.ident)
@@ -766,6 +882,11 @@ class CourseworkPanel(ttk.Frame):
             canvas.create_rectangle(x+2*s,y+3*s,x+w+2*s,y+h+3*s,fill='#12121d' if dark else '#e8edf5',outline='',tags=tags)
             colored['outline'].append(canvas.create_rectangle(x,y,x+w,y+h,fill=fill,outline=color,
                                     width=outline_width,tags=tags))
+            if node.ident in sheet_heads:
+                # Head of another sheet: double frame, as in IS-2.
+                inset = max(2, 3*s)
+                colored['outline'].append(canvas.create_rectangle(x+inset,y+inset,x+w-inset,y+h-inset,outline=color,
+                                        width=1,tags=tags))
             is_alternative = node.kind == '1'
             # The two branch cells share a dedicated bottom band. The action
             # code stays in the main part of the block, above that band.
@@ -788,6 +909,14 @@ class CourseworkPanel(ttk.Frame):
                 if code and code[0]:
                     canvas.create_text(x+w-pad, code_bottom, anchor='se', text=code[0],
                                        fill=ink, font=code_font, tags=tags)
+                # Function / branch parameter in the lower left corner, as in IS-2.
+                mark_text = marks.get(node.ident, '')
+                if mark_text:
+                    code_width = code_measure(code[0]) if code and code[0] else 0
+                    mark = _fit_text_lines(mark_text, code_measure, max(0, w - 3*pad - code_width), 1)
+                    if mark and mark[0]:
+                        canvas.create_text(x+pad, code_bottom, anchor='sw', text=mark[0],
+                                           fill=ink, font=code_font, tags=tags)
                 if is_alternative:
                     for number, center in (('1', x+w/4), ('2', x+3*w/4)):
                         canvas.create_text(center, band_top+band_height/2, anchor='center',
@@ -795,7 +924,8 @@ class CourseworkPanel(ttk.Frame):
         self._remember_selection_items('course', dark, {node.ident: node.kind for node in scene.nodes}, selection_items)
         canvas.configure(scrollregion=(0, 0, grid_width, grid_height))
         title = tr('Весь проект') if self.focus_id is None else action_code(self.doc.action(self.focus_id))
-        scope = tr('глубина 2 + выходы альтернатив') if self.depth_limit == 2 else tr('вся структура')
+        scope = (tr('лист') if self.depth_limit == SPD_SHEET_DEPTH else
+                 tr('глубина 2 + выходы альтернатив') if self.depth_limit == 2 else tr('вся структура'))
         hint = ' · ' + tr('Увеличьте масштаб для подписей') if not show_labels else ''
         self.mode_label.configure(text=tr('{title} · {scope} · {zoom}%{hint}').format(title=title, scope=scope, zoom=round(s*100), hint=hint))
 
@@ -835,8 +965,17 @@ class CourseworkPanel(ttk.Frame):
         self._focus_scene()
 
     def _zoom(self, scale):
+        old = self.zoom
         self.zoom = max(0.25, min(2.5, self.zoom*scale))
-        self._resize_redraw.request()
+        if self.zoom == old:
+            return
+        if self.doc is None:
+            self._resize_redraw.request()
+            return
+        # Wheel zoom: scale the current picture at once, redraw it properly
+        # once the wheel stops, instead of a full redraw for every step.
+        preview_scale(self.canvas, self.zoom / old)
+        self._zoom_redraw.request()
 
     def _wheel(self, event):
         if event.delta:
@@ -859,6 +998,8 @@ class CourseworkPanel(ttk.Frame):
         # Limit retained view states; this is not document undo history.
         del self._navigation_history[:-100]
         self.focus_id, self.depth_limit = focus, depth
+        if getattr(self, 'interface_mode', None) == 'simple':
+            self._sheet_strip.select(self.focus_id)
         self._draw()
         self.canvas.xview_moveto(0)
         self.canvas.yview_moveto(0)
@@ -898,7 +1039,9 @@ class CourseworkPanel(ttk.Frame):
 
     def _focus_scene(self):
         if self.selected_id:
-            self._navigate_scene(self.selected_id, 2)
+            # A sheet head opens its sheet, as in IS-2; other actions their subtree.
+            heads = spd_sheet_heads(self.doc) if self.doc is not None else []
+            self._navigate_scene(self.selected_id, SPD_SHEET_DEPTH if self.selected_id in heads else 2)
 
     def _clear_properties(self):
         self.property_code.configure(text=tr('Выберите действие'))

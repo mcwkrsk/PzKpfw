@@ -1,0 +1,376 @@
+<?xml version='1.0' encoding='utf-8'?>
+<project info="" name="Вариант 2. Проектировочный расчет сечения ремня">
+ <user info="" name="IS-2 User" />
+ <models>
+  <primaryModel>
+   <params LastID="38">
+    <param codingType="1" sign="i" name="Количество передач" number="1" id="1" group="3" o="2" />
+    <param codingType="1" sign="b" name="Стандартная ширина ремня, мм" number="2" id="2" group="3" o="4" />
+    <param codingType="1" sign="KUZ" name="Код узла" number="1" id="3" group="1" o="2" />
+    <param codingType="1" sign="KSE" name="Код сборочной единицы" number="2" id="4" group="1" o="3" />
+    <param codingType="1" sign="KD" name="Код детали" number="3" id="5" group="1" o="4" />
+    <param codingType="1" sign="NUZ" name="Наименование узла" number="1" id="6" group="2" o="2" />
+    <param codingType="1" sign="NSE" name="Наименование сборочной единицы" number="2" id="7" group="2" o="3" />
+    <param codingType="1" sign="ND" name="Наименование детали" number="3" id="8" group="2" o="4" />
+    <param codingType="1" sign="{b}" name="Массив стандартных значений ширины ремня, мм" number="3" id="9" group="3" o="2" />
+    <param codingType="1" sign="Mat" name="Материал и покрытие ремня" number="4" id="10" group="3" o="4" />
+    <param codingType="1" sign="typeB" name="Тип ремня" number="5" id="11" group="3" o="4" />
+    <param codingType="1" sign="D1" name="Диаметр меньшего шкива, мм" number="1" id="12" group="5" o="4" />
+    <param codingType="1" sign="hasDelta" name="Признак ранее выбранной толщины" number="6" id="13" group="3" o="4" />
+    <param codingType="1" sign="plies" name="Число прокладок" number="7" id="14" group="3" o="4" />
+    <param codingType="1" sign="layer" name="Наличие прослоек" number="8" id="15" group="3" o="4" />
+    <param codingType="1" sign="rmin" name="Допускаемое отношение диаметра к толщине" number="2" id="16" group="5" o="4" />
+    <param codingType="1" sign="deltaLim" name="Предельная толщина ремня, мм" number="3" id="17" group="5" o="4" />
+    <param codingType="1" sign="delta" name="Толщина ремня, мм" number="4" id="18" group="5" o="4" />
+    <param codingType="1" sign="N" name="Передаваемая мощность, кВт" number="1" id="19" group="9" o="3" />
+    <param codingType="1" sign="v" name="Скорость ремня, м/с" number="1" id="20" group="8" o="4" />
+    <param codingType="1" sign="F" name="Окружная сила, Н" number="2" id="21" group="9" o="3" />
+    <param codingType="1" sign="sigma0" name="Начальное напряжение ремня, МПа" number="3" id="22" group="9" o="4" />
+    <param codingType="1" sign="A" name="Коэффициент A, МПа" number="4" id="23" group="9" o="4" />
+    <param codingType="1" sign="W" name="Коэффициент W, МПа" number="5" id="24" group="9" o="4" />
+    <param codingType="1" sign="sigmaF0" name="Приведенное полезное напряжение, МПа" number="6" id="25" group="9" o="4" />
+    <param codingType="1" sign="auto" name="Признак автоматического натяжения" number="9" id="26" group="3" o="3" />
+    <param codingType="1" sign="c0case" name="Признак единичного коэффициента расположения" number="10" id="27" group="3" o="3" />
+    <param codingType="1" sign="angleBand" name="Признак диапазона угла наклона" number="11" id="28" group="3" o="3" />
+    <param codingType="1" sign="C0" name="Коэффициент расположения передачи" number="7" id="29" group="9" o="3" />
+    <param codingType="1" sign="alpha1" name="Угол обхвата меньшего шкива, град" number="5" id="30" group="5" o="4" />
+    <param codingType="1" sign="C1" name="Коэффициент угла обхвата" number="8" id="31" group="9" o="3" />
+    <param codingType="1" sign="C2" name="Коэффициент влияния центробежной силы" number="9" id="32" group="9" o="3" />
+    <param codingType="1" sign="load" name="Характер нагрузки" number="12" id="33" group="3" o="3" />
+    <param codingType="1" sign="motor" name="Тип приводного двигателя" number="13" id="34" group="3" o="3" />
+    <param codingType="1" sign="shift" name="Число рабочих смен" number="14" id="35" group="3" o="3" />
+    <param codingType="1" sign="C3" name="Коэффициент режима работы" number="10" id="36" group="9" o="3" />
+    <param codingType="1" sign="sigmaF" name="Допускаемое полезное напряжение, МПа" number="11" id="37" group="9" o="4" />
+    <param codingType="1" sign="bCalc" name="Расчетная ширина ремня, мм" number="6" id="38" group="5" o="4" />
+   </params>
+   <objects LastID="4">
+    <object name="Узел(виртуальный)" id="2" />
+    <object name="Сборочная единица" id="3" />
+    <object name="Деталь" id="4" />
+   </objects>
+   <spd>
+    <actions lastID="61">
+     <pd symbol="122" status="1" name="Проектировочный расчет для всех плоскоременных передач" level="1" formalization="0" number="1" mark="" id="1" type="3" />
+     <pd symbol="122" status="1" name="Проектировочный расчет для i-ой плоскоременной передачи" level="2" formalization="2" number="1" mark="" id="2" type="2" />
+     <pd symbol="122" status="0" name="Фиксация i-ой передачи" level="3" formalization="0" number="1" mark="" id="3" type="0" />
+     <pd symbol="122" status="1" name="Определение параметров для текущей передачи, b" level="3" formalization="2" number="2" mark="" id="4" type="2" />
+     <pd symbol="122" status="1" name="Определение параметров для всех плоскоременных передач в зависимости от наличия передачи, {b}" level="3" formalization="0" number="3" mark="" id="5" type="1">
+      <alts text="При наличии передачи" />
+      <alts text="При отсутствии передачи" />
+     </pd>
+     <pd symbol="122" status="1" name="Определение толщины ремня, delta" level="4" formalization="2" number="1" mark="" id="6" type="2" />
+     <pd symbol="122" status="1" name="Определение окружной силы, F" level="4" formalization="2" number="2" mark="" id="7" type="2" />
+     <pd symbol="122" status="1" name="Определение приведенного полезного напряжения, sigmaF0" level="4" formalization="2" number="3" mark="" id="8" type="2" />
+     <pd symbol="122" status="1" name="Определение поправочных коэффициентов, C3" level="4" formalization="2" number="4" mark="" id="9" type="2" />
+     <pd symbol="122" status="0" name="Расчет допускаемого полезного напряжения, sigmaF" level="4" formalization="0" number="5" mark="По формуле (1.11): sigmaF = sigmaF0*C0*C1*C2*C3" id="10" type="0" />
+     <pd symbol="122" status="1" name="Определение ширины ремня, b" level="4" formalization="2" number="6" mark="" id="11" type="2" />
+     <pd symbol="122" status="1" name="Определение параметров для всех плоскоременных передач при наличии передачи, {b}" level="4" formalization="2" number="7" mark="" id="12" type="2" />
+     <pd symbol="122" status="0" name="Определение параметров для всех плоскоременных передач при отсутствии передачи, {b}" level="4" formalization="0" number="8" mark="" id="13" type="0" />
+     <pd symbol="122" status="1" name="Определение исходных данных ремня, layer" level="5" formalization="2" number="1" mark="" id="14" type="2" />
+     <pd symbol="122" status="1" name="Определение толщины ремня, delta" level="5" formalization="0" number="2" mark="" id="15" type="1">
+      <alts text="Толщина выбрана ранее" />
+      <alts text="Толщина не выбрана ранее" />
+     </pd>
+     <pd symbol="122" status="0" name="Определение передаваемой мощности, N" level="5" formalization="1" number="3" mark="Определяется специалистом" id="16" type="0" />
+     <pd symbol="122" status="0" name="Определение скорости ремня, v" level="5" formalization="1" number="4" mark="Определяется специалистом" id="17" type="0" />
+     <pd symbol="122" status="0" name="Расчет окружной силы, F" level="5" formalization="0" number="5" mark="По формуле (1.10): F = 10^3*N/v" id="18" type="0" />
+     <pd symbol="122" status="0" name="Выбор начального напряжения ремня, sigma0" level="5" formalization="1" number="6" mark="Определяется специалистом" id="19" type="0" />
+     <pd symbol="122" status="0" name="Выбор коэффициента A, A" level="5" formalization="3" number="7" mark="По таблице 1.5 по Mat, sigma0" id="20" type="0" />
+     <pd symbol="122" status="0" name="Выбор коэффициента W, W" level="5" formalization="3" number="8" mark="По таблице 1.5 по Mat, sigma0" id="21" type="0" />
+     <pd symbol="122" status="0" name="Расчет приведенного полезного напряжения, sigmaF0" level="5" formalization="0" number="9" mark="По формуле (1.12): sigmaF0 = A-W*delta/D1" id="22" type="0" />
+     <pd symbol="122" status="1" name="Определение коэффициента расположения, C0" level="5" formalization="2" number="10" mark="" id="23" type="2" />
+     <pd symbol="122" status="1" name="Определение коэффициента угла обхвата, C1" level="5" formalization="2" number="11" mark="" id="24" type="2" />
+     <pd symbol="122" status="1" name="Определение коэффициента центробежной силы, C2" level="5" formalization="0" number="12" mark="" id="25" type="1">
+      <alts text="Автоматическое натяжение" />
+      <alts text="Неавтоматическое натяжение" />
+     </pd>
+     <pd symbol="122" status="1" name="Определение коэффициента режима работы, C3" level="5" formalization="2" number="13" mark="" id="26" type="2" />
+     <pd symbol="122" status="0" name="Расчет расчетной ширины ремня, bCalc" level="5" formalization="0" number="14" mark="По формуле (1.13): bCalc = F/(delta*sigmaF)" id="27" type="0" />
+     <pd symbol="122" status="1" name="Выбор стандартной ширины ремня, b" level="5" formalization="0" number="15" mark="" id="28" type="1">
+      <alts text="Синтетический ремень" />
+      <alts text="Прорезиненный ремень" />
+     </pd>
+     <pd symbol="122" status="0" name="Переход к следующей передаче" level="5" formalization="0" number="16" mark="" id="29" type="0" />
+     <pd symbol="122" status="0" name="Определение параметров для всех плоскоременных передач при наличии передачи для предыдущей передачи, {b}" level="5" formalization="0" number="17" mark="" id="30" type="0" />
+     <pd symbol="122" status="0" name="Определение материала и покрытия ремня, Mat" level="6" formalization="1" number="1" mark="Определяется специалистом" id="31" type="0" />
+     <pd symbol="122" status="0" name="Определение типа ремня, typeB" level="6" formalization="1" number="2" mark="Определяется специалистом" id="32" type="0" />
+     <pd symbol="122" status="0" name="Определение диаметра меньшего шкива, D1" level="6" formalization="1" number="3" mark="Определяется специалистом" id="33" type="0" />
+     <pd symbol="122" status="0" name="Определение признака ранее выбранной толщины, hasDelta" level="6" formalization="1" number="4" mark="Определяется специалистом" id="34" type="0" />
+     <pd symbol="122" status="0" name="Определение числа прокладок, plies" level="6" formalization="1" number="5" mark="Определяется специалистом" id="35" type="0" />
+     <pd symbol="122" status="0" name="Определение наличия прослоек, layer" level="6" formalization="1" number="6" mark="Определяется специалистом" id="36" type="0" />
+     <pd symbol="122" status="0" name="Определение ранее выбранной толщины ремня, delta" level="6" formalization="1" number="7" mark="Определяется специалистом" id="37" type="0" />
+     <pd symbol="122" status="1" name="Определение стандартной толщины ремня, delta" level="6" formalization="2" number="8" mark="" id="38" type="2" />
+     <pd symbol="122" status="0" name="Определение признака автоматического натяжения, auto" level="6" formalization="1" number="9" mark="Определяется специалистом" id="39" type="0" />
+     <pd symbol="122" status="0" name="Определение признака единичного коэффициента расположения, c0case" level="6" formalization="1" number="10" mark="Определяется специалистом" id="40" type="0" />
+     <pd symbol="122" status="0" name="Определение признака диапазона угла наклона, angleBand" level="6" formalization="1" number="11" mark="Определяется специалистом" id="41" type="0" />
+     <pd symbol="122" status="1" name="Определение коэффициента расположения передачи, C0" level="6" formalization="0" number="12" mark="" id="42" type="1">
+      <alts text="Автоматическое натяжение, быстроходный синтетический ремень или наклон до 60 град" />
+      <alts text="Неавтоматическое натяжение прорезиненного ремня, наклон свыше 60 град" />
+     </pd>
+     <pd symbol="122" status="0" name="Определение угла обхвата на меньшем шкиве, alpha1" level="6" formalization="1" number="13" mark="Определяется специалистом" id="43" type="0" />
+     <pd symbol="122" status="0" name="Выбор коэффициента угла обхвата, C1" level="6" formalization="3" number="14" mark="По таблице 1.6 по alpha1" id="44" type="0" />
+     <pd symbol="122" status="0" name="Определение коэффициента при автоматическом натяжении, C2" level="6" formalization="0" number="15" mark="C2 = 1 (с. 11)" id="45" type="0" />
+     <pd symbol="122" status="0" name="Выбор коэффициента при неавтоматическом натяжении, C2" level="6" formalization="3" number="16" mark="По таблице 1.7 по typeB, v" id="46" type="0" />
+     <pd symbol="122" status="0" name="Определение характера нагрузки, load" level="6" formalization="1" number="17" mark="Определяется специалистом" id="47" type="0" />
+     <pd symbol="122" status="0" name="Определение типа приводного двигателя, motor" level="6" formalization="1" number="18" mark="Определяется специалистом" id="48" type="0" />
+     <pd symbol="122" status="0" name="Определение числа рабочих смен, shift" level="6" formalization="1" number="19" mark="Определяется специалистом" id="49" type="0" />
+     <pd symbol="122" status="0" name="Выбор коэффициента режима работы, C3" level="6" formalization="3" number="20" mark="По таблице 1.8 по load, motor, shift" id="50" type="0" />
+     <pd symbol="122" status="0" name="Выбор стандартной ширины синтетического ремня, b" level="6" formalization="3" number="21" mark="По таблице 1.3 по Mat, bCalc" id="51" type="0" />
+     <pd symbol="122" status="0" name="Выбор стандартной ширины прорезиненного ремня, b" level="6" formalization="3" number="22" mark="По таблицам 1.4 и 1.9 по plies, bCalc" id="52" type="0" />
+     <pd symbol="122" status="0" name="Выбор допускаемого отношения диаметра к толщине, rmin" level="7" formalization="3" number="1" mark="По таблице 1.1 по Mat" id="53" type="0" />
+     <pd symbol="122" status="0" name="Расчет предельной толщины ремня, deltaLim" level="7" formalization="0" number="2" mark="По формуле (1.9): deltaLim = D1/rmin" id="54" type="0" />
+     <pd symbol="122" status="1" name="Выбор стандартной толщины ремня, delta" level="7" formalization="0" number="3" mark="" id="55" type="1">
+      <alts text="Синтетический ремень" />
+      <alts text="Прорезиненный ремень" />
+     </pd>
+     <pd symbol="122" status="0" name="Определение единичного коэффициента расположения, C0" level="7" formalization="0" number="4" mark="C0 = 1 (с. 10)" id="56" type="0" />
+     <pd symbol="122" status="1" name="Определение коэффициента по диапазону наклона, C0" level="7" formalization="0" number="5" mark="" id="57" type="1">
+      <alts text="Наклон 60...80 град" />
+      <alts text="Наклон 80...90 град" />
+     </pd>
+     <pd symbol="122" status="0" name="Выбор толщины синтетического ремня, delta" level="8" formalization="3" number="1" mark="По таблице 1.3 по Mat, deltaLim" id="58" type="0" />
+     <pd symbol="122" status="0" name="Выбор толщины прорезиненного ремня, delta" level="8" formalization="3" number="2" mark="По таблице 1.4 по Mat, plies, layer, deltaLim" id="59" type="0" />
+     <pd symbol="122" status="0" name="Определение коэффициента при наклоне 60...80 град, C0" level="8" formalization="0" number="3" mark="C0 = 0,9 (с. 10)" id="60" type="0" />
+     <pd symbol="122" status="0" name="Определение коэффициента при наклоне 80...90 град, C0" level="8" formalization="0" number="4" mark="C0 = 0,8 (с. 10)" id="61" type="0" />
+    </actions>
+    <links>
+     <link afe3="0" afe1="1" afe2="2" type="2" />
+     <link afe3="0" afe1="1" afe2="2" type="3" />
+     <link afe3="0" afe1="2" afe2="3" type="2" />
+     <link afe3="0" afe1="2" afe2="4" type="2" />
+     <link afe3="0" afe1="2" afe2="5" type="2" />
+     <link afe3="4" afe1="2" afe2="3" type="3" />
+     <link afe3="5" afe1="2" afe2="4" type="3" />
+     <link afe3="0" afe1="2" afe2="5" type="3" />
+     <link afe3="0" afe1="4" afe2="6" type="2" />
+     <link afe3="0" afe1="4" afe2="7" type="2" />
+     <link afe3="0" afe1="4" afe2="8" type="2" />
+     <link afe3="0" afe1="4" afe2="9" type="2" />
+     <link afe3="0" afe1="4" afe2="10" type="2" />
+     <link afe3="0" afe1="4" afe2="11" type="2" />
+     <link afe3="7" afe1="4" afe2="6" type="3" />
+     <link afe3="8" afe1="4" afe2="7" type="3" />
+     <link afe3="9" afe1="4" afe2="8" type="3" />
+     <link afe3="10" afe1="4" afe2="9" type="3" />
+     <link afe3="11" afe1="4" afe2="10" type="3" />
+     <link afe3="0" afe1="4" afe2="11" type="3" />
+     <link afe3="0" afe1="6" afe2="14" type="2" />
+     <link afe3="0" afe1="6" afe2="15" type="2" />
+     <link afe3="15" afe1="6" afe2="14" type="3" />
+     <link afe3="0" afe1="6" afe2="15" type="3" />
+     <link afe3="0" afe1="14" afe2="31" type="2" />
+     <link afe3="0" afe1="14" afe2="32" type="2" />
+     <link afe3="0" afe1="14" afe2="33" type="2" />
+     <link afe3="0" afe1="14" afe2="34" type="2" />
+     <link afe3="0" afe1="14" afe2="35" type="2" />
+     <link afe3="0" afe1="14" afe2="36" type="2" />
+     <link afe3="32" afe1="14" afe2="31" type="3" />
+     <link afe3="33" afe1="14" afe2="32" type="3" />
+     <link afe3="34" afe1="14" afe2="33" type="3" />
+     <link afe3="35" afe1="14" afe2="34" type="3" />
+     <link afe3="36" afe1="14" afe2="35" type="3" />
+     <link afe3="0" afe1="14" afe2="36" type="3" />
+     <link afe3="0" afe1="15" afe2="37" type="2" />
+     <link afe3="0" afe1="15" afe2="38" type="2" />
+     <link afe3="38" afe1="15" afe2="37" type="3" />
+     <link afe3="0" afe1="15" afe2="38" type="3" />
+     <link afe3="0" afe1="38" afe2="53" type="2" />
+     <link afe3="0" afe1="38" afe2="54" type="2" />
+     <link afe3="0" afe1="38" afe2="55" type="2" />
+     <link afe3="54" afe1="38" afe2="53" type="3" />
+     <link afe3="55" afe1="38" afe2="54" type="3" />
+     <link afe3="0" afe1="38" afe2="55" type="3" />
+     <link afe3="0" afe1="55" afe2="58" type="2" />
+     <link afe3="0" afe1="55" afe2="59" type="2" />
+     <link afe3="59" afe1="55" afe2="58" type="3" />
+     <link afe3="0" afe1="55" afe2="59" type="3" />
+     <link afe3="0" afe1="7" afe2="16" type="2" />
+     <link afe3="0" afe1="7" afe2="17" type="2" />
+     <link afe3="0" afe1="7" afe2="18" type="2" />
+     <link afe3="17" afe1="7" afe2="16" type="3" />
+     <link afe3="18" afe1="7" afe2="17" type="3" />
+     <link afe3="0" afe1="7" afe2="18" type="3" />
+     <link afe3="0" afe1="8" afe2="19" type="2" />
+     <link afe3="0" afe1="8" afe2="20" type="2" />
+     <link afe3="0" afe1="8" afe2="21" type="2" />
+     <link afe3="0" afe1="8" afe2="22" type="2" />
+     <link afe3="20" afe1="8" afe2="19" type="3" />
+     <link afe3="21" afe1="8" afe2="20" type="3" />
+     <link afe3="22" afe1="8" afe2="21" type="3" />
+     <link afe3="0" afe1="8" afe2="22" type="3" />
+     <link afe3="0" afe1="9" afe2="23" type="2" />
+     <link afe3="0" afe1="9" afe2="24" type="2" />
+     <link afe3="0" afe1="9" afe2="25" type="2" />
+     <link afe3="0" afe1="9" afe2="26" type="2" />
+     <link afe3="24" afe1="9" afe2="23" type="3" />
+     <link afe3="25" afe1="9" afe2="24" type="3" />
+     <link afe3="26" afe1="9" afe2="25" type="3" />
+     <link afe3="0" afe1="9" afe2="26" type="3" />
+     <link afe3="0" afe1="23" afe2="39" type="2" />
+     <link afe3="0" afe1="23" afe2="40" type="2" />
+     <link afe3="0" afe1="23" afe2="41" type="2" />
+     <link afe3="0" afe1="23" afe2="42" type="2" />
+     <link afe3="40" afe1="23" afe2="39" type="3" />
+     <link afe3="41" afe1="23" afe2="40" type="3" />
+     <link afe3="42" afe1="23" afe2="41" type="3" />
+     <link afe3="0" afe1="23" afe2="42" type="3" />
+     <link afe3="0" afe1="42" afe2="56" type="2" />
+     <link afe3="0" afe1="42" afe2="57" type="2" />
+     <link afe3="57" afe1="42" afe2="56" type="3" />
+     <link afe3="0" afe1="42" afe2="57" type="3" />
+     <link afe3="0" afe1="57" afe2="60" type="2" />
+     <link afe3="0" afe1="57" afe2="61" type="2" />
+     <link afe3="61" afe1="57" afe2="60" type="3" />
+     <link afe3="0" afe1="57" afe2="61" type="3" />
+     <link afe3="0" afe1="24" afe2="43" type="2" />
+     <link afe3="0" afe1="24" afe2="44" type="2" />
+     <link afe3="44" afe1="24" afe2="43" type="3" />
+     <link afe3="0" afe1="24" afe2="44" type="3" />
+     <link afe3="0" afe1="25" afe2="45" type="2" />
+     <link afe3="0" afe1="25" afe2="46" type="2" />
+     <link afe3="46" afe1="25" afe2="45" type="3" />
+     <link afe3="0" afe1="25" afe2="46" type="3" />
+     <link afe3="0" afe1="26" afe2="47" type="2" />
+     <link afe3="0" afe1="26" afe2="48" type="2" />
+     <link afe3="0" afe1="26" afe2="49" type="2" />
+     <link afe3="0" afe1="26" afe2="50" type="2" />
+     <link afe3="48" afe1="26" afe2="47" type="3" />
+     <link afe3="49" afe1="26" afe2="48" type="3" />
+     <link afe3="50" afe1="26" afe2="49" type="3" />
+     <link afe3="0" afe1="26" afe2="50" type="3" />
+     <link afe3="0" afe1="11" afe2="27" type="2" />
+     <link afe3="0" afe1="11" afe2="28" type="2" />
+     <link afe3="28" afe1="11" afe2="27" type="3" />
+     <link afe3="0" afe1="11" afe2="28" type="3" />
+     <link afe3="0" afe1="28" afe2="51" type="2" />
+     <link afe3="0" afe1="28" afe2="52" type="2" />
+     <link afe3="52" afe1="28" afe2="51" type="3" />
+     <link afe3="0" afe1="28" afe2="52" type="3" />
+     <link afe3="0" afe1="5" afe2="12" type="2" />
+     <link afe3="0" afe1="5" afe2="13" type="2" />
+     <link afe3="13" afe1="5" afe2="12" type="3" />
+     <link afe3="0" afe1="5" afe2="13" type="3" />
+     <link afe3="0" afe1="12" afe2="29" type="2" />
+     <link afe3="0" afe1="12" afe2="30" type="2" />
+     <link afe3="30" afe1="12" afe2="29" type="3" />
+     <link afe3="0" afe1="12" afe2="30" type="3" />
+    </links>
+   </spd>
+   <matrix>
+    <AElement e1="2" e3="0" e2="1" id="0" name="" char="33" power="1" type="4" />
+    <AElement e1="3" e3="0" e2="1" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="3" e3="0" e2="3" id="0" name="" char="46" power="1" type="4" />
+    <AElement e1="3" e3="0" e2="4" id="0" name="" char="46" power="1" type="4" />
+    <AElement e1="3" e3="0" e2="5" id="0" name="" char="46" power="1" type="4" />
+    <AElement e1="3" e3="0" e2="6" id="0" name="" char="46" power="1" type="4" />
+    <AElement e1="3" e3="0" e2="7" id="0" name="" char="46" power="1" type="4" />
+    <AElement e1="3" e3="0" e2="8" id="0" name="" char="46" power="1" type="4" />
+    <AElement e1="5" e3="0" e2="1" id="0" name="" char="63" power="1" type="4" />
+    <AElement e1="10" e3="0" e2="37" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="10" e3="0" e2="25" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="10" e3="0" e2="29" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="10" e3="0" e2="31" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="10" e3="0" e2="32" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="10" e3="0" e2="36" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="13" e3="0" e2="9" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="13" e3="0" e2="1" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="15" e3="0" e2="13" id="0" name="" char="63" power="1" type="4" />
+    <AElement e1="16" e3="0" e2="19" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="17" e3="0" e2="20" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="18" e3="0" e2="21" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="18" e3="0" e2="19" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="18" e3="0" e2="20" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="19" e3="0" e2="22" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="20" e3="0" e2="23" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="20" e3="0" e2="10" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="20" e3="0" e2="22" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="21" e3="0" e2="24" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="21" e3="0" e2="10" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="21" e3="0" e2="22" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="22" e3="0" e2="25" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="22" e3="0" e2="23" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="22" e3="0" e2="24" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="22" e3="0" e2="18" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="22" e3="0" e2="12" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="25" e3="0" e2="26" id="0" name="" char="63" power="1" type="4" />
+    <AElement e1="27" e3="0" e2="38" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="27" e3="0" e2="21" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="27" e3="0" e2="18" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="27" e3="0" e2="37" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="28" e3="0" e2="11" id="0" name="" char="63" power="1" type="4" />
+    <AElement e1="29" e3="0" e2="1" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="30" e3="0" e2="9" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="30" e3="0" e2="1" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="31" e3="0" e2="10" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="32" e3="0" e2="11" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="33" e3="0" e2="12" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="34" e3="0" e2="13" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="35" e3="0" e2="14" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="36" e3="0" e2="15" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="37" e3="0" e2="18" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="39" e3="0" e2="26" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="40" e3="0" e2="27" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="41" e3="0" e2="28" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="42" e3="0" e2="27" id="0" name="" char="63" power="1" type="4" />
+    <AElement e1="43" e3="0" e2="30" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="44" e3="0" e2="31" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="44" e3="0" e2="30" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="45" e3="0" e2="32" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="46" e3="0" e2="32" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="46" e3="0" e2="11" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="46" e3="0" e2="20" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="47" e3="0" e2="33" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="48" e3="0" e2="34" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="49" e3="0" e2="35" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="50" e3="0" e2="36" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="50" e3="0" e2="33" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="50" e3="0" e2="34" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="50" e3="0" e2="35" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="51" e3="0" e2="2" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="51" e3="0" e2="10" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="51" e3="0" e2="38" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="51" e3="0" e2="18" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="52" e3="0" e2="2" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="52" e3="0" e2="38" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="52" e3="0" e2="14" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="52" e3="0" e2="18" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="53" e3="0" e2="16" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="53" e3="0" e2="10" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="54" e3="0" e2="17" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="54" e3="0" e2="12" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="54" e3="0" e2="16" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="55" e3="0" e2="11" id="0" name="" char="63" power="1" type="4" />
+    <AElement e1="56" e3="0" e2="29" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="57" e3="0" e2="28" id="0" name="" char="63" power="1" type="4" />
+    <AElement e1="58" e3="0" e2="18" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="58" e3="0" e2="10" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="58" e3="0" e2="17" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="59" e3="0" e2="18" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="59" e3="0" e2="10" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="59" e3="0" e2="14" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="59" e3="0" e2="15" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="59" e3="0" e2="17" id="0" name="" char="43" power="1" type="4" />
+    <AElement e1="60" e3="0" e2="29" id="0" name="" char="42" power="1" type="4" />
+    <AElement e1="61" e3="0" e2="29" id="0" name="" char="42" power="1" type="4" />
+   </matrix>
+  </primaryModel>
+  <ConceptModel>
+   <cs last_elem_id="0" last_link_id="0">
+    <elemets />
+    <links />
+   </cs>
+   <spz last_id="1">
+    <elemets>
+     <AElement symbol="99" number="1" id="1" name="PZ_1" status="0" level="1" formalization="0" type="0" />
+    </elemets>
+    <links />
+   </spz>
+   <content />
+  </ConceptModel>
+ </models>
+ <ModuleParams>
+  <Module name="PrimaryModelAuto">
+   <param decStr="z32;z43;z44;z46;z52;z5.12;z5.13;" />
+  </Module>
+ </ModuleParams>
+</project>
