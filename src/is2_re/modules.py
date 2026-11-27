@@ -33,8 +33,7 @@ from pathlib import Path, PurePosixPath
 
 from . import __version__
 from .installation import InstallationError, data_dir, download, fetch_json, is_newer, parse_version
-
-CATALOGUE_URL = "https://raw.githubusercontent.com/mcwkrsk/PzKpfw/main/modules/index.json"
+CATALOGUE_URL = "https://raw.githubusercontent.com/mcwkrsk/PzKpfw/master/modules/index.json"
 MANIFEST = "module.json"
 ID_RE = re.compile(r"^[a-z][a-z0-9-]{1,63}$")
 PACKAGE_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_]*$")
