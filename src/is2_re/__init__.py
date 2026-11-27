@@ -1,6 +1,6 @@
 """Evidence-first reader, editor, validator and writer for IS-2 project XML."""
 
-__version__ = "9.10.0"
+__version__ = "1.0.0"
 from .model import Action, Link, Project, ProjectFormatError, load_project
 from .document import ProjectDocument, ActionRecord, LinkRecord
 from .concept import ConceptStructureDocument, SubjectCategory, SCBinaryLink
