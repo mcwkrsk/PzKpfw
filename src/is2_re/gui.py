@@ -265,7 +265,7 @@ class Is2Studio(tk.Tk):
         self.autosave_writer = pz_autosave.BackgroundWriter(self)
         self.autosave = pz_autosave.AutosaveScheduler(self, self._autosave_now)
         self._autosave_backed_up = set()
-        self.after(1500, self._offer_recovery)
+        self._recovery_offer_job = self.after(1500, self._run_recovery_offer)
         self._set_title()
         self.updates = UpdateController(self)
         self.loaded_modules = []
@@ -4841,13 +4841,19 @@ class Is2Studio(tk.Tk):
         self._fit_nav_job = None
         self._fit_nav_row()
 
+    def _run_recovery_offer(self):
+        self._recovery_offer_job = None
+        self._offer_recovery()
+
     def destroy(self):
-        job, self._fit_nav_job = getattr(self, '_fit_nav_job', None), None
-        if job is not None:
-            try:
-                self.after_cancel(job)
-            except tk.TclError:
-                pass
+        for name in ('_fit_nav_job', '_recovery_offer_job'):
+            job = getattr(self, name, None)
+            setattr(self, name, None)
+            if job is not None:
+                try:
+                    self.after_cancel(job)
+                except tk.TclError:
+                    pass
         super().destroy()
 
     def _align_nav_to_page(self):

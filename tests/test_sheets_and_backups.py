@@ -49,7 +49,9 @@ class SpdSheetTests(unittest.TestCase):
 class BackupLocationTests(unittest.TestCase):
     def test_backups_go_to_the_app_folder_not_beside_the_project(self):
         with tempfile.TemporaryDirectory() as tmp:
-            tmp = Path(tmp)
+            # resolve(): on Windows the temp folder may be given as a short
+            # 8.3 name (RUNNER~1) while backup paths are fully resolved.
+            tmp = Path(tmp).resolve()
             project = tmp / 'downloads' / 'p.is2'
             project.parent.mkdir()
             project.write_bytes(SAMPLE.read_bytes())
@@ -57,7 +59,7 @@ class BackupLocationTests(unittest.TestCase):
             with mock.patch.dict(os.environ, env):
                 info = create_project_backup(project)
                 self.assertFalse((project.parent / '.pzkpfw-backups').exists())
-                self.assertTrue(str(info.path).startswith(str(tmp / 'local')))
+                self.assertTrue(info.path.is_relative_to(tmp / 'local'), info.path)
                 self.assertEqual((backup_directory(project) / 'source.txt').read_text(encoding='utf-8').strip(),
                                  str(project.resolve()))
                 # Copies made by older versions beside the project are still listed.

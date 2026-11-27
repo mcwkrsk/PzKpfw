@@ -51,7 +51,9 @@ class InterfaceModeTests(unittest.TestCase):
 
     def menubar_labels(self):
         bar = self.app._menubar
-        return [bar.entrycget(i, 'label') for i in range(bar.index('end') + 1)]
+        # Windows keeps a tear-off entry (no label) at index 0 of the menu bar.
+        return [bar.entrycget(i, 'label') for i in range(bar.index('end') + 1)
+                if bar.type(i) in ('command', 'cascade')]
 
     def test_default_is_simple_and_switching_keeps_every_command(self):
         app, panel = self.app, self.app.course_panel
