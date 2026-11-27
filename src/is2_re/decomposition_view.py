@@ -18,8 +18,10 @@ from .specifications import action_code
 from .button_notebook import ButtonNotebook
 from .ui_performance import CoalescedCallback
 from .focus_view import PackSnapshot
+from .document import reads_document
 
 
+@reads_document
 def sheet_scene(doc, focus=None):
     """Return scene and display geometry without editing the document."""
     if focus is None:
@@ -67,6 +69,7 @@ def structural_mark(doc, ident, *, nodes=None, parents=None, orders=None):
     return mark
 
 
+@reads_document
 def primitives(doc, focus=None, *, show_codes=True, show_symbols=True):
     """Generate common graphics for the canvas and SVG export."""
     scene, geom, lines = sheet_scene(doc, focus)
@@ -178,6 +181,9 @@ class DecompositionPanel(ttk.Frame):
         self.canvas=tk.Canvas(holder,background='#1b1b29',highlightthickness=0)
         self._resize_redraw = CoalescedCallback(self.canvas, self.draw)
         self.canvas.bind('<Configure>', self._resize_redraw.request)
+        # A hidden diagram is drawn when its canvas is shown again.
+        self._draw_pending = False
+        self.canvas.bind('<Map>', self._draw_if_pending, add='+')
         self.canvas.bind('<ButtonPress-2>', lambda e: self.canvas.scan_mark(e.x, e.y))
         self.canvas.bind('<B2-Motion>', lambda e: self.canvas.scan_dragto(e.x, e.y, gain=1))
         sx=ttk.Scrollbar(holder,orient='horizontal',command=self.canvas.xview)
@@ -226,7 +232,14 @@ class DecompositionPanel(ttk.Frame):
             frame=next((k for k,v in self._frames.items() if v==previous),None)
             if frame:self.tabs.select(frame)
             else:self.focus=None
-        self.draw()
+        if self.canvas.winfo_ismapped():
+            self.draw()
+        else:
+            self._draw_pending = True
+
+    def _draw_if_pending(self, _event=None):
+        if getattr(self, '_draw_pending', False):
+            self.draw()
 
     def _tab_changed(self,_event=None):
         self.focus=self._frames.get(self.tabs.select())
@@ -255,6 +268,7 @@ class DecompositionPanel(ttk.Frame):
 
     def draw(self):
         canvas = self.canvas
+        self._draw_pending = False
         canvas.delete('all')
         dark = self.app.theme_name.get() == 'dark'
         canvas.configure(background='#1b1b29' if dark else '#ffffff')

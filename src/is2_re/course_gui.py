@@ -30,6 +30,31 @@ FORMAL_LABELS = {'0': tr('Аналитическая'), '2': tr('Алгорит�
 STATUS_LABELS = {'0': tr('Элементарное'), '1': tr('Промежуточное')}
 
 
+_MEASURE_CACHE: dict = {}
+_MEASURE_CACHE_LIMIT = 20000
+
+
+def _cached_measure(font, key):
+    """Return font.measure memoized by (font class, family, size, weight).
+
+    Tk text measurement is a round trip into Tcl. Redraws measure the same
+    captions again and again, so widths are kept between redraws; the key
+    contains everything the Font was created with.
+    """
+    cache = _MEASURE_CACHE.setdefault((type(font), *key), {})
+    if len(cache) > _MEASURE_CACHE_LIMIT:
+        cache.clear()
+    raw = font.measure
+
+    def measure(text):
+        try:
+            return cache[text]
+        except KeyError:
+            value = cache[text] = raw(text)
+            return value
+    return measure
+
+
 def _fit_text_lines(value, measure, max_width, max_lines):
     """Word-wrap and ellipsize using the actual font metrics in pixels."""
     if max_width <= 0 or max_lines <= 0:
@@ -37,11 +62,16 @@ def _fit_text_lines(value, measure, max_width, max_lines):
     remaining = (value or tr('(без названия)')).strip() or tr('(без названия)')
     lines = []
     while remaining and len(lines) < max_lines:
-        count = 0
-        for i in range(1, len(remaining) + 1):
-            if measure(remaining[:i]) > max_width:
-                break
-            count = i
+        # Largest prefix that fits. Prefix widths grow with length, so a
+        # binary search gives the same count as checking every prefix.
+        low, high = 0, len(remaining)
+        while low < high:
+            mid = (low + high + 1) // 2
+            if measure(remaining[:mid]) > max_width:
+                high = mid - 1
+            else:
+                low = mid
+        count = low
         if not count:
             break
         if count < len(remaining):
@@ -56,6 +86,18 @@ def _fit_text_lines(value, measure, max_width, max_lines):
             last = last[:-1]
         lines[-1] = last + '…' if measure(last + '…') <= max_width else ''
     return lines
+
+
+def _course_node_style(kind, selected, dark):
+    """Outline colour, fill and line width of a block in the normal view."""
+    color = PRIMARY if selected else (('#70cfcb' if dark else '#207a75') if kind == '1' else ('#72758d' if dark else '#526c88'))
+    fill = ('#30365f' if selected else '#282836') if dark else (PALE_BLUE if selected else SURFACE)
+    return color, fill, (2.5 if selected else 1.4)
+
+
+def _is2_node_style(selected):
+    """Outline colour and line width of a block in the IS-2 view."""
+    return ('#128228' if selected else '#202020'), (2 if selected else 1.2)
 
 
 class CourseworkPanel(ttk.Frame):
@@ -166,7 +208,9 @@ class CourseworkPanel(ttk.Frame):
         self.search_entry.pack(side='left', fill='x', expand=True)
         ttk.Button(search_bar, text='×', width=3,
                    command=lambda: self.search_var.set('')).pack(side='left', padx=(3, 0))
-        self.search_var.trace_add('write', lambda *_: self._refresh_tree())
+        # Typing in the search box filters once per short pause, with the latest text.
+        self._search_refresh = CoalescedCallback(self.search_entry, self._refresh_tree, interval_ms=120)
+        self.search_var.trace_add('write', lambda *_: self._search_refresh.request())
         ttk.Label(left, text=tr('Поиск по коду и наименованию'),
                   style='Muted.TLabel').pack(anchor='w', pady=(0, 5))
         treebox = ttk.Frame(left)
@@ -201,6 +245,9 @@ class CourseworkPanel(ttk.Frame):
         center.columnconfigure(0, weight=1); center.rowconfigure(0, weight=1)
         self._resize_redraw = CoalescedCallback(self.canvas, self._draw)
         self.canvas.bind('<Configure>', self._resize_redraw.request)
+        # Redraws requested while the scheme is hidden run when it is shown.
+        self._draw_pending = False
+        self.canvas.bind('<Map>', self._draw_if_pending, add='+')
         self.canvas.bind('<Button-1>', self._canvas_select)
         self.canvas.bind('<Double-1>', self._canvas_open)
         self.canvas.bind('<Button-3>', self._canvas_context_menu)
@@ -409,6 +456,7 @@ class CourseworkPanel(ttk.Frame):
                         current = parents.get(current, '')
         self.tree.delete(*self.tree.get_children())
         font = tkfont.nametofont('TkDefaultFont')
+        measure = _cached_measure(font, ('TkDefaultFont', tuple(sorted(font.actual().items()))))
         self._tree_requested_width = 240
         for row in rows:
             if row.action_id not in visible:
@@ -416,7 +464,7 @@ class CourseworkPanel(ttk.Frame):
             parent = row.parent_id if row.parent_id in visible else ''
             node = nodes[row.action_id]
             caption = f'{action_code(node)}  {node.get("name", "")}'
-            self._tree_requested_width = max(self._tree_requested_width, font.measure(caption) + 25 * (row.depth + 1) + 24)
+            self._tree_requested_width = max(self._tree_requested_width, measure(caption) + 25 * (row.depth + 1) + 24)
             self.tree.insert(parent, 'end', iid=row.action_id, text=caption)
         self._update_tree_column_width()
         for top in self.tree.get_children(''):
@@ -431,11 +479,14 @@ class CourseworkPanel(ttk.Frame):
             self._navigation_history.clear()
         if self.doc is None:
             self._update_navigation_controls()
+            self._selection_state = None
             self.canvas.delete('all')
             self.tree.delete(*self.tree.get_children())
             self._clear_properties()
             self.tree_count.configure(text='')
             return
+        self._scene_cache = None
+        self._marks_cache = None
         nodes = {n.get('id', ''): n for n in self.doc.actions}
         if self.focus_id not in nodes:
             self.focus_id = None
@@ -445,12 +496,51 @@ class CourseworkPanel(ttk.Frame):
         self._refresh_tree()
         if self._is2_view:
             self._refresh_is2_sheets()
-        self._draw()
+        self._draw_when_visible()
         self._show_properties()
 
+    def _draw_when_visible(self):
+        try:
+            mapped = self.canvas.winfo_ismapped()
+        except (tk.TclError, AttributeError):
+            mapped = True
+        if mapped:
+            self._draw()
+        else:
+            self._selection_state = None
+            self._draw_pending = True
+
+    def _draw_if_pending(self, _event=None):
+        if getattr(self, '_draw_pending', False):
+            self._draw()
+
+    def _scene_cache_key(self):
+        """Inputs of the scene; None when the document revision is unknown."""
+        revision = getattr(getattr(self, 'app', None), '_doc_revision', None)
+        if revision is None:
+            return None
+        return (self.doc, revision, self.focus_id, self.depth_limit, bool(getattr(self, '_is2_view', False)))
+
     def _display_scene(self):
+        # Selection, zoom, resize and theme redraws do not change the scene;
+        # it is rebuilt only when the document, its revision or the view changes.
+        key = self._scene_cache_key()
+        cached = getattr(self, '_scene_cache', None)
+        if key is not None and cached is not None and cached[0][0] is key[0] and cached[0][1:] == key[1:]:
+            return cached[1]
         builder = build_is2_spd_scene if getattr(self, '_is2_view', False) else build_course_scene
-        return builder(self.doc, self.focus_id, max_depth=self.depth_limit)
+        scene = builder(self.doc, self.focus_id, max_depth=self.depth_limit)
+        self._scene_cache = (key, scene) if key is not None else None
+        return scene
+
+    def _parameter_marks(self):
+        key = self._scene_cache_key()
+        cached = getattr(self, '_marks_cache', None)
+        if key is not None and cached is not None and cached[0][0] is key[0] and cached[0][1] == key[1]:
+            return cached[1]
+        marks = is2_parameter_marks(self.doc)
+        self._marks_cache = (key, marks) if key is not None else None
+        return marks
 
     def _toggle_is2_view(self):
         self._is2_view = not self._is2_view
@@ -509,35 +599,42 @@ class CourseworkPanel(ttk.Frame):
                 canvas.create_text(ox+(parent.x+scene.node_width/2+7)*z,
                                    oy+(parent.y+scene.node_height+child.y)*z/2,
                                    text='+', fill='#202020', font=('Arial', max(6, round(11*z))))
-        marks = is2_parameter_marks(self.doc)
+        marks = self._parameter_marks()
         show_labels = z >= .55
         if show_labels:
             small_font = tkfont.Font(root=canvas,family='Arial',size=-max(6,round(10*z)))
             title_fonts = {size: tkfont.Font(root=canvas,family='Arial',size=-size)
                            for size in range(max(5,round(8*z)), max(6,round(12*z))+1)}
             self._scene_fonts = (small_font, *title_fonts.values())
+            small_measure = _cached_measure(small_font, ('Arial', -max(6,round(10*z)), None))
+            title_measures = {size: _cached_measure(font, ('Arial', -size, None)) for size, font in title_fonts.items()}
+            # Line heights are constant per font: ask Tk once, not per block.
+            small_linespace = small_font.metrics('linespace')
+            title_linespaces = {size: font.metrics('linespace') for size, font in title_fonts.items()}
         w,h = scene.node_width*z,scene.node_height*z
+        selection_items = {}
         for node in scene.nodes:
             x,y = ox+node.x*z,oy+node.y*z
             tags = ('course-node', 'course-action:'+node.ident)
-            color = '#128228' if node.ident == self.selected_id else '#202020'
-            canvas.create_rectangle(x,y,x+w,y+h,fill='#ffffff',outline=color,width=2 if node.ident==self.selected_id else 1.2,tags=tags)
+            color, outline_width = _is2_node_style(node.ident == self.selected_id)
+            colored = selection_items[node.ident] = {'outline': [], 'stroke': []}
+            colored['outline'].append(canvas.create_rectangle(x,y,x+w,y+h,fill='#ffffff',outline=color,width=outline_width,tags=tags))
             band = 15*z if node.kind=='1' else 0
             if band:
-                canvas.create_line(x,y+h-band,x+w,y+h-band,fill=color,tags=tags)
-                canvas.create_line(x+w/2,y+h-band,x+w/2,y+h,fill=color,tags=tags)
+                colored['stroke'].append(canvas.create_line(x,y+h-band,x+w,y+h-band,fill=color,tags=tags))
+                colored['stroke'].append(canvas.create_line(x+w/2,y+h-band,x+w/2,y+h,fill=color,tags=tags))
             if not show_labels:
                 continue
             if band:
                 for number,fraction in (('1',.25),('2',.75)):
-                    canvas.create_text(x+w*fraction,y+h-band/2,text=number,fill=color,font=small_font,tags=tags)
+                    colored['stroke'].append(canvas.create_text(x+w*fraction,y+h-band/2,text=number,fill=color,font=small_font,tags=tags))
             pad=max(2,4*z)
-            available = max(1, h-band-small_font.metrics('linespace')-2*pad)
+            available = max(1, h-band-small_linespace-2*pad)
             for size in sorted(title_fonts, reverse=True):
                 title_font = title_fonts[size]
-                line_height = title_font.metrics('linespace')
+                line_height = title_linespaces[size]
                 line_count = max(1, int(available // line_height))
-                lines = _fit_text_lines(node.title, title_font.measure, w-2*pad, line_count)
+                lines = _fit_text_lines(node.title, title_measures[size], w-2*pad, line_count)
                 if lines and not lines[-1].endswith('…'):
                     break
             top = y + pad + max(0, (available - len(lines)*line_height)/2)
@@ -545,15 +642,61 @@ class CourseworkPanel(ttk.Frame):
                 canvas.create_text(x+w/2,top+index*line_height,anchor='n',text=line,fill='#202020',font=title_font,tags=tags)
             bottom=y+h-band-pad
             for text, tx, anchor in ((node.code,x+w-pad,'se'),(marks.get(node.ident,''),x+pad,'sw')):
-                fitted = _fit_text_lines(text,small_font.measure,w*.45,1) if text else []
+                fitted = _fit_text_lines(text,small_measure,w*.45,1) if text else []
                 if fitted:
-                    canvas.create_text(tx,bottom,anchor=anchor,text=fitted[0],fill=color,font=small_font,tags=tags)
+                    colored['stroke'].append(canvas.create_text(tx,bottom,anchor=anchor,text=fitted[0],fill=color,font=small_font,tags=tags))
+        self._remember_selection_items('is2', False, {node.ident: node.kind for node in scene.nodes}, selection_items)
         canvas.configure(scrollregion=(0,0,width,height))
         title = tr('Общая схема') if self.focus_id is None else action_code(self.doc.action(self.focus_id))
         self.mode_label.configure(text=tr('Вид ИС-2 · {title} · {zoom}%').format(title=title, zoom=round(z*100)))
 
+    def _drawn_view_key(self, dark):
+        key = self._scene_cache_key()
+        return None if key is None else (*key, dark, self.zoom)
+
+    def _remember_selection_items(self, view, dark, kinds, items):
+        """Keep the canvas items whose style depends on the selection."""
+        key = self._drawn_view_key(dark)
+        self._selection_state = None if key is None else (key, view, dark, kinds, items)
+
+    def _restyle_selection(self, previous, current):
+        """Move the selection highlight without redrawing the whole scene.
+
+        Returns False when the canvas does not show the current scene; the
+        caller then redraws. Colours come from the same style functions as
+        the full drawing, so the result is identical.
+        """
+        state = getattr(self, '_selection_state', None)
+        if state is None:
+            return False
+        key, view, dark, kinds, items = state
+        current_dark = self.app.theme_name.get() == 'dark'
+        now = self._drawn_view_key(current_dark if view == 'course' else False)
+        if now is None or now[0] is not key[0] or now[1:] != key[1:] or (view == 'course') != (not getattr(self, '_is2_view', False)):
+            return False
+        try:
+            for ident in dict.fromkeys((previous, current)):
+                if ident not in items:
+                    continue
+                selected = ident == current
+                if view == 'course':
+                    color, fill, width = _course_node_style(kinds[ident], selected, dark)
+                    for item in items[ident]['outline']:
+                        self.canvas.itemconfigure(item, outline=color, fill=fill, width=width)
+                else:
+                    color, width = _is2_node_style(selected)
+                    for item in items[ident]['outline']:
+                        self.canvas.itemconfigure(item, outline=color, width=width)
+                for item in items[ident]['stroke']:
+                    self.canvas.itemconfigure(item, fill=color)
+        except tk.TclError:
+            return False
+        return True
+
     def _draw(self):
         canvas = self.canvas
+        self._draw_pending = False
+        self._selection_state = None
         canvas.delete('all')
         dark = self.app.theme_name.get() == 'dark'
         canvas.configure(background='#1b1b29' if dark else '#ffffff')
@@ -592,11 +735,18 @@ class CourseworkPanel(ttk.Frame):
             code_font = tkfont.Font(root=canvas, family='Arial', size=-max(6, round(11*s)), weight='bold')
             small_font = tkfont.Font(root=canvas, family='Arial', size=-max(6, round(10*s)))
             self._scene_fonts = (title_font, code_font, small_font)
+            title_measure = _cached_measure(title_font, ('Arial', -max(6, round(13*s)), None))
+            code_measure = _cached_measure(code_font, ('Arial', -max(6, round(11*s)), 'bold'))
+            # Line heights are constant per font: ask Tk once, not per block.
+            title_linespace = title_font.metrics('linespace')
+            code_linespace = code_font.metrics('linespace')
+            small_linespace = small_font.metrics('linespace')
         by_id = {n.ident: n for n in scene.nodes}
         for edge, points in edge_paths(scene):
             coords = [value*s for value in points]
             canvas.create_line(*coords, fill='#737d9a' if dark else '#8ba0b8',
                                width=max(1,1.5*s), arrow='last' if edge.kind == '1' else 'none')
+        selection_items = {}
         children_by_parent = {}
         for edge in scene.edges:
             children_by_parent.setdefault(edge.source, []).append(by_id[edge.target])
@@ -610,31 +760,31 @@ class CourseworkPanel(ttk.Frame):
             x,y = node.x*s,node.y*s
             tags=('course-node', 'course-action:'+node.ident)
             is_selected = node.ident == self.selected_id
-            color = PRIMARY if is_selected else (('#70cfcb' if dark else '#207a75') if node.kind == '1' else ('#72758d' if dark else '#526c88'))
-            fill = ('#30365f' if is_selected else '#282836') if dark else (PALE_BLUE if is_selected else SURFACE)
+            color, fill, outline_width = _course_node_style(node.kind, is_selected, dark)
+            colored = selection_items[node.ident] = {'outline': [], 'stroke': []}
             ink = '#f3f3f8' if dark else INK
             canvas.create_rectangle(x+2*s,y+3*s,x+w+2*s,y+h+3*s,fill='#12121d' if dark else '#e8edf5',outline='',tags=tags)
-            canvas.create_rectangle(x,y,x+w,y+h,fill=fill,outline=color,
-                                    width=2.5 if is_selected else 1.4,tags=tags)
+            colored['outline'].append(canvas.create_rectangle(x,y,x+w,y+h,fill=fill,outline=color,
+                                    width=outline_width,tags=tags))
             is_alternative = node.kind == '1'
             # The two branch cells share a dedicated bottom band. The action
             # code stays in the main part of the block, above that band.
-            band_height = (max(13*s, small_font.metrics('linespace') + 2*max(1, 2*s))
+            band_height = (max(13*s, small_linespace + 2*max(1, 2*s))
                            if show_labels else 13*s) if is_alternative else 0
             band_top = y + h - band_height
             if is_alternative:
-                canvas.create_line(x, band_top, x+w, band_top, fill=color, tags=tags)
-                canvas.create_line(x+w/2, band_top, x+w/2, y+h, fill=color, tags=tags)
+                colored['stroke'].append(canvas.create_line(x, band_top, x+w, band_top, fill=color, tags=tags))
+                colored['stroke'].append(canvas.create_line(x+w/2, band_top, x+w/2, y+h, fill=color, tags=tags))
             if show_labels:
                 pad = max(2, 5*s)
                 code_bottom = band_top - max(1, 2*s) if is_alternative else y+h-pad
-                available = max(0, code_bottom - code_font.metrics('linespace') - (y + pad))
-                line_height = title_font.metrics('linespace')
-                lines = _fit_text_lines(node.title, title_font.measure, max(0, w - 2*pad), int(available // line_height))
+                available = max(0, code_bottom - code_linespace - (y + pad))
+                line_height = title_linespace
+                lines = _fit_text_lines(node.title, title_measure, max(0, w - 2*pad), int(available // line_height))
                 for idx, line in enumerate(lines):
                     canvas.create_text(x+w/2, y+pad+idx*line_height, anchor='n', text=line,
                                        fill=ink, font=title_font, tags=tags)
-                code = _fit_text_lines(node.code, code_font.measure, max(0, w - 2*pad), 1)
+                code = _fit_text_lines(node.code, code_measure, max(0, w - 2*pad), 1)
                 if code and code[0]:
                     canvas.create_text(x+w-pad, code_bottom, anchor='se', text=code[0],
                                        fill=ink, font=code_font, tags=tags)
@@ -642,6 +792,7 @@ class CourseworkPanel(ttk.Frame):
                     for number, center in (('1', x+w/4), ('2', x+3*w/4)):
                         canvas.create_text(center, band_top+band_height/2, anchor='center',
                                            text=number, fill=ink, font=small_font, tags=tags)
+        self._remember_selection_items('course', dark, {node.ident: node.kind for node in scene.nodes}, selection_items)
         canvas.configure(scrollregion=(0, 0, grid_width, grid_height))
         title = tr('Весь проект') if self.focus_id is None else action_code(self.doc.action(self.focus_id))
         scope = tr('глубина 2 + выходы альтернатив') if self.depth_limit == 2 else tr('вся структура')
@@ -654,18 +805,19 @@ class CourseworkPanel(ttk.Frame):
             self.select_action(selected[0])
 
     def select_action(self, ident: str):
-        if self.doc is None or ident not in {n.get('id') for n in self.doc.actions}:
+        if self.doc is None or not any(n.get('id') == ident for n in self.doc.actions):
             return
         if self.selected_id == ident:
             return
-        self.selected_id = ident
+        previous, self.selected_id = self.selected_id, ident
         if self.tree.exists(ident) and self.tree.selection() != (ident,):
             self.tree.selection_set(ident)
             self.tree.see(ident)
         if self.app.action_tree.exists(ident):
             self.app.action_tree.selection_set(ident)
             self.app.action_tree.see(ident)
-        self._draw()
+        if not self._restyle_selection(previous, ident):
+            self._draw_when_visible()
         self._show_properties()
 
     def _canvas_select(self, _event=None):

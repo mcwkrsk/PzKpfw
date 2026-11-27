@@ -6,8 +6,10 @@ claim byte-identical output to Qt's QDomDocument serializer.
 """
 from __future__ import annotations
 
+from contextlib import contextmanager
 from copy import deepcopy
 from dataclasses import dataclass
+import functools
 import os
 from pathlib import Path
 import tempfile
@@ -71,8 +73,42 @@ class LinkRecord:
     next_id: str
 
 
+class _ReadIndex:
+    """Lookups over one unchanged document: links grouped by type and parent,
+    actions by id. Only valid inside ProjectDocument.read_snapshot()."""
+    __slots__ = ("root", "by_type", "by_type_parent", "action_by_id", "sibling_memo")
+
+    def __init__(self, document: "ProjectDocument"):
+        self.root = document.root
+        self.by_type: dict[str, list[ET.Element]] = {}
+        self.by_type_parent: dict[tuple[str, str], list[ET.Element]] = {}
+        for node in document.links_node.findall("link"):
+            kind = node.get("type")
+            self.by_type.setdefault(kind, []).append(node)
+            self.by_type_parent.setdefault((kind, node.get("afe1")), []).append(node)
+        self.action_by_id: dict[str, ET.Element] = {}
+        for node in document.actions_node.findall("pd"):
+            self.action_by_id.setdefault(node.get("id"), node)
+        self.sibling_memo: dict[str, object] = {}
+
+
+def reads_document(func):
+    """Run a read-only projection with cached link lookups (same results)."""
+    @functools.wraps(func)
+    def wrapper(document, *args, **kwargs):
+        snapshot = getattr(document, "read_snapshot", None)
+        if snapshot is None:
+            return func(document, *args, **kwargs)
+        with snapshot():
+            return func(document, *args, **kwargs)
+    return wrapper
+
+
 class ProjectDocument:
     """Editable XML-backed project with conservative, schema-aware operations."""
+
+    _read_index: _ReadIndex | None = None
+    _read_depth = 0
 
     def __init__(self, root: ET.Element, *, source_path: str | None = None):
         self.root = root
@@ -204,6 +240,28 @@ class ProjectDocument:
             if value is not None:
                 user.set(key, value)
 
+    @contextmanager
+    def read_snapshot(self):
+        """Cache link and action lookups while the document is only read.
+
+        Views call sibling_order() for every parent; without the cache each
+        call scans all links. Nothing may modify the document inside the
+        block. Nested blocks share one index.
+        """
+        if self._read_depth == 0:
+            self._read_index = _ReadIndex(self)
+        self._read_depth += 1
+        try:
+            yield self
+        finally:
+            self._read_depth -= 1
+            if self._read_depth == 0:
+                self._read_index = None
+
+    def _active_index(self) -> _ReadIndex | None:
+        index = self._read_index
+        return index if index is not None and index.root is self.root else None
+
     @property
     def actions(self) -> list[ET.Element]:
         return self.actions_node.findall("pd")
@@ -214,6 +272,12 @@ class ProjectDocument:
 
     def action(self, action_id: str | int) -> ET.Element:
         wanted = str(action_id)
+        index = self._active_index()
+        if index is not None:
+            node = index.action_by_id.get(wanted)
+            if node is None:
+                raise KeyError(f"action id {wanted!r} does not exist")
+            return node
         for node in self.actions:
             if node.get("id") == wanted:
                 return node
@@ -227,16 +291,40 @@ class ProjectDocument:
         ) for node in self.actions]
 
     def _links_of_type(self, link_type: str) -> list[ET.Element]:
+        index = self._active_index()
+        if index is not None:
+            return list(index.by_type.get(link_type, ()))
         return [node for node in self.links if node.get("type") == link_type]
+
+    def _links_of_parent(self, link_type: str, parent: str) -> list[ET.Element]:
+        index = self._active_index()
+        if index is not None:
+            return list(index.by_type_parent.get((link_type, parent), ()))
+        return [node for node in self._links_of_type(link_type) if node.get("afe1") == parent]
 
     def composition_children(self, parent_id: str | int) -> list[str]:
         parent = str(parent_id)
-        return [node.get("afe2", "") for node in self._links_of_type("2") if node.get("afe1") == parent]
+        return [node.get("afe2", "") for node in self._links_of_parent("2", parent)]
 
     def sibling_order(self, parent_id: str | int) -> list[str]:
         """Return child order by following type=3 afe3 links, never sorting IDs."""
         parent = str(parent_id)
-        records = [n for n in self._links_of_type("3") if n.get("afe1") == parent]
+        index = self._active_index()
+        if index is None:
+            return self._sibling_order(parent)
+        memo = index.sibling_memo
+        if parent not in memo:
+            try:
+                memo[parent] = self._sibling_order(parent)
+            except ProjectFormatError as exc:
+                memo[parent] = exc
+        result = memo[parent]
+        if isinstance(result, ProjectFormatError):
+            raise ProjectFormatError(*result.args)
+        return list(result)
+
+    def _sibling_order(self, parent: str) -> list[str]:
+        records = self._links_of_parent("3", parent)
         if not records:
             if self.composition_children(parent):
                 raise ProjectFormatError(f"parent {parent}: composition children exist without arrangement links")

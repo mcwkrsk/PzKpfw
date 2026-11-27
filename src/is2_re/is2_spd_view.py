@@ -5,8 +5,10 @@ from html import escape
 
 from .coursework import build_course_scene, _wrapped_lines
 from .specifications import parameter_code, primary_links
+from .document import reads_document
 
 
+@reads_document
 def build_is2_spd_scene(doc, focus=None, *, max_depth=2):
     roots = {node.get('id', '') for node in doc.actions}
     roots -= {link.get('afe2', '') for link in doc.links if link.get('type') == '2'}
@@ -109,6 +111,7 @@ def is2_connectors(scene):
                        right.x,right.y+scene.node_height/2)
 
 
+@reads_document
 def is2_parameter_marks(doc):
     """Labels come only from existing matrix records, not inferred links."""
     params = {p.get('id', ''): p for p in doc.params_node.findall('param')}

@@ -10,7 +10,7 @@ from html import escape
 from collections import defaultdict
 import textwrap
 
-from .document import ProjectDocument
+from .document import ProjectDocument, reads_document
 from .i18n import tr, available_languages, get_language_info
 from .gui_models import action_tree_rows
 from .specifications import action_code, project_forms
@@ -90,6 +90,7 @@ def renumber_structure(doc: ProjectDocument, *, symbol: str = 'z') -> dict[str, 
             'algorithm': 'PzKpfw depth-global sequential numbering; NOT native codeStructure()'}
 
 
+@reads_document
 def course_checklist(doc: ProjectDocument) -> dict[str, object]:
     """Pragmatic completeness advisory, not a university's assessment rubric."""
     issues = doc.validate(deep=True)
@@ -126,6 +127,7 @@ def course_checklist(doc: ProjectDocument) -> dict[str, object]:
     return result
 
 
+@reads_document
 def build_course_scene(doc: ProjectDocument, focus: str | None = None, *, max_depth: int | None = None) -> CourseScene:
     """Tidy hierarchy with sequence rails. Focus selects an entire subtree."""
     nodes_by_id = {n.get('id', ''): n for n in doc.actions}

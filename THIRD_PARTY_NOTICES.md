@@ -1,17 +1,15 @@
 # Third-party components
 
 The source application uses Python's standard library, including Tkinter and
-Tcl/Tk supplied by the Python or operating-system distributor. These runtimes
-are not bundled in the source archive.
+Tcl/Tk supplied by the Python or operating-system distributor.
 
-The optional Windows executable build downloads and uses PyInstaller and its
-transitive dependencies. A built executable includes runtime components; check
-the actual build's dependency versions, licenses and distribution obligations
-before publishing it.
+The Windows installer is built with Inno Setup. At install time it downloads the
+PzKpfw runtime: CPython 3.12 from python-build-standalone (PSF license, with
+Tcl/Tk and other bundled libraries under their own licenses), pip, python-docx
+(MIT), lxml (BSD) and Pillow (MIT-CMU / HPND). Check the versions and licenses of
+the actual runtime archive before publishing it.
 
-DOCX report export uses python-docx (MIT license) and Pillow (HPND license);
-these optional dependencies are installed separately or included in the EXE build.
+DOCX report export uses python-docx and Pillow; when running from sources they
+are installed separately (requirements.txt).
 
-No original IS-2 binaries or proprietary runtime are included in this snapshot.
-Confirm rights to any included project assets and third-party materials before
-wider distribution.
+No original IS-2 binaries or proprietary runtime are included.

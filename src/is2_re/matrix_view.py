@@ -3,7 +3,9 @@ from .i18n import tr
 from .specifications import project_forms, primary_links, parameter_code, action_code, _sort_number
 from .gui_models import action_tree_rows
 from collections import defaultdict
+from .document import reads_document
 
+@reads_document
 def inferred_structural_marks(doc, *, links=None):
     """Conservative visual hints only; never modify XML or claim native parity."""
     actions = {n.get('id',''):n for n in doc.actions}
@@ -61,6 +63,7 @@ def inferred_structural_marks(doc, *, links=None):
             if end is not None: add(end,param,'}')
     return marks
 
+@reads_document
 def matrix_context(doc):
     """Build a bounded lookup for one refresh; contains no document reference."""
     links, _ = primary_links(doc)
@@ -70,6 +73,7 @@ def matrix_context(doc):
     return by_cell, inferred_structural_marks(doc, links=links)
 
 
+@reads_document
 def grouped_matrix(doc, *, context=None):
     forms, warnings = project_forms(doc)
     headers, rows = forms['M']
@@ -89,17 +93,20 @@ def grouped_matrix(doc, *, context=None):
         row_marks = structural_row_marks(doc, ordered_actions)
         derived = context[1] if context is not None else inferred_structural_marks(doc)
         new_rows=[]
+        ordered_param_ids=[(i, params[i].get('id','')) for i in order]
         for row,node in zip(rows,ordered_actions):
             cells=[]
-            for i in order:
+            node_id=node.get('id','')
+            mark_order = '.#][{}/' if node.get('type') == '1' else '.][{}#/'
+            for i, param_id in ordered_param_ids:
                 raw=row[2+i]
-                hints=derived.get((node.get('id',''),params[i].get('id','')),set())
-                mark_order = '.#][{}/' if node.get('type') == '1' else '.][{}#/'
-                cells.append(raw + ''.join(mark for mark in mark_order if mark in hints and mark not in raw))
-            new_rows.append([row_marks.get(node.get('id',''), ''), row[1]] + cells)
+                hints=derived.get((node_id,param_id))
+                cells.append(raw + ''.join(mark for mark in mark_order if mark in hints and mark not in raw) if hints else raw)
+            new_rows.append([row_marks.get(node_id, ''), row[1]] + cells)
         rows=new_rows
     return [tr('Структ.'), headers[1]]+labels, rows, [params[i].get('id','') for i in order], warnings
 
+@reads_document
 def structural_row_marks(doc, actions):
     """Reconstruct observed sequence boundaries and alternative branches for display."""
     nodes = {n.get('id', ''): n for n in actions}

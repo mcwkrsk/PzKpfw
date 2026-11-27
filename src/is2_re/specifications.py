@@ -7,6 +7,7 @@ from .i18n import tr, get_language, get_language_info
 import html
 from collections import defaultdict
 from .gui_models import action_tree_rows
+from .document import reads_document
 
 ACTION_TYPES={'0':tr('Элементарное'),'1':tr('Альтернатива'),'2':tr('Последовательность'),'3':tr('Цикл')}
 STATUS={'0':'Э','1':'П'}
@@ -61,6 +62,7 @@ def _char(node):
         return raw if len(raw)==1 else f'код {raw or "?"}'
 
 
+@reads_document
 def primary_links(doc):
     """Return recovered matrix entries, preserving invalid/unknown entries as warnings."""
     matrix=doc.root.find('./models/primaryModel/matrix')
@@ -79,6 +81,7 @@ def primary_links(doc):
     return result,warnings
 
 
+@reads_document
 def project_forms(doc):
     nodes={n.get('id',''):n for n in doc.actions}
     actions=[nodes[r.action_id] for r in action_tree_rows(doc)]
@@ -175,11 +178,12 @@ def project_forms(doc):
     if len(actions)*len(params)>250_000:
         warnings.append(tr('Плотная матрица превышает 250 000 ячеек: показ отключён для экономии памяти. Используйте команду primary-links (разреженный список).'))
     else:
+        param_ids=[p.get('id','') for p in params]
         for n in actions:
             aid=n.get('id',''); cell=[]
-            for p in params:
-                entries=grouped.get((aid,p.get('id','')),[])
-                cell.append(' '.join(mark if power in ('1','') else f'{mark}×{power}' for mark,power in entries))
+            for param_id in param_ids:
+                entries=grouped.get((aid,param_id))
+                cell.append(' '.join(mark if power in ('1','') else f'{mark}×{power}' for mark,power in entries) if entries else '')
             rows.append([('[' if n.get('type')=='2' else '#?' if n.get('type')=='1' else '/' if n.get('type')=='3' else ''), action_code(n)]+cell)
     forms['M']=(headers,rows)
     if len({parameter_code(n) for n in params}) != len(params): warnings.append(tr('Есть повторяющиеся отображаемые коды параметров; в матрице дополнительно указаны ID.'))

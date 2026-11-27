@@ -6,7 +6,18 @@ import csv
 import html
 import io
 from pathlib import Path
-from xml.sax.saxutils import escape, quoteattr
+
+
+# xml.sax.saxutils pulls in urllib/http at import time; load it on first export
+# so that starting the editor does not pay for it.
+def escape(data, *args, **kwargs):
+    from xml.sax.saxutils import escape as _escape
+    return _escape(data, *args, **kwargs)
+
+
+def quoteattr(data, *args, **kwargs):
+    from xml.sax.saxutils import quoteattr as _quoteattr
+    return _quoteattr(data, *args, **kwargs)
 
 from .gui_models import action_tree_rows, action_diagram_layout
 from .specifications import form_html

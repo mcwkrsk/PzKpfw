@@ -1,0 +1,10 @@
+{
+  "id": "hello-example",
+  "name": "Пример модуля",
+  "version": "1.0.0",
+  "min_app_version": "9.10.0",
+  "entry": "hello_example:register",
+  "description": "Показывает, сколько действий и параметров в открытом проекте. Образец для авторов модулей.",
+  "author": "PzKpfw contributors",
+  "requirements": []
+}

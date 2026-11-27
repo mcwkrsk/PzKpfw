@@ -2,7 +2,7 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from .document import ProjectDocument
+from .document import ProjectDocument, reads_document
 
 
 @dataclass(frozen=True)
@@ -13,6 +13,7 @@ class ActionTreeRow:
     depth: int
 
 
+@reads_document
 def action_tree_rows(document: ProjectDocument) -> list[ActionTreeRow]:
     """Build display rows from composition edges and type-3 sibling order.
 
@@ -55,6 +56,7 @@ def action_tree_rows(document: ProjectDocument) -> list[ActionTreeRow]:
     return rows
 
 
+@reads_document
 def action_diagram_layout(document: ProjectDocument, *, x_gap: int = 330, y_gap: int = 140):
     """Return tree rows, node coordinates and the two observed edge classes.
 

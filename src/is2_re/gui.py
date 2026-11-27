@@ -9,6 +9,7 @@ from .i18n import (tr, tr_dynamic, available_languages, discover_languages, get_
 import hashlib
 import json
 import sys
+import functools
 import textwrap
 import tkinter as tk
 import tkinter.font as tkfont
@@ -44,6 +45,8 @@ from .ui_resources import persistent_menu, canvas_tag_at
 from .ui_performance import CoalescedCallback
 from .focus_view import PackSnapshot
 from .tooltips import ButtonTooltips
+from . import installation, modules as pz_modules
+from .modules_gui import ModulesDialog, UpdateController
 from .ui_theme import apply_theme, load_theme, save_theme, load_tooltips, save_tooltips, BACKGROUND, SURFACE, INK, MUTED, BORDER, PRIMARY, PALETTES
 from .feature_audit import feature_audit
 from .matrix_view import grouped_matrix, cell_description, inferred_structural_marks, matrix_context
@@ -51,6 +54,19 @@ from .matrix_canvas import MatrixCanvas, wheel_steps
 from . import __version__
 from .ui_icons import make_history_icon
 from .parameter_dialog import ParameterDialog, group_label
+
+# Editor-sidecar writes on selection / tab change are batched into one write.
+VIEW_STATE_SAVE_DELAY_MS = 400
+
+
+@functools.lru_cache(maxsize=4096)
+def _graph_node_title(label: str) -> str:
+    return '\n'.join(textwrap.wrap(label, width=38, max_lines=2, placeholder='…'))
+
+
+@functools.lru_cache(maxsize=4096)
+def _graph_node_detail(detail: str) -> str:
+    return textwrap.shorten(detail, width=48, placeholder='…')
 
 
 class RecordDialog(tk.Toplevel):
@@ -211,6 +227,8 @@ class Is2Studio(tk.Tk):
         self._pending_editor_state: dict = {}
         self._diagram_focus = None
         self._deferred_views = set()
+        # Bumped by every recorded edit; views use it to reuse derived data.
+        self._doc_revision = 0
         self.bind('<Escape>', self._escape_diagram_focus, add='+')
         self._build_menu()
         self._build_layout()
@@ -223,6 +241,13 @@ class Is2Studio(tk.Tk):
         self._on_notebook_tab_changed()
         self.protocol("WM_DELETE_WINDOW", self._quit)
         self._set_title()
+        self.updates = UpdateController(self)
+        self.loaded_modules = []
+        self._module_menu_separator = False
+        # Modules and the daily update check start after the window is shown.
+        self.after_idle(self._load_modules)
+        if installation.automatic_check_due():
+            self.after(4000, lambda: self.updates.check(manual=False))
 
     def _install_app_icon(self) -> None:
         """Set the PzKpfw application icon; tolerate platform-specific Tk issues."""
@@ -321,7 +346,15 @@ class Is2Studio(tk.Tk):
         self._populate_language_menu()
         appearance.add_cascade(label=tr("Язык интерфейса"), menu=self.language_menu)
         menu.add_cascade(label=tr("Вид"), menu=appearance)
+        self.modules_menu = tk.Menu(menu, tearoff=False)
+        self.modules_menu.add_command(label=tr("Управление модулями…"), command=self.show_modules)
+        menu.add_cascade(label=tr("Модули"), menu=self.modules_menu)
         help_menu = tk.Menu(menu, tearoff=False)
+        help_menu.add_command(label=tr("Проверить обновления…"), command=lambda: self.updates.check(manual=True))
+        self.automatic_updates = tk.BooleanVar(value=installation.automatic_checks_enabled())
+        help_menu.add_checkbutton(label=tr("Проверять обновления автоматически"), variable=self.automatic_updates,
+                                  command=lambda: installation.save_update_settings(automatic=bool(self.automatic_updates.get())))
+        help_menu.add_separator()
         help_menu.add_command(label=tr("О программе"), command=self._about)
         menu.add_cascade(label=tr("Справка"), menu=help_menu)
         self.config(menu=menu)
@@ -1416,11 +1449,42 @@ class Is2Studio(tk.Tk):
             pass
         self._pending_editor_state = {}
 
+    def _request_view_state_save(self) -> None:
+        """Save the editor sidecar once after a short pause instead of on every click."""
+        if getattr(self, '_view_state_job', None) is not None:
+            return
+        try:
+            self._view_state_job = self.after(VIEW_STATE_SAVE_DELAY_MS, self._run_view_state_save)
+        except tk.TclError:
+            self._view_state_job = None
+            self._save_graph_view_state()
+
+    def _run_view_state_save(self) -> None:
+        self._view_state_job = None
+        self._save_graph_view_state()
+
+    def _flush_view_state_save(self) -> None:
+        """Write a pending sidecar save now (before the document or path changes)."""
+        if getattr(self, '_view_state_job', None) is not None:
+            self._save_graph_view_state()
+
+    def _cancel_view_state_save(self) -> None:
+        job = getattr(self, '_view_state_job', None)
+        if job is None:
+            return
+        self._view_state_job = None
+        try:
+            self.after_cancel(job)
+        except (tk.TclError, AttributeError):
+            pass
+
     def _save_graph_view_state(self, *, silent: bool = True) -> bool:
+        # A direct save stores the current state; a pending delayed one is redundant.
+        self._cancel_view_state_save()
         if self.doc is None or self.path is None:
             return False
         try:
-            valid_keys = {node["key"] for node in build_relationship_graph(self.doc)["nodes"]}
+            valid_keys = {node["key"] for node in self._relationship_graph()["nodes"]}
             positions = {key: value for key, value in self.graph_positions.items() if key in valid_keys}
             state = self._capture_editor_state()
             save_view_state(
@@ -1450,7 +1514,7 @@ class Is2Studio(tk.Tk):
         if self.notebook.select() == str(self.matrix_page):
             self._refresh_matrix()
         if self.doc is not None and self.path is not None:
-            self._save_graph_view_state()
+            self._request_view_state_save()
 
     def _on_tree_selection_changed(self, _event=None):
         """Keep the table and the visual editor focused on the same action."""
@@ -1459,7 +1523,7 @@ class Is2Studio(tk.Tk):
             if selected and self.course_panel.selected_id != selected:
                 self.course_panel.select_action(selected)
         if self.doc is not None and self.path is not None:
-            self._save_graph_view_state()
+            self._request_view_state_save()
 
     def _graph_auto_layout(self):
         if self.doc is None:
@@ -1535,6 +1599,20 @@ class Is2Studio(tk.Tk):
                 positions[node["key"]] = (columns[group_key][0], top + index * row_step)
         return columns, grouped, positions
 
+    def _relationship_graph(self):
+        """Relationship report of the current document, rebuilt only after edits.
+
+        Dragging a node redraws the graph many times per second without
+        changing the project; the report is read-only for the view.
+        """
+        key = (self.doc, getattr(self, '_doc_revision', None))
+        cached = getattr(self, '_relationship_graph_cache', None)
+        if cached is not None and cached[0][0] is key[0] and cached[0][1] == key[1] and key[1] is not None:
+            return cached[1]
+        graph = build_relationship_graph(self.doc)
+        self._relationship_graph_cache = (key, graph)
+        return graph
+
     def _refresh_graph(self):
         canvas = getattr(self, "graph_canvas", None)
         if canvas is None:
@@ -1550,7 +1628,7 @@ class Is2Studio(tk.Tk):
             return
 
         kind_map = {tr("Все"): "all", "SCBinaryLink (cs)": "scbinarylink", "AIEBinaryLink (spz)": "aie_binary_link", "AEContentLink (content)": "ae_content_link", "Parameter → Object": "parameter_object"}
-        graph = build_relationship_graph(self.doc)
+        graph = self._relationship_graph()
         visible = filter_relationship_graph(graph, relation_kind=kind_map.get(self.graph_filter_var.get(), "all"), query=self.graph_search_var.get())
         nodes, edges = visible["nodes"], visible["edges"]
         self.graph_nodes_by_key = {node["key"]: node for node in nodes}
@@ -1622,8 +1700,8 @@ class Is2Studio(tk.Tk):
                     width=max(1, 3 * zoom if selected else 1.4 * zoom), tags=tags,
                 )
                 self.graph_item_ids[node["key"]] = rect
-                title = '\n'.join(textwrap.wrap(node.get('label', node['key']), width=38, max_lines=2, placeholder='…'))
-                detail = textwrap.shorten(node.get('detail', ''), width=48, placeholder='…')
+                title = _graph_node_title(node.get('label', node['key']))
+                detail = _graph_node_detail(node.get('detail', ''))
                 canvas.create_text(x0 + 9 * zoom, y0 + 7 * zoom, anchor="nw", width=node_width - 18 * zoom,
                                    text=title,
                                    font=("TkDefaultFont", max(7, int(10 * zoom)), "bold"), fill=palette['ink'] if dark else '#18212f', tags=tags)
@@ -3110,6 +3188,7 @@ class Is2Studio(tk.Tk):
         # Localize controlled status/history templates after their IDs and
         # counters have been formatted by the operation handler.
         message = tr_dynamic(message)
+        self._doc_revision += 1
         current = self._document_snapshot()
         previous = self._last_history_snapshot
         if current is not None:
@@ -3132,6 +3211,7 @@ class Is2Studio(tk.Tk):
         restored = ProjectDocument.from_bytes(snapshot)
         restored.source_path = current_path
         self.doc = restored
+        self._doc_revision += 1
         self._last_history_snapshot = snapshot
         self.dirty = self._saved_fingerprint is None or self._fingerprint(snapshot) != self._saved_fingerprint
         self.refresh_all()
@@ -3199,6 +3279,7 @@ class Is2Studio(tk.Tk):
             return
         try:
             d = dialog.result
+            self._flush_view_state_save()
             self.doc = create_course_project(d["name"], d["root"], author=d["author"], symbol=d["symbol"])
             self.path = None
             self.graph_positions.clear(); self.graph_selected_key = None; self.graph_zoom = 1.0
@@ -3228,6 +3309,7 @@ class Is2Studio(tk.Tk):
             return
         try:
             values = dialog.result
+            self._flush_view_state_save()
             self.doc = ProjectDocument.new_empty(
                 values["project_name"], info=values["project_info"],
                 user_name=values["user_name"], user_info=values["user_info"],
@@ -3250,6 +3332,7 @@ class Is2Studio(tk.Tk):
             return
         try:
             doc = ProjectDocument.load(target)
+            self._flush_view_state_save()
             self.doc = doc
             self.path = Path(target)
             self.graph_selected_key = None
@@ -3405,6 +3488,7 @@ class Is2Studio(tk.Tk):
             ):
                 return
             try:
+                self._flush_view_state_save()
                 restored_path, rollback = restore_project_backup(record.path, self.path, overwrite=True, backup_existing=True)
                 self.doc = ProjectDocument.load(restored_path)
                 self.history.clear()
@@ -3695,10 +3779,16 @@ class Is2Studio(tk.Tk):
     def refresh_all(self):
         if self.doc is None:
             return
+        # Derived views are rebuilt from the document after every refresh.
+        self._relationship_graph_cache = None
         self._refresh_metadata()
         self._refresh_actions()
         self.course_panel.refresh()
-        self._refresh_matrix()
+        # The matrix tab refreshes itself whenever it is opened.
+        if self.notebook.select() == str(self.matrix_page):
+            self._refresh_matrix()
+        else:
+            self._matrix_hide_tooltip()
         self._refresh_or_defer('diagram', self.diagram_canvas, self._refresh_diagram)
         self._refresh_params()
         self._refresh_objects()
@@ -4495,6 +4585,87 @@ class Is2Studio(tk.Tk):
         window.bind('<Escape>', lambda _event: window.destroy())
         window.grab_set()
         window.focus_set()
+
+    # ---- modules and updates ------------------------------------------------
+    def show_modules(self):
+        ModulesDialog(self)
+
+    def _load_modules(self):
+        try:
+            self.loaded_modules = pz_modules.load_modules(self, pz_modules.installed_modules())
+        except OSError as exc:
+            self.status.set(tr("Ошибка модуля") + f": {exc}")
+            return
+        failed = [m.manifest.name for m in self.loaded_modules if m.enabled and m.error]
+        if failed:
+            self.status.set(tr("Ошибка модуля") + ": " + ", ".join(failed))
+
+    def module_command_added(self, module, label, callback):
+        if not self._module_menu_separator:
+            self.modules_menu.add_separator()
+            self._module_menu_separator = True
+
+        def run():
+            try:
+                callback()
+            except Exception as exc:  # module errors must not close the editor
+                messagebox.showerror(tr("Ошибка модуля"), f"{module.manifest.name}: {type(exc).__name__}: {exc}", parent=self)
+        self.modules_menu.add_command(label=label, command=run)
+
+    def module_document(self):
+        return self.doc
+
+    def module_project_path(self):
+        return self.path
+
+    def module_apply_change(self, message, change):
+        if self.doc is None:
+            raise RuntimeError(tr("Сначала откройте проект."))
+        snapshot = self.doc.to_bytes()
+        try:
+            change(self.doc)
+        except Exception:
+            self.doc = ProjectDocument.from_bytes(snapshot)
+            self.doc.source_path = str(self.path) if self.path else None
+            self.refresh_all()
+            raise
+        self._mark_dirty(message)
+        self.refresh_all()
+
+    def module_show_text(self, title, text):
+        window = tk.Toplevel(self)
+        window.title(title)
+        window.geometry("760x520")
+        outer = ttk.Frame(window)
+        outer.pack(fill="both", expand=True)
+        frame = ttk.Frame(outer, padding=12)
+        frame.pack(fill="both", expand=True)
+        scroll = ttk.Scrollbar(frame)
+        scroll.pack(side="right", fill="y")
+        box = tk.Text(frame, wrap="word", yscrollcommand=scroll.set)
+        box.pack(fill="both", expand=True)
+        scroll.config(command=box.yview)
+        box.insert("1.0", text)
+        box.configure(state="disabled")
+        ttk.Button(outer, text=tr("Закрыть"), command=window.destroy).pack(anchor="e", padx=12, pady=(0, 12))
+        window.bind("<Escape>", lambda _e: window.destroy())
+        apply_theme(self, self.theme_name.get())
+
+    def confirm_close_for_update(self) -> bool:
+        """Offer to save before the installer replaces the program."""
+        return not self.dirty or self._save_prompt()
+
+    def hand_over_to_installer(self, installer_path):
+        # The project may have been edited while the update was downloading.
+        if self.dirty and not self._save_prompt():
+            return
+        try:
+            installation.start_installer(installer_path)
+        except (OSError, installation.InstallationError) as exc:
+            messagebox.showerror(tr("Обновления"), tr("Не удалось установить обновление: {error}").format(error=exc), parent=self)
+            return
+        self.dirty = False
+        self._quit()
 
     def _quit(self):
         if self.dirty and not self._save_prompt():
