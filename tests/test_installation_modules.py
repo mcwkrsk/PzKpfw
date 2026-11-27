@@ -15,7 +15,7 @@ from is2_re import __version__, installation, modules
 def _module_zip(folder, ident="demo-mod", package="demo_mod", version="1.0.0", body=None, extra=None, manifest=None):
     path = Path(folder) / f"{ident}-{version}.zip"
     data = manifest or {"id": ident, "name": "Demo", "version": version, "entry": f"{package}:register",
-                        "min_app_version": "9.10.0", "description": "test"}
+                        "min_app_version": __version__, "description": "test"}
     with zipfile.ZipFile(path, "w") as archive:
         archive.writestr("module.json", json.dumps(data))
         archive.writestr(f"{package}/__init__.py", body or
